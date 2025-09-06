@@ -142,11 +142,6 @@
   outline: none;
 }
 
-.form-input:focus {
-  ring: 2px;
-  ring-color: #3b82f6;
-}
-
 /* Utility classes */
 .text-center {
   text-align: center;
