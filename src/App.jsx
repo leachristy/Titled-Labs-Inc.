@@ -63,13 +63,12 @@ export default function App() {
   )
 
   const HomePage = () => (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pt-24 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pt-60 px-4">
       <div className="max-w-4xl mx-auto text-center">
         <img 
           src={logoImage} 
           alt="Untilted Logo" 
-          className="w-36
-           h-32 object-contain shadow-lg rounded-full mx-auto mb-8"
+          className="w-36 h-32 object-contain shadow-lg rounded-full mx-auto mb-8"
           style={{filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 1))' }}
         />
         <h1 className="text-5xl font-extrabold text-gray-900 mb-6">
@@ -148,7 +147,7 @@ export default function App() {
                 <img 
                   src={member.image} 
                   alt={member.name}
-                  className="w-26 h-24 full mx-auto mb-4"
+                  className="w-25 h-26 object-contain square-full mx-auto mb-4"
                 />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{member.name}</h3>
                 <p className="text-blue-500 font-medium mb-3">{member.role}</p>
