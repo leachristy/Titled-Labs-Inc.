@@ -18,10 +18,10 @@ export default function App() {
           <div className="flex items-center space-x-3">
             <img 
               src={logoImage} 
-              alt="Tilted Logo" 
+              alt="Untilted Logo" 
               className="w-15 h-10 object-contain"
             />
-            <span className="text-xl font-bold text-gray-800">Tilted Lab Inc.</span>
+            <span className="text-xl font-bold text-gray-800">Untilted Lab Inc.</span>
           </div>
           <div className="flex space-x-6">
             <button 
@@ -65,11 +65,11 @@ export default function App() {
       <div className="max-w-4xl mx-auto text-center">
         <img 
           src={logoImage} 
-          alt="Tilted Logo" 
+          alt="Untilted Logo" 
           className="logo-image"
         />
         <h1 className="text-5xl font-extrabold text-gray-900 mb-6">
-          Welcome to Tilted Lab Inc.
+          Welcome to Untilted Lab Inc.
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
           Your journey to mental wellness starts here. Connect with licensed therapists, 
@@ -97,8 +97,8 @@ export default function App() {
     const team = [
       {
         name: "Lea Christy",
-        role: "CEO of Tilted Lab Inc",
-        bio: "Let's go Tilted Lab!!!",
+        role: "CEO of Untilted Lab Inc",
+        bio: "Let's go Untilted Lab!!!",
         image: leaImage
       },
       {
@@ -131,7 +131,7 @@ export default function App() {
       <div className="min-h-screen bg-gray-50 pt-30 px-20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-5">About Tilted Lab Inc.</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-5">About Untilted Lab Inc.</h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               We're dedicated to making mental health care accessible, affordable, and effective. 
               Our team of licensed professionals is here to support you on your wellness journey.
@@ -302,7 +302,7 @@ export default function App() {
               </div>
               <div>
                 <h3 className="font-medium text-gray-900">Email</h3>
-                <p className="text-gray-600">support@tilted.com</p>
+                <p className="text-gray-600">support@Untilted.com</p>
               </div>
               <div>
                 <h3 className="font-medium text-gray-900">Crisis Hotline</h3>
