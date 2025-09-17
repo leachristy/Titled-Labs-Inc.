@@ -1,6 +1,7 @@
-import { useState } from "react";
 import "./App.css";
 import NavBar from "./components/NavBar";
+import { Routes, Route } from "react-router-dom";
+
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Community from "./pages/Community";
@@ -8,23 +9,16 @@ import AIChat from "./pages/AIChat";
 import Contact from "./pages/Contact";
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState("home");
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case "home": return <Home onNavigate={setCurrentPage} />;
-      case "about": return <About />;
-      case "community": return <Community />;
-      case "ai-chat": return <AIChat />;
-      case "contact": return <Contact />;
-      default: return <Home onNavigate={setCurrentPage} />;
-    }
-  };
-
   return (
     <div className="min-h-screen">
-      <NavBar currentPage={currentPage} onNavigate={setCurrentPage} />
-      {renderPage()}
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/ai-chat" element={<AIChat />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
     </div>
   );
 }
