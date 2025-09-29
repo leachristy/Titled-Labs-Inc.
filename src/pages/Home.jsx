@@ -1,6 +1,9 @@
 import logoImage from "../assets/logo.png";
+import { useNavigate } from "react-router";
 
 export default function Home({ onNavigate }) {
+  const navigate = useNavigate();
+
   return (
     <>
       <title>Home</title>
@@ -18,13 +21,13 @@ export default function Home({ onNavigate }) {
           </p>
           <div className="button-group">
             <button
-              onClick={() => onNavigate("ai-chat")}
+              onClick={() => navigate("/ai-chat")}
               className="primary-button blue"
             >
               Start AI Chat
             </button>
             <button
-              onClick={() => onNavigate("community")}
+              onClick={() => navigate("/community")}
               className="primary-button green"
             >
               Join Community
