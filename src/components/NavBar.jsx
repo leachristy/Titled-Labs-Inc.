@@ -7,16 +7,18 @@ export default function NavBar() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <img
-              src={logoImage}
-              alt="Untilted Logo"
-              className="w-15 h-10 object-contain"
-            />
-            <span className="text-xl font-bold text-gray-800">
-              Untilted Lab Inc.
-            </span>
-          </div>
+          <NavLink to="/">
+            <div className="flex items-center space-x-3">
+              <img
+                src={logoImage}
+                alt="Untilted Logo"
+                className="w-15 h-10 object-contain"
+              />
+              <span className="text-xl font-bold text-gray-800">
+                Untilted Lab Inc.
+              </span>
+            </div>
+          </NavLink>
 
           {/* Navigation links */}
           <div className="flex space-x-6">
