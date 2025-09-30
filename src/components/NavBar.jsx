@@ -55,6 +55,14 @@ export default function NavBar() {
               AI Chat
             </NavLink>
             <NavLink
+              to="/users"
+              className={({ isActive }) =>
+                isActive ? "text-blue-600 font-semibold" : "text-gray-700"
+              }
+            >
+              Users
+            </NavLink>
+            <NavLink
               to="/contact"
               className={({ isActive }) =>
                 isActive ? "text-blue-600 font-semibold" : "text-gray-700"
