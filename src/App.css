@@ -1,30 +1,42 @@
 /* Global styles */
 .page-container {
   min-height: 100vh;
-  padding-top: 1.5rem; /* pt-24 */
+  padding-top: 6rem; /* pt-24 */
   padding-left: 1rem;
   padding-right: 1rem;
 }
 
 .page-container.home-page {
   background: linear-gradient(to bottom, #dbeafe, #ffffff);
-  padding-top: 15rem; /* pt-60 */
 }
 
 .page-container.gray-bg {
   background-color: #f9fafb;
 }
 
+/* Hero gradient for home page */
+.hero-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #9e97a4 100%);
+}
+
 /* Navigation styles */
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #1f2937;
+}
+
 .nav-button {
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   transition: all 0.2s ease-in-out;
   color: #4b5563;
+  font-weight: 500;
 }
 
 .nav-button:hover {
   color: #3b82f6;
+  background-color: #f3f4f6;
 }
 
 .nav-button.active {
@@ -39,6 +51,8 @@
   border-radius: 0.5rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
 }
 
 .primary-button.blue {
@@ -48,6 +62,7 @@
 
 .primary-button.blue:hover {
   background-color: #2563eb;
+  transform: translateY(-1px);
 }
 
 .primary-button.green {
@@ -57,14 +72,21 @@
 
 .primary-button.green:hover {
   background-color: #059669;
+  transform: translateY(-1px);
 }
 
 /* Card styles */
 .card {
   background-color: white;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .team-card {
@@ -74,7 +96,7 @@
 /* Chat styles */
 .chat-container {
   background-color: white;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   height: 24rem;
   margin-bottom: 1rem;
@@ -86,6 +108,7 @@
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .chat-avatar {
@@ -97,13 +120,15 @@
   justify-content: center;
   color: white;
   font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .chat-bubble {
   background-color: #f3f4f6;
-  border-radius: 0.5rem;
-  padding: 0.75rem;
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
   max-width: 18rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .chat-bubble.ai {
@@ -114,23 +139,14 @@
   background-color: #e5e7eb;
 }
 
-/* Profile image styles */
-.profile-image {
-  width: 6rem;
-  height: 6rem;
-  border-radius: 50%;
-  margin: 0 auto 1rem auto;
-  object-fit: cover;
-}
-
 .logo-image {
-  width: 9rem;
-  height: 8rem;
+  width: 10rem;
+  height: 10rem;
   object-fit: contain;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   border-radius: 50%;
   margin: 0 auto 2rem auto;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 1));
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
 }
 
 /* Form styles */
@@ -138,11 +154,17 @@
   width: 100%;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem;
   outline: none;
+  transition: all 0.2s ease-in-out;
 }
 
-/* Utility classes */
+.form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Layout utilities */
 .text-center {
   text-align: center;
 }
@@ -157,12 +179,14 @@
   margin: 0 auto;
 }
 
+/* Grid layouts */
 .grid-team {
   display: grid;
   gap: 2rem;
+  grid-template-columns: 1fr;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .grid-team {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -177,6 +201,7 @@
 .grid-contact {
   display: grid;
   gap: 2rem;
+  grid-template-columns: 1fr;
 }
 
 @media (min-width: 768px) {
@@ -185,16 +210,52 @@
   }
 }
 
+/* Button group responsive layout */
 .button-group {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   justify-content: center;
+  align-items: center;
 }
 
 @media (min-width: 640px) {
   .button-group {
     flex-direction: row;
+  }
+}
+
+/* Responsive spacing */
+@media (max-width: 768px) {
+  .page-container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .logo-image {
+    width: 8rem;
+    height: 8rem;
+  }
+}
+
+/* Mobile navigation specific styles */
+@media (max-width: 1024px) {
+  .mobile-menu {
+    display: block;
+  }
+  
+  .desktop-menu {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-menu {
+    display: none;
+  }
+  
+  .desktop-menu {
+    display: flex;
   }
 }
 
