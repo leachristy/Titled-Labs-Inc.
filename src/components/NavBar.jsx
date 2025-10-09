@@ -97,6 +97,19 @@ export default function NavBar() {
             >
               Contact
             </NavLink>
+
+            <NavLink
+              to="/login"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-md text-sm font-medium transition ${
+                  isActive 
+                    ? "bg-blue-500 text-white" 
+                    : "text-gray-700 hover:text-blue-500"
+                }`
+              }
+            >
+              Login
+            </NavLink>
           </div>
 
           {/* Mobile Hamburger Menu Button - Visible on tablet and mobile */}

@@ -1,3 +1,13 @@
+
+
+:root {
+  --pink-color: #dfd2d5;
+  --purple-color: #abaac0;
+  --blue-color: #8090b0;
+  --dark-blue-color: #646f89;
+  --darker-blue-color: #373e4f;
+}
+
 /* Global styles */
 .page-container {
   min-height: 100vh;
