@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 
-export const Login = () => {
+export default function Login() {
     const navigate = useNavigate();
     const handleSignIn = () => {
         console.log("Sign in clicked");
@@ -30,6 +30,12 @@ export const Login = () => {
             onClick={handleSignIn}
             className='w-full bg-[var(--blue-color)] text-white p-2 rounded mb-2 hover:bg-[var(--dark-blue-color)] transition'>
                 sign in
+            </button>
+
+            <button 
+            onClick={() => navigate("/signup")}
+            className="w-full bg-[var(--blue-color)] text-white p-2 rounded mb-2 hover:bg-[var(--dark-blue-color)] transition">
+            sign up with email
             </button>
 
             <button className="w-full bg-[var(--blue-color)] text-white p-2 rounded hover:bg-[var(--dark-blue-color)] transition">
