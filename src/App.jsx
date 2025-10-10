@@ -16,26 +16,52 @@ import Signup from "./pages/Signup";
 import Dashboard from "./webapp-pages/Dashboard";
 import AIChat from "./webapp-pages/AIChat";
 import Community from "./webapp-pages/Community";
+import { AuthContextProvider } from "./contexts/AuthContext";
+import Protected from "./components/Protected";
 
 export default function App() {
   return (
     <ThemeProvider>
       <div className="min-h-screen">
         <ThemeToggle />
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<UnifiedHome />} />
-          <Route path="/home" element={<UnifiedHome />} />
-          <Route path="/home-earthy" element={<Home />} />
-          <Route path="/home-cool" element={<Home2 />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/aichat" element={<AIChat />} />
-          <Route path="/community" element={<Community />} />
-        </Routes>
+        <AuthContextProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<UnifiedHome />} />
+            <Route path="/home" element={<UnifiedHome />} />
+            <Route path="/home-earthy" element={<Home />} />
+            <Route path="/home-cool" element={<Home2 />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/contact" element={<Contact />} />
+
+            <Route
+              path="/dashboard"
+              element={
+                <Protected>
+                  <Dashboard />
+                </Protected>
+              }
+            />
+            <Route
+              path="/aichat"
+              element={
+                <Protected>
+                  <AIChat />
+                </Protected>
+              }
+            />
+            <Route
+              path="/community"
+              element={
+                <Protected>
+                  <Community />
+                </Protected>
+              }
+            />
+          </Routes>
+        </AuthContextProvider>
       </div>
     </ThemeProvider>
   );
