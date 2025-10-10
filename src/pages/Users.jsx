@@ -29,35 +29,35 @@ export default function Users() {
 
   return (
     <>
-      <title>Users</title>
+      <title>Users - Untilted | Mental Wellness</title>
 
       {/* push content down from fixed navbar */}
-      <div className="min-h-screen pt-32">
+      <div className="min-h-screen pt-32 bg-cream-100">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="mb-8">
             <button
               onClick={() => setVisible((v) => !v)}
-              className="inline-block px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition"
+              className="btn-primary"
             >
               {visible ? "Hide Users" : "Show Users"}
             </button>
           </div>
 
-          {usersLoading && <p className="text-gray-500">Loading…</p>}
+          {usersLoading && <p className="text-brown-600">Loading…</p>}
           {usersError ? (
-            <p className="text-red-500 font-medium">{usersError.message}</p>
+            <p className="text-rust-600 font-medium">{usersError.message}</p>
           ) : (
             visible && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
                 {users.map((user) => (
                   <div
                     key={user.id}
-                    className="bg-white shadow-md rounded-lg p-4 text-left border border-gray-200"
+                    className="card text-left"
                   >
-                    <h3 className="text-lg font-bold text-gray-800">
+                    <h3 className="text-lg font-bold text-brown-800">
                       {user.first_name} {user.last_name}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-brown-600">
                       ID: {user.ID ?? user.id}
                     </p>
                   </div>

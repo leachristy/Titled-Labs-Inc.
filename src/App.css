@@ -1,4 +1,11 @@
 /* Global styles */
+body {
+  background-color: #f5f1eb; /* cream-100 */
+  color: #693d31; /* brown-800 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .page-container {
   min-height: 100vh;
   padding-top: 6rem; /* pt-24 */

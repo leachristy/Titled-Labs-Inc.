@@ -4,14 +4,14 @@ import { team } from "../data/team";
 export default function About() {
   return (
     <>
-      <title>About</title>
-      <div className="min-h-screen bg-gray-50 pt-30 px-20">
+      <title>About - Untilted | Mental Wellness</title>
+      <div className="min-h-screen bg-cream-100 pt-30 px-20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-5">
+            <h1 className="text-heading mb-5">
               About Untilted Lab Inc.
             </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-subheading">
               We're dedicated to making mental health care accessible,
               affordable, and effective. Our team of licensed professionals is
               here to support you on your wellness journey.

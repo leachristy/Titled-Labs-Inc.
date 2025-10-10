@@ -1,36 +1,399 @@
-import logoImage from "../assets/logo.png";
 import { useNavigate } from "react-router";
+import HeroSection from "../components/home/HeroSection";
+import StatsBar from "../components/home/StatsBar";
+import FeaturesGrid from "../components/home/FeaturesGrid";
+import DetailedFeature from "../components/home/DetailedFeature";
+import Testimonial from "../components/home/Testimonial";
+import CTASection from "../components/home/CTASection";
 
 export default function Home() {
   const navigate = useNavigate();
 
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
   return (
     <>
-      <title>Home</title>
+      <title>Home - Untilted | Mental Wellness App</title>
 
-      <div className="page-container home-page">
-        <div className="max-w-4xl mx-auto text-center">
-          <img src={logoImage} alt="Untilted Logo" className="logo-image" />
-          <h1 className="text-5xl font-extrabold text-gray-900 mb-6">
-            Welcome to Untilted Lab Inc.
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Your journey to mental wellness starts here. Connect with licensed
-            therapists, join supportive communities, and access AI-powered
-            mental health resources.
-          </p>
-          <div className="button-group">
-            <button
-              onClick={() => navigate("/ai-chat")}
-              className="primary-button blue"
-            >
-              Start AI Chat
-            </button>
-            <button
-              onClick={() => navigate("/community")}
-              className="primary-button green"
-            >
-              Join Community
+      {/* Hero Section */}
+      <HeroSection onNavigate={handleNavigation} />
+
+      {/* Stats Bar */}
+      <StatsBar />
+
+      {/* Main Features Grid */}
+      <FeaturesGrid />
+
+      {/* Detailed Feature 1 - Therapy & Community */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <DetailedFeature
+            badge="PROFESSIONAL SUPPORT"
+            title="Connect with licensed therapists and supportive communities"
+            description="Join specialized groups, attend sessions, and access evidence-based therapy tools—all in one secure platform."
+            linkText="Learn more about our team"
+            onNavigate={() => handleNavigation("/about")}
+          >
+            {/* Therapy Portal Mockup */}
+            <div className="visual-frame">
+              <div className="visual-card">
+                <div className="mock-portal-header">
+                  <div className="mock-portal-avatar bg-rust-500">
+                    <span>DR</span>
+                  </div>
+                  <div>
+                    <div className="mock-portal-title">Dr. Sarah Mitchell</div>
+                    <div className="mock-portal-subtitle">
+                      Licensed Therapist • CBT Specialist
+                    </div>
+                  </div>
+                </div>
+                <div className="mock-portal-items">
+                  <div className="mock-portal-item">
+                    <span className="text-sm text-brown-800">Next Session</span>
+                    <span className="font-semibold text-rust-500">
+                      Tomorrow, 3:00 PM
+                    </span>
+                  </div>
+                  <div className="mock-portal-item">
+                    <span className="text-sm text-brown-800">
+                      Total Sessions
+                    </span>
+                    <span className="font-semibold text-brown-800">
+                      12 completed
+                    </span>
+                  </div>
+                  <div className="mock-portal-item">
+                    <span className="text-sm text-brown-800">
+                      Progress Notes
+                    </span>
+                    <span className="font-semibold text-terracotta-400">
+                      8 entries
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DetailedFeature>
+
+          {/* Detailed Feature 2 - Contact & Support */}
+          <DetailedFeature
+            badge="WELLNESS SUPPORT"
+            title="Get personalized support for your mental wellness journey"
+            description="Available support to provide coping strategies, mindfulness exercises, and emotional support for your journey."
+            linkText="Contact us today"
+            onNavigate={() => handleNavigation("/contact")}
+            reverse
+          >
+            {/* AI Chat Mockup */}
+            <div className="visual-frame">
+              <div className="visual-card space-y-4">
+                <div className="mock-chat-message">
+                  <div className="mock-chat-avatar bg-terracotta-400">AI</div>
+                  <div className="mock-chat-bubble border-terracotta-400 bg-cream-50">
+                    <p>
+                      I understand you're feeling anxious about tomorrow. Let's
+                      try a grounding exercise together.
+                    </p>
+                  </div>
+                </div>
+                <div className="mock-chat-message">
+                  <div className="mock-chat-avatar bg-rust-500">ME</div>
+                  <div className="mock-chat-bubble border-rust-400 bg-white">
+                    <p>That would be helpful, thank you.</p>
+                  </div>
+                </div>
+                <div className="mock-chat-message">
+                  <div className="mock-chat-avatar bg-terracotta-400">AI</div>
+                  <div className="mock-chat-bubble border-terracotta-400 bg-cream-50">
+                    <p>
+                      Great. Let's start by naming 5 things you can see right
+                      now...
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DetailedFeature>
+
+          {/* Detailed Feature 3 - Community */}
+          <DetailedFeature
+            badge="PEER SUPPORT"
+            title="Find your community and share your journey"
+            description="Join support groups tailored to your needs. Connect with others who understand what you're going through."
+            linkText="Meet our team"
+            onNavigate={() => handleNavigation("/about")}
+          >
+            {/* Community Groups Mockup */}
+            <div className="visual-frame">
+              <div className="space-y-3">
+                <div className="mock-group-item">
+                  <div className="mock-group-avatar bg-rust-500">AA</div>
+                  <div className="flex-1">
+                    <div className="mock-group-title">
+                      Anxiety & Stress Management
+                    </div>
+                    <div className="mock-group-members">
+                      2,453 members • 15 active now
+                    </div>
+                  </div>
+                </div>
+                <div className="mock-group-item">
+                  <div className="mock-group-avatar bg-terracotta-400">DM</div>
+                  <div className="flex-1">
+                    <div className="mock-group-title">
+                      Depression & Mood Support
+                    </div>
+                    <div className="mock-group-members">
+                      1,847 members • 8 active now
+                    </div>
+                  </div>
+                </div>
+                <div className="mock-group-item">
+                  <div className="mock-group-avatar bg-tan-300">CR</div>
+                  <div className="flex-1">
+                    <div className="mock-group-title">Coping & Resilience</div>
+                    <div className="mock-group-members">
+                      3,102 members • 22 active now
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DetailedFeature>
+        </div>
+      </section>
+
+      {/* Testimonial Section */}
+      <Testimonial />
+
+      {/* Who We Serve Section */}
+      <div className="py-20 bg-cream-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-brown-800 mb-4">
+              Who we're for
+            </h2>
+            <p className="text-base text-brown-700 max-w-2xl mx-auto">
+              Untilted supports individuals at every stage of their mental
+              wellness journey.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Individual Users */}
+            <div className="card p-8 hover:border-rust-400 transition-colors duration-200">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-12 h-12 bg-rust-500 flex items-center justify-center flex-shrink-0">
+                  <svg
+                    className="w-7 h-7 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-brown-800 mb-2">
+                    Individual Users
+                  </h3>
+                  <p className="text-brown-700 text-sm leading-relaxed">
+                    Start your personal mental wellness journey with
+                    comprehensive tools and support designed for you.
+                  </p>
+                </div>
+              </div>
+              <ul className="space-y-3 mb-6 pl-1">
+                <li className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-rust-500 rounded-full mt-2"></div>
+                  <span className="text-brown-700 text-sm">
+                    24/7 AI support and resources
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-rust-500 rounded-full mt-2"></div>
+                  <span className="text-brown-700 text-sm">
+                    Access to supportive communities
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-rust-500 rounded-full mt-2"></div>
+                  <span className="text-brown-700 text-sm">
+                    Progress tracking and insights
+                  </span>
+                </li>
+              </ul>
+              <button
+                onClick={() => navigate("/contact")}
+                className="text-rust-500 font-medium hover:text-rust-600 inline-flex items-center gap-2 group"
+              >
+                Get started
+                <svg
+                  className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Therapists & Practices */}
+            <div className="card p-8 hover:border-rust-400 transition-colors duration-200">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-12 h-12 bg-terracotta-400 flex items-center justify-center flex-shrink-0">
+                  <svg
+                    className="w-7 h-7 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-brown-800 mb-2">
+                    Therapists & Practices
+                  </h3>
+                  <p className="text-brown-700 text-sm leading-relaxed">
+                    Streamline your practice management and provide better care
+                    with our comprehensive platform.
+                  </p>
+                </div>
+              </div>
+              <ul className="space-y-3 mb-6 pl-1">
+                <li className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-terracotta-400 rounded-full mt-2"></div>
+                  <span className="text-brown-700 text-sm">
+                    Automated scheduling and billing
+                  </span>
+                </li>
+              </ul>
+              <button
+                onClick={() => navigate("/about")}
+                className="text-terracotta-400 font-medium hover:text-terracotta-500 inline-flex items-center gap-2 group"
+              >
+                Learn more
+                <svg
+                  className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* CTA Section */}
+      <CTASection onNavigate={handleNavigation} />
+
+      {/* Resources Section */}
+      <div className="py-20 bg-cream-100 border-t border-tan-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-semibold text-brown-800 mb-4">
+              More from Untilted
+            </h2>
+            <p className="text-base text-brown-700">
+              Explore resources designed to support your mental wellness journey
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Resource 1 */}
+            <div className="card overflow-hidden hover:border-rust-400 transition-colors duration-200 cursor-pointer group">
+              <div className="h-48 bg-rust-400"></div>
+              <div className="p-6">
+                <div className="inline-block px-3 py-1 bg-cream-200 text-brown-800 text-xs font-semibold tracking-wider mb-3">
+                  ARTICLE
+                </div>
+                <h3 className="text-lg font-semibold text-brown-800 mb-2 group-hover:text-rust-500 transition-colors">
+                  5 ways to manage daily stress
+                </h3>
+                <p className="text-brown-600 text-sm leading-relaxed">
+                  Discover practical techniques to reduce stress and improve
+                  your daily well-being.
+                </p>
+              </div>
+            </div>
+
+            {/* Resource 2 */}
+            <div className="card overflow-hidden hover:border-rust-400 transition-colors duration-200 cursor-pointer group">
+              <div className="h-48 bg-terracotta-400"></div>
+              <div className="p-6">
+                <div className="inline-block px-3 py-1 bg-cream-200 text-brown-800 text-xs font-semibold tracking-wider mb-3">
+                  GUIDE
+                </div>
+                <h3 className="text-lg font-semibold text-brown-800 mb-2 group-hover:text-terracotta-400 transition-colors">
+                  Getting started with therapy
+                </h3>
+                <p className="text-brown-600 text-sm leading-relaxed">
+                  Your complete guide to beginning therapy and what to expect.
+                </p>
+              </div>
+            </div>
+
+            {/* Resource 3 */}
+            <div className="card overflow-hidden hover:border-rust-400 transition-colors duration-200 cursor-pointer group">
+              <div className="h-48 bg-tan-300"></div>
+              <div className="p-6">
+                <div className="inline-block px-3 py-1 bg-cream-200 text-brown-800 text-xs font-semibold tracking-wider mb-3">
+                  TEMPLATE
+                </div>
+                <h3 className="text-lg font-semibold text-brown-800 mb-2 group-hover:text-tan-400 transition-colors">
+                  Mindfulness journal template
+                </h3>
+                <p className="text-brown-600 text-sm leading-relaxed">
+                  Track your thoughts and emotions with our free journal
+                  template.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-10">
+            <button className="text-rust-500 font-medium hover:text-rust-600 inline-flex items-center gap-2 group">
+              View all resources
+              <svg
+                className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
             </button>
           </div>
         </div>

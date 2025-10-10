@@ -6,7 +6,7 @@ export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-lg fixed top-0 w-full z-50">
+    <nav className="bg-cream-100 shadow-md fixed top-0 w-full z-50 border-b border-tan-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
@@ -17,7 +17,7 @@ export default function NavBar() {
                 alt="Untilted Logo"
                 className="w-12 h-10 object-contain"
               />
-              <span className="text-xl font-bold text-gray-800">
+              <span className="text-xl font-bold text-brown-800">
                 Untilted Lab Inc.
               </span>
             </div>
@@ -30,8 +30,8 @@ export default function NavBar() {
               className={({ isActive }) =>
                 `px-3 py-2 rounded-md text-sm font-medium transition ${
                   isActive 
-                    ? "bg-blue-500 text-white" 
-                    : "text-gray-700 hover:text-blue-500"
+                    ? "bg-rust-500 text-white" 
+                    : "text-brown-700 hover:text-rust-500"
                 }`
               }
             >
@@ -42,44 +42,20 @@ export default function NavBar() {
               className={({ isActive }) =>
                 `px-3 py-2 rounded-md text-sm font-medium transition ${
                   isActive 
-                    ? "bg-blue-500 text-white" 
-                    : "text-gray-700 hover:text-blue-500"
+                    ? "bg-rust-500 text-white" 
+                    : "text-brown-700 hover:text-rust-500"
                 }`
               }
             >
               About
             </NavLink>
             <NavLink
-              to="/community"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md text-sm font-medium transition ${
-                  isActive 
-                    ? "bg-blue-500 text-white" 
-                    : "text-gray-700 hover:text-blue-500"
-                }`
-              }
-            >
-              Community
-            </NavLink>
-            <NavLink
-              to="/ai-chat"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md text-sm font-medium transition ${
-                  isActive 
-                    ? "bg-blue-500 text-white" 
-                    : "text-gray-700 hover:text-blue-500"
-                }`
-              }
-            >
-              AI Chat
-            </NavLink>
-            <NavLink
               to="/users"
               className={({ isActive }) =>
                 `px-3 py-2 rounded-md text-sm font-medium transition ${
                   isActive 
-                    ? "bg-blue-500 text-white" 
-                    : "text-gray-700 hover:text-blue-500"
+                    ? "bg-rust-500 text-white" 
+                    : "text-brown-700 hover:text-rust-500"
                 }`
               }
             >
@@ -90,8 +66,8 @@ export default function NavBar() {
               className={({ isActive }) =>
                 `px-3 py-2 rounded-md text-sm font-medium transition ${
                   isActive 
-                    ? "bg-blue-500 text-white" 
-                    : "text-gray-700 hover:text-blue-500"
+                    ? "bg-rust-500 text-white" 
+                    : "text-brown-700 hover:text-rust-500"
                 }`
               }
             >
@@ -103,7 +79,7 @@ export default function NavBar() {
           <div className="lg:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-md text-gray-700 hover:text-blue-500 focus:outline-none"
+              className="p-2 rounded-md text-brown-700 hover:text-rust-500 focus:outline-none"
               aria-label="Toggle menu"
             >
               <svg
@@ -138,15 +114,15 @@ export default function NavBar() {
             isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="py-2 space-y-1 bg-gray-50 rounded-lg mx-2 mb-2">
+          <div className="py-2 space-y-1 bg-cream-50 rounded-lg mx-2 mb-2">
             <NavLink
               to="/"
               onClick={() => setIsMenuOpen(false)}
               className={({ isActive }) =>
                 `block px-4 py-3 rounded-md text-base font-medium transition ${
                   isActive
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:text-blue-500 hover:bg-gray-100"
+                    ? "bg-rust-500 text-white"
+                    : "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
                 }`
               }
             >
@@ -158,38 +134,12 @@ export default function NavBar() {
               className={({ isActive }) =>
                 `block px-4 py-3 rounded-md text-base font-medium transition ${
                   isActive
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:text-blue-500 hover:bg-gray-100"
+                    ? "bg-rust-500 text-white"
+                    : "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
                 }`
               }
             >
               About
-            </NavLink>
-            <NavLink
-              to="/community"
-              onClick={() => setIsMenuOpen(false)}
-              className={({ isActive }) =>
-                `block px-4 py-3 rounded-md text-base font-medium transition ${
-                  isActive
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:text-blue-500 hover:bg-gray-100"
-                }`
-              }
-            >
-              Community
-            </NavLink>
-            <NavLink
-              to="/ai-chat"
-              onClick={() => setIsMenuOpen(false)}
-              className={({ isActive }) =>
-                `block px-4 py-3 rounded-md text-base font-medium transition ${
-                  isActive
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:text-blue-500 hover:bg-gray-100"
-                }`
-              }
-            >
-              AI Chat
             </NavLink>
             <NavLink
               to="/users"
@@ -197,8 +147,8 @@ export default function NavBar() {
               className={({ isActive }) =>
                 `block px-4 py-3 rounded-md text-base font-medium transition ${
                   isActive
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:text-blue-500 hover:bg-gray-100"
+                    ? "bg-rust-500 text-white"
+                    : "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
                 }`
               }
             >
@@ -210,8 +160,8 @@ export default function NavBar() {
               className={({ isActive }) =>
                 `block px-4 py-3 rounded-md text-base font-medium transition ${
                   isActive
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:text-blue-500 hover:bg-gray-100"
+                    ? "bg-rust-500 text-white"
+                    : "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
                 }`
               }
             >
