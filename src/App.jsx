@@ -12,7 +12,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import SignUp from "./pages/SignUp";
 import Dashboard from "./webapp-pages/Dashboard";
 import AIChat from "./webapp-pages/AIChat";
 import Community from "./webapp-pages/Community";
@@ -31,7 +31,7 @@ export default function App() {
             <Route path="/home" element={<UnifiedHome />} />
             <Route path="/home-earthy" element={<Home />} />
             <Route path="/home-cool" element={<Home2 />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/about" element={<About />} />
             <Route path="/users" element={<Users />} />
             <Route path="/contact" element={<Contact />} />

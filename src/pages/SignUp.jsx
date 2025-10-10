@@ -4,7 +4,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext.jsx";
 import NavBar from "../components/NavBar";
 
-export default function Signup() {
+export default function SignUp() {
   const { googleSignIn, user } = UserAuth();
   const navigate = useNavigate();
   const { currentTheme } = useTheme();
