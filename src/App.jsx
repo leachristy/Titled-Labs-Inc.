@@ -13,12 +13,14 @@ import Contact from "./pages/Contact";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Dashboard from "./webapp-pages/Dashboard";
+import AIChat from "./webapp-pages/AIChat";
+import Community from "./webapp-pages/Community";
 
 export default function App() {
   return (
     <ThemeProvider>
       <div className="min-h-screen">
-        <NavBar />
         <ThemeToggle />
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -30,6 +32,9 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/users" element={<Users />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/aichat" element={<AIChat />} />
+          <Route path="/community" element={<Community />} />
         </Routes>
       </div>
     </ThemeProvider>

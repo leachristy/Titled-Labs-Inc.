@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
-import logoImage from "../assets/logo.png";
+import logoImage from "../assets/Thong.png";
 
-export default function NavBar() {
+export default function UntiltNavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { currentTheme } = useTheme();
 
@@ -32,7 +32,7 @@ export default function NavBar() {
                   isEarthy ? "text-brown-800" : "text-charcoal-grey"
                 }`}
               >
-                Tilted Lab Inc.
+                Untilt
               </span>
             </div>
           </NavLink>
@@ -40,7 +40,7 @@ export default function NavBar() {
           {/* Desktop Navigation - Hidden on tablet and mobile */}
           <div className="items-center hidden space-x-6 lg:flex">
             <NavLink
-              to="/"
+              to="/dashboard"
               className={({ isActive }) =>
                 `px-3 py-2 rounded-md text-sm font-medium transition ${
                   isActive
@@ -53,10 +53,10 @@ export default function NavBar() {
                 }`
               }
             >
-              Home
+              Dashboard
             </NavLink>
             <NavLink
-              to="/about"
+              to="/aichat"
               className={({ isActive }) =>
                 `px-3 py-2 rounded-md text-sm font-medium transition ${
                   isActive
@@ -69,9 +69,24 @@ export default function NavBar() {
                 }`
               }
             >
-              About
+              AI Chat
             </NavLink>
-
+            <NavLink
+              to="/community"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-md text-sm font-medium transition ${
+                  isActive
+                    ? `${isEarthy ? "bg-rust-500" : "bg-slate-blue"} text-white`
+                    : `${
+                        isEarthy
+                          ? "text-brown-700 hover:text-rust-500"
+                          : "text-charcoal-grey hover:text-slate-blue"
+                      }`
+                }`
+              }
+            >
+              Community
+            </NavLink>
             <NavLink
               to="/contact"
               className={({ isActive }) =>
@@ -85,9 +100,7 @@ export default function NavBar() {
                       }`
                 }`
               }
-            >
-              Contact
-            </NavLink>
+            ></NavLink>
 
             {/* Desktop Auth Buttons */}
             <div className="flex items-center ml-6 space-x-3">

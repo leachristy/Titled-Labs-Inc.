@@ -3,9 +3,9 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, orderBy, query } from "firebase/firestore";
 import { useTheme } from "../contexts/ThemeContext";
 import { db } from "../src/firebase";
-import NavBar from "../components/NavBar";
+import UntiltNavBar from "../components/UntiltNavBar";
 
-export default function Users() {
+export default function Dashboard() {
   const [visible, setVisible] = useState(false);
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
@@ -25,8 +25,8 @@ export default function Users() {
 
   return (
     <>
-      <title>Users - Tilted | Mental Wellness</title>
-      <NavBar />
+      <title>Untilt - Dashboard</title>
+      <UntiltNavBar />
       {/* push content down from fixed navbar */}
       <div
         className={`min-h-screen pt-32 ${

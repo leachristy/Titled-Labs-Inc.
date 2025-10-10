@@ -3,6 +3,7 @@ import HeroSection2 from "../components/home/HeroSection2";
 import StatsBar2 from "../components/home/StatsBar2";
 import FeaturesGrid2 from "../components/home/FeaturesGrid2";
 import "../Home2.css";
+import NavBar from "../components/NavBar";
 
 export default function Home2() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function Home2() {
   return (
     <>
       <title>Home2 - Tilted | Mental Wellness App</title>
-
+      <NavBar />
       {/* Hero Section */}
       <HeroSection2 onNavigate={handleNavigation} />
 
