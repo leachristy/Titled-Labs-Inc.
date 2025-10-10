@@ -1,13 +1,24 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { UserAuth } from "../contexts/AuthContext";
 import logoImage from "../assets/Thong.png";
 
 export default function UntiltNavBar() {
+  const { user, logOut } = UserAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { currentTheme } = useTheme();
 
   const isEarthy = currentTheme === "earthy";
+
+  // signout handler
+  const handleSignOut = async () => {
+    try {
+      await logOut();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <nav
@@ -87,43 +98,28 @@ export default function UntiltNavBar() {
             >
               Community
             </NavLink>
-            <NavLink
-              to="/contact"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive
-                    ? `${isEarthy ? "bg-rust-500" : "bg-slate-blue"} text-white`
-                    : `${
-                        isEarthy
-                          ? "text-brown-700 hover:bg-tan-200 hover:text-brown-800"
-                          : "text-charcoal-grey hover:bg-cool-grey hover:text-charcoal-grey"
-                      }`
-                }`
-              }
-            ></NavLink>
 
             {/* Desktop Auth Buttons */}
             <div className="flex items-center ml-6 space-x-3">
-              <NavLink
-                to="/login"
+              <div
                 className={`${
                   isEarthy
                     ? "text-brown-700 hover:text-rust-500"
                     : "text-charcoal-grey hover:text-slate-blue"
                 } px-3 py-2 rounded-md text-sm font-medium transition-colors`}
               >
-                Login
-              </NavLink>
-              <NavLink
-                to="/signup"
+                {user?.displayName?.split(" ")[0] || "Unknown"}
+              </div>
+              <button
+                onClick={handleSignOut}
                 className={`${
                   isEarthy
                     ? "bg-rust-500 hover:bg-rust-600"
                     : "bg-slate-blue hover:bg-charcoal-grey"
                 } text-white px-4 py-2 rounded-md text-sm font-medium transition-colors`}
               >
-                Sign Up
-              </NavLink>
+                Sign Out
+              </button>
             </div>
           </div>
 
@@ -176,7 +172,7 @@ export default function UntiltNavBar() {
             } rounded-lg mx-2 mb-2`}
           >
             <NavLink
-              to="/"
+              to="/dashboard"
               onClick={() => setIsMenuOpen(false)}
               className={({ isActive }) =>
                 `block px-4 py-3 rounded-md text-base font-medium transition ${
@@ -190,10 +186,10 @@ export default function UntiltNavBar() {
                 }`
               }
             >
-              Home
+              Dashboard
             </NavLink>
             <NavLink
-              to="/about"
+              to="/aichat"
               onClick={() => setIsMenuOpen(false)}
               className={({ isActive }) =>
                 `block px-4 py-3 rounded-md text-base font-medium transition ${
@@ -207,10 +203,10 @@ export default function UntiltNavBar() {
                 }`
               }
             >
-              About
+              AIChat
             </NavLink>
             <NavLink
-              to="/users"
+              to="/community"
               onClick={() => setIsMenuOpen(false)}
               className={({ isActive }) =>
                 `block px-4 py-3 rounded-md text-base font-medium transition ${
@@ -224,24 +220,7 @@ export default function UntiltNavBar() {
                 }`
               }
             >
-              Users
-            </NavLink>
-            <NavLink
-              to="/contact"
-              onClick={() => setIsMenuOpen(false)}
-              className={({ isActive }) =>
-                `block px-4 py-3 rounded-md text-base font-medium transition ${
-                  isActive
-                    ? `${isEarthy ? "bg-rust-500" : "bg-slate-blue"} text-white`
-                    : `${
-                        isEarthy
-                          ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
-                          : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
-                      }`
-                }`
-              }
-            >
-              Contact
+              Community
             </NavLink>
 
             {/* Mobile Auth Buttons */}
@@ -250,8 +229,7 @@ export default function UntiltNavBar() {
                 isEarthy ? "border-tan-200" : "border-cool-grey"
               } border-t mt-2 pt-4`}
             >
-              <NavLink
-                to="/login"
+              <div
                 onClick={() => setIsMenuOpen(false)}
                 className={`block w-full text-center px-4 py-2 rounded-md text-base font-medium ${
                   isEarthy
@@ -259,8 +237,8 @@ export default function UntiltNavBar() {
                     : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
                 } mb-2`}
               >
-                Login
-              </NavLink>
+                {user?.displayName || "Unknown"}
+              </div>
               <NavLink
                 to="/signup"
                 onClick={() => setIsMenuOpen(false)}
@@ -270,7 +248,7 @@ export default function UntiltNavBar() {
                     : "bg-slate-blue hover:bg-charcoal-grey"
                 } text-white`}
               >
-                Sign Up
+                Sign Out
               </NavLink>
             </div>
           </div>
