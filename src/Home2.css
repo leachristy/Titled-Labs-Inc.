@@ -1,0 +1,109 @@
+/* New Color Palette CSS for Home2 */
+:root {
+  --pale-lavender: #DFD2D5;
+  --cool-grey: #ABAAC0;
+  --blue-grey: #8090B0;
+  --slate-blue: #646F89;
+  --charcoal-grey: #373E4F;
+}
+
+/* Color utility classes for the new palette */
+.bg-pale-lavender { background-color: var(--pale-lavender); }
+.bg-cool-grey { background-color: var(--cool-grey); }
+.bg-blue-grey { background-color: var(--blue-grey); }
+.bg-slate-blue { background-color: var(--slate-blue); }
+.bg-charcoal-grey { background-color: var(--charcoal-grey); }
+
+.text-pale-lavender { color: var(--pale-lavender); }
+.text-cool-grey { color: var(--cool-grey); }
+.text-blue-grey { color: var(--blue-grey); }
+.text-slate-blue { color: var(--slate-blue); }
+.text-charcoal-grey { color: var(--charcoal-grey); }
+
+.border-pale-lavender { border-color: var(--pale-lavender); }
+.border-cool-grey { border-color: var(--cool-grey); }
+.border-blue-grey { border-color: var(--blue-grey); }
+.border-slate-blue { border-color: var(--slate-blue); }
+.border-charcoal-grey { border-color: var(--charcoal-grey); }
+
+/* Hover states */
+.hover\:bg-pale-lavender:hover { background-color: var(--pale-lavender); }
+.hover\:bg-cool-grey:hover { background-color: var(--cool-grey); }
+.hover\:bg-blue-grey:hover { background-color: var(--blue-grey); }
+.hover\:bg-slate-blue:hover { background-color: var(--slate-blue); }
+.hover\:bg-charcoal-grey:hover { background-color: var(--charcoal-grey); }
+
+.hover\:text-pale-lavender:hover { color: var(--pale-lavender); }
+.hover\:text-cool-grey:hover { color: var(--cool-grey); }
+.hover\:text-blue-grey:hover { color: var(--blue-grey); }
+.hover\:text-slate-blue:hover { color: var(--slate-blue); }
+.hover\:text-charcoal-grey:hover { color: var(--charcoal-grey); }
+
+.hover\:border-pale-lavender:hover { border-color: var(--pale-lavender); }
+.hover\:border-cool-grey:hover { border-color: var(--cool-grey); }
+.hover\:border-blue-grey:hover { border-color: var(--blue-grey); }
+.hover\:border-slate-blue:hover { border-color: var(--slate-blue); }
+.hover\:border-charcoal-grey:hover { border-color: var(--charcoal-grey); }
+
+/* Custom button styles for new palette */
+.btn-primary-new {
+  background-color: var(--slate-blue);
+  color: white;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary-new:hover {
+  background-color: var(--charcoal-grey);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.btn-secondary-new {
+  background-color: white;
+  color: var(--slate-blue);
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: 2px solid var(--slate-blue);
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-new:hover {
+  background-color: var(--pale-lavender);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Card styles for new palette */
+.card-new {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  border: 1px solid var(--cool-grey);
+}
+
+.card-new:hover {
+  border-color: var(--blue-grey);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Visual frame for mockups */
+.visual-frame-new {
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, var(--pale-lavender), var(--cool-grey));
+  border: 1px solid var(--cool-grey);
+}
+
+.visual-card-new {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}

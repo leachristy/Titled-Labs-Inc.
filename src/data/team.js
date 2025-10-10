@@ -7,8 +7,8 @@ import hungImage from '../assets/hung.png';
 export const team = [
   {
     name: 'Lea Christy',
-    role: 'CEO of Untilted Lab Inc',
-    bio: "Let's go Untilted Lab!!!",
+    role: 'CEO of Tilted Lab Inc',
+    bio: "Let's go Tilted Lab!!!",
     image: leaImage,
   },
   {

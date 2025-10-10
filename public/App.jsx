@@ -19,11 +19,11 @@ export default function App() {
       </h1>
       {/* Subtitle */}
       <h2 className="text-2xl font-semibold text-blue-500 mb-6 text-center">
-        Untilted — Therapy Website
+        Tilted — Therapy Website
       </h2>
       {/* Description */}
       <p className="text-lg text-gray-700 max-w-xl text-center mb-8">
-        Welcome to Untilted, your online destination for accessible, compassionate therapy. 
+        Welcome to Tilted, your online destination for accessible, compassionate therapy. 
         Discover resources, connect with professionals, and start your journey to well-being.
       </p>
       {/* Placeholder for future buttons/links */}
