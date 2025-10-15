@@ -8,12 +8,12 @@ export default function BreathingExercises() {
   const isEarthy = currentTheme === "earthy";
   const navigate = useNavigate();
 
-  // 🧘 State
+  // Exercise State
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
 
-  // 🧘 Hardcoded Exercises
+  // Breathing Exercises
   const exercises = [
     {
       name: "Pursed Lip Breathing",
@@ -55,14 +55,14 @@ export default function BreathingExercises() {
     },
   ];
 
-  // 🧭 Select an Exercise (manual start)
+  // Exercise Start
   const startExercise = (exercise) => {
     setSelectedExercise(exercise);
     setTimeLeft(exercise.duration);
     setIsRunning(false); // manual start
   };
 
-  // 🕒 Timer effect
+  // Timer
   useEffect(() => {
     if (!isRunning) return;
 
