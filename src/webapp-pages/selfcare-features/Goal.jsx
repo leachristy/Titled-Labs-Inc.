@@ -5,6 +5,7 @@ import { goalStyles, getRelativeFontSize, getTextScaleLabel } from "../app-style
 import { db, auth } from "../../src/firebase";
 import { collection, addDoc, updateDoc, deleteDoc, doc, query, where, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const PRESET_GOALS = [
   "Reduce anxiety levels",
@@ -48,6 +49,7 @@ export default function Goals() {
   const [editText, setEditText] = useState("");
   const [resizingGoal, setResizingGoal] = useState(null);
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const navigate = useNavigate();
 
   // Listen to auth state changes
   useEffect(() => {
@@ -350,6 +352,17 @@ export default function Goals() {
       <UntiltNavBar />
       <div {...goalStyles.container(isEarthy)}>
         <div className="max-w-7xl mx-auto">
+          {/* 👇 Back Button */}
+          <button
+            onClick={() => navigate("/selfcare")}
+            className={`mb-6 px-4 py-2 rounded-lg flex items-center gap-2 font-medium shadow-sm ${
+              isEarthy
+                ? "bg-tan-300 hover:bg-tan-400 text-brown-900"
+                : "bg-indigo-200 hover:bg-indigo-300 text-indigo-900"
+            } transition`}
+          >
+            ← Back to Self-Care
+          </button>
           {/* Header */}
           <div className="mb-8">
             <h1 className={goalStyles.header.title(isEarthy)}>
