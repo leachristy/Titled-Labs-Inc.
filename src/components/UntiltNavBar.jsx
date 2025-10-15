@@ -67,6 +67,22 @@ export default function UntiltNavBar() {
               Dashboard
             </NavLink>
             <NavLink
+              to="/selfcare"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-md text-sm font-medium transition ${
+                  isActive
+                    ? `${isEarthy ? "bg-rust-500" : "bg-slate-blue"} text-white`
+                    : `${
+                        isEarthy
+                          ? "text-brown-700 hover:text-rust-500"
+                          : "text-charcoal-grey hover:text-slate-blue"
+                      }`
+                }`
+              }
+            >
+              Self Care
+            </NavLink>
+            <NavLink
               to="/aichat"
               className={({ isActive }) =>
                 `px-3 py-2 rounded-md text-sm font-medium transition ${
