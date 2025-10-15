@@ -18,6 +18,7 @@ import AIChat from "./webapp-pages/AIChat";
 import Community from "./webapp-pages/Community";
 import { AuthContextProvider } from "./contexts/AuthContext";
 import Protected from "./components/Protected";
+import { SelfCare } from "./webapp-pages/SelfCare";
 
 export default function App() {
   return (
@@ -35,12 +36,19 @@ export default function App() {
             <Route path="/about" element={<About />} />
             <Route path="/users" element={<Users />} />
             <Route path="/contact" element={<Contact />} />
-
             <Route
               path="/dashboard"
               element={
                 <Protected>
                   <Dashboard />
+                </Protected>
+              }
+            />
+            <Route
+              path="/selfcare"
+              element={
+                <Protected>
+                  <SelfCare />
                 </Protected>
               }
             />
