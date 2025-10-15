@@ -18,7 +18,7 @@ export default function HeroSection({ onNavigate }) {
               <img
                 src={isEarthy ? landingImage : landingImage2}
                 alt="Tilted Mental Wellness"
-                className="object-contain h-auto mt-5 rounded-lg shadow-2xl w-md"
+                className="object-cover w-full max-w-2xl h-80 mt-5 rounded-lg shadow-2xl"
               />
             </div>
           </div>
