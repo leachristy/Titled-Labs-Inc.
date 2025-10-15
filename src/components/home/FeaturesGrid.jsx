@@ -1,6 +1,10 @@
+import { useTheme } from "../../contexts/ThemeContext";
 import FeatureCard from "./FeatureCard";
 
 export default function FeaturesGrid() {
+  const { currentTheme } = useTheme();
+  const isEarthy = currentTheme === "earthy";
+
   const features = [
     {
       icon: (
@@ -44,14 +48,28 @@ export default function FeaturesGrid() {
     }
   ];
 
+  const securityBadges = isEarthy ? [
+    { title: "HIPAA", subtitle: "Compliant", color: "rust" },
+    { title: "HITRUST", subtitle: "Certified", color: "terracotta" },
+    { title: "256-bit", subtitle: "Encryption", color: "brown" }
+  ] : [
+    { title: "HIPAA", subtitle: "Compliant", color: "slate" },
+    { title: "HITRUST", subtitle: "Certified", color: "blue" },
+    { title: "256-bit", subtitle: "Encryption", color: "charcoal" }
+  ];
+
   return (
-    <section className="py-20 bg-cream-100">
+    <section className={`py-20 ${isEarthy ? "bg-cream-100" : "bg-pale-lavender"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-brown-800 mb-4">
+          <h2 className={`text-3xl sm:text-4xl font-bold mb-4 ${
+            isEarthy ? "text-brown-800" : "text-charcoal-grey"
+          }`}>
             Simplify every part of your wellness journey
           </h2>
-          <p className="text-lg text-brown-700 max-w-3xl mx-auto">
+          <p className={`text-lg max-w-3xl mx-auto ${
+            isEarthy ? "text-brown-700" : "text-charcoal-grey"
+          }`}>
             Our platform streamlines everything you need, saving you time so you can focus on what truly matters—your mental health and personal growth.
           </p>
         </div>
@@ -64,45 +82,40 @@ export default function FeaturesGrid() {
 
         {/* Security Badges */}
         <div className="flex flex-wrap justify-center gap-8">
-          <SecurityBadge 
-            icon={<ShieldCheckIcon />}
-            title="HIPAA"
-            subtitle="Compliant"
-            color="rust"
-          />
-          <SecurityBadge 
-            icon={<CertificationIcon />}
-            title="HITRUST"
-            subtitle="Certified"
-            color="terracotta"
-          />
-          <SecurityBadge 
-            icon={<ShieldCheckIcon />}
-            title="256-bit"
-            subtitle="Encryption"
-            color="brown"
-          />
+          {securityBadges.map((badge, index) => (
+            <SecurityBadge key={index} {...badge} isEarthy={isEarthy} />
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function SecurityBadge({ icon, title, subtitle, color }) {
-  const colorMap = {
+function SecurityBadge({ title, subtitle, color, isEarthy }) {
+  const colorMap = isEarthy ? {
     rust: "text-rust-500",
     terracotta: "text-terracotta-400",
     brown: "text-brown-600"
+  } : {
+    slate: "text-slate-blue",
+    blue: "text-blue-grey",
+    charcoal: "text-charcoal-grey"
   };
 
   return (
-    <div className="flex items-center gap-3 bg-white px-6 py-4 rounded-lg border border-tan-200 shadow-sm">
+    <div className={`flex items-center gap-3 bg-white px-6 py-4 rounded-lg border shadow-sm ${
+      isEarthy ? "border-tan-200" : "border-cool-grey"
+    }`}>
       <div className={`${colorMap[color]}`}>
-        {icon}
+        {title === "HITRUST" ? <CertificationIcon /> : <ShieldCheckIcon />}
       </div>
       <div>
-        <div className="font-semibold text-brown-800">{title}</div>
-        <div className="text-sm text-brown-600">{subtitle}</div>
+        <div className={`font-semibold ${isEarthy ? "text-brown-800" : "text-charcoal-grey"}`}>
+          {title}
+        </div>
+        <div className={`text-sm ${isEarthy ? "text-brown-600" : "text-slate-blue"}`}>
+          {subtitle}
+        </div>
       </div>
     </div>
   );

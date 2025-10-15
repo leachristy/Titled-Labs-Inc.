@@ -1,14 +1,11 @@
 import { useNavigate } from "react-router";
 import { useTheme } from "../contexts/ThemeContext";
 import HeroSection from "../components/home/HeroSection";
-import HeroSection2 from "../components/home/HeroSection2";
 import StatsBar from "../components/home/StatsBar";
-import StatsBar2 from "../components/home/StatsBar2";
 import FeaturesGrid from "../components/home/FeaturesGrid";
-import FeaturesGrid2 from "../components/home/FeaturesGrid2";
-import DetailedFeatureThemed from "../components/home/DetailedFeatureThemed";
-import TestimonialThemed from "../components/home/TestimonialThemed";
-import CTASectionThemed from "../components/home/CTASectionThemed";
+import DetailedFeature from "../components/home/DetailedFeature";
+import Testimonial from "../components/home/Testimonial";
+import CTASection from "../components/home/CTASection";
 import NavBar from "../components/NavBar";
 
 export default function UnifiedHome() {
@@ -26,22 +23,18 @@ export default function UnifiedHome() {
       <title>Home - Tilted | Mental Wellness App</title>
       <NavBar />
       {/* Hero Section */}
-      {isEarthy ? (
-        <HeroSection onNavigate={handleNavigation} />
-      ) : (
-        <HeroSection2 onNavigate={handleNavigation} />
-      )}
+      <HeroSection onNavigate={handleNavigation} />
 
       {/* Stats Bar */}
-      {isEarthy ? <StatsBar /> : <StatsBar2 />}
+      <StatsBar />
 
       {/* Main Features Grid */}
-      {isEarthy ? <FeaturesGrid /> : <FeaturesGrid2 />}
+      <FeaturesGrid />
 
       {/* Detailed Feature 1 - Therapy & Community */}
       <section className="py-20 bg-white">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <DetailedFeatureThemed
+          <DetailedFeature
             badge="PROFESSIONAL SUPPORT"
             title="Connect with licensed therapists and supportive communities"
             description="Join specialized groups, attend sessions, and access evidence-based therapy tools—all in one secure platform."
@@ -158,10 +151,10 @@ export default function UnifiedHome() {
                 </div>
               </div>
             </div>
-          </DetailedFeatureThemed>
+          </DetailedFeature>
 
           {/* Detailed Feature 2 - Contact & Support */}
-          <DetailedFeatureThemed
+          <DetailedFeature
             badge="WELLNESS SUPPORT"
             title="Get personalized support for your mental wellness journey"
             description="Available support to provide coping strategies, mindfulness exercises, and emotional support for your journey."
@@ -258,10 +251,10 @@ export default function UnifiedHome() {
                 </div>
               </div>
             </div>
-          </DetailedFeatureThemed>
+          </DetailedFeature>
 
           {/* Detailed Feature 3 - Community */}
-          <DetailedFeatureThemed
+          <DetailedFeature
             badge="PEER SUPPORT"
             title="Find your community and share your journey"
             description="Join support groups tailored to your needs. Connect with others who understand what you're going through."
@@ -372,12 +365,12 @@ export default function UnifiedHome() {
                 </div>
               </div>
             </div>
-          </DetailedFeatureThemed>
+          </DetailedFeature>
         </div>
       </section>
 
       {/* Testimonial Section */}
-      <TestimonialThemed />
+      <Testimonial />
 
       {/* Who We Serve Section */}
       <div
@@ -605,7 +598,7 @@ export default function UnifiedHome() {
       </div>
 
       {/* CTA Section */}
-      <CTASectionThemed onNavigate={handleNavigation} />
+      <CTASection onNavigate={handleNavigation} />
 
       {/* Resources Section */}
       <div

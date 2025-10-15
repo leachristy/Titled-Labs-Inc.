@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
-import HeroSection2 from "../components/home/HeroSection2";
-import StatsBar2 from "../components/home/StatsBar2";
-import FeaturesGrid2 from "../components/home/FeaturesGrid2";
+import HeroSection from "../components/home/HeroSection";
+import StatsBar from "../components/home/StatsBar";
+import FeaturesGrid from "../components/home/FeaturesGrid";
 import "../Home2.css";
 import NavBar from "../components/NavBar";
 
@@ -17,13 +17,13 @@ export default function Home2() {
       <title>Home2 - Tilted | Mental Wellness App</title>
       <NavBar />
       {/* Hero Section */}
-      <HeroSection2 onNavigate={handleNavigation} />
+      <HeroSection onNavigate={handleNavigation} />
 
       {/* Stats Bar */}
-      <StatsBar2 />
+      <StatsBar />
 
       {/* Main Features Grid */}
-      <FeaturesGrid2 />
+      <FeaturesGrid />
 
       {/* Detailed Feature 1 - Therapy & Community */}
       <section className="py-20 bg-white">

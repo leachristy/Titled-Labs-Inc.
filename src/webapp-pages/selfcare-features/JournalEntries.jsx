@@ -1,8 +1,8 @@
 import React from "react";
-import UntiltNavBar from "../components/UntiltNavBar";
-import { useTheme } from "../contexts/ThemeContext";
+import UntiltNavBar from "../../components/UntiltNavBar";
+import { useTheme } from "../../contexts/ThemeContext";
 
-export default JournalEntries = () => {
+export default function JournalEntries() {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
