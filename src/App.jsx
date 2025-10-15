@@ -19,6 +19,8 @@ import Community from "./webapp-pages/Community";
 import { AuthContextProvider } from "./contexts/AuthContext";
 import Protected from "./components/Protected";
 import { SelfCare } from "./webapp-pages/SelfCare";
+import JournalEntries from "./webapp-pages/selfcare-features/JournalEntries";
+
 
 export default function App() {
   return (
@@ -49,6 +51,14 @@ export default function App() {
               element={
                 <Protected>
                   <SelfCare />
+                </Protected>
+              }
+            />
+            <Route
+              path="/journal"
+              element={
+                <Protected>
+                  <JournalEntries />
                 </Protected>
               }
             />

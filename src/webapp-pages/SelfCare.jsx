@@ -2,11 +2,14 @@ import React from 'react';
 import UntiltNavBar from '../components/UntiltNavBar';
 import { useTheme } from "../contexts/ThemeContext";
 import CustomButton from '../components/Button';
+import { useNavigate } from 'react-router-dom';
 
 const SelfCareSection = ({ title, children, isEarthy }) => (
   <div>
     <h1
-      className={`mb-2 text-3xl font-bold ${isEarthy ? "text-brown-800" : "text-charcoal-grey"}`}
+      className={`mb-2 text-3xl font-bold ${
+        isEarthy ? "text-brown-800" : "text-charcoal-grey"
+      }`}
     >
       {title}
     </h1>
@@ -20,8 +23,14 @@ export const SelfCare = () => {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
+  const navigate = useNavigate();
+
   const handleClick = () => {
     console.log("Button clicked!");
+  };
+
+  const handleJournalClick = () => {
+    navigate("/journal");
   };
 
   return (
@@ -51,7 +60,7 @@ export const SelfCare = () => {
 
           <SelfCareSection title="Journal Entries" isEarthy={isEarthy}>
             Journal entries feature preview here
-            <CustomButton isEarthy={isEarthy} onClick={handleClick}>
+            <CustomButton isEarthy={isEarthy} onClick={handleJournalClick}>
               View Page
             </CustomButton>
           </SelfCareSection>
