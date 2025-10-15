@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UntiltNavBar from "../../components/UntiltNavBar";
 import { useTheme } from "../../contexts/ThemeContext";
 import { goalStyles, getRelativeFontSize, getTextScaleLabel } from "../app-styles/Goal.styles";
+import { db, auth } from "../../src/firebase";
+import { collection, addDoc, updateDoc, deleteDoc, doc, query, where, onSnapshot } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 const PRESET_GOALS = [
   "Reduce anxiety levels",
@@ -32,9 +35,12 @@ export default function Goals() {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
   
-  const [goals, setGoals] = useState(INITIAL_GOALS);
+  const [goals, setGoals] = useState([]);
+  const [archivedGoals, setArchivedGoals] = useState([]);
+  const [userId, setUserId] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPresetModal, setShowPresetModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [newGoalText, setNewGoalText] = useState("");
   const [draggedGoal, setDraggedGoal] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -43,10 +49,66 @@ export default function Goals() {
   const [resizingGoal, setResizingGoal] = useState(null);
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
+  // Listen to auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+        setGoals([]); // Clear goals if user logs out
+        setArchivedGoals([]); // Clear archived goals
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Load active goals from Firestore
+  useEffect(() => {
+    if (!userId) return;
+
+    const goalsRef = collection(db, "goals");
+    const q = query(goalsRef, where("userId", "==", userId), where("isArchived", "==", false));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const goalsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setGoals(goalsData);
+    });
+
+    return () => unsubscribe();
+  }, [userId]);
+
+  // Load archived goals from Firestore
+  useEffect(() => {
+    if (!userId) return;
+
+    const goalsRef = collection(db, "goals");
+    const q = query(goalsRef, where("userId", "==", userId), where("isArchived", "==", true));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const archivedData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setArchivedGoals(archivedData);
+    });
+
+    return () => unsubscribe();
+  }, [userId]);
+
   // Goal management functions
-  const addGoal = (text) => {
+  const addGoal = async (text) => {
+    if (!userId) {
+      alert("Please log in to add goals");
+      return;
+    }
+
     const newGoal = {
-      id: Date.now(),
+      userId,
       text,
       position: { x: Math.random() * 300 + 50, y: Math.random() * 200 + 150 },
       stickyType: "pin",
@@ -54,31 +116,97 @@ export default function Goals() {
       width: 200,
       height: 150,
       textScale: 1.0,
+      isCompleted: false,
+      isArchived: false,
+      createdAt: new Date().toISOString(),
     };
-    setGoals([...goals, newGoal]);
+
+    try {
+      await addDoc(collection(db, "goals"), newGoal);
+    } catch (error) {
+      console.error("Error adding goal:", error);
+      alert("Failed to add goal. Please try again.");
+    }
   };
 
-  const deleteGoal = (id) => {
-    setGoals(goals.filter(goal => goal.id !== id));
+  const deleteGoal = async (id) => {
+    if (!userId) return;
+
+    try {
+      await deleteDoc(doc(db, "goals", id));
+    } catch (error) {
+      console.error("Error deleting goal:", error);
+      alert("Failed to delete goal. Please try again.");
+    }
   };
 
-  const toggleStickyType = (id) => {
-    setGoals(goals.map(goal => 
-      goal.id === id 
-        ? { ...goal, stickyType: goal.stickyType === "pin" ? "tape" : "pin" }
-        : goal
-    ));
+  const updateGoalInDB = async (id, updates) => {
+    if (!userId) return;
+
+    try {
+      await updateDoc(doc(db, "goals", id), updates);
+    } catch (error) {
+      console.error("Error updating goal:", error);
+    }
   };
 
-  const changeTextScale = (id) => {
-    setGoals(goals.map(goal => {
-      if (goal.id === id) {
-        const currentIndex = TEXT_SCALES.indexOf(goal.textScale || 1.0);
-        const nextIndex = (currentIndex + 1) % TEXT_SCALES.length;
-        return { ...goal, textScale: TEXT_SCALES[nextIndex] };
-      }
-      return goal;
-    }));
+  const toggleComplete = async (id) => {
+    const goal = goals.find(g => g.id === id);
+    if (!goal) return;
+
+    const newCompletedState = !goal.isCompleted;
+    await updateGoalInDB(id, { isCompleted: newCompletedState });
+  };
+
+  const archiveGoal = async (id) => {
+    const goal = goals.find(g => g.id === id);
+    if (!goal) return;
+
+    await updateGoalInDB(id, { 
+      isArchived: true,
+      archivedAt: new Date().toISOString()
+    });
+  };
+
+  const restoreGoal = async (id) => {
+    const goal = archivedGoals.find(g => g.id === id);
+    if (!goal) return;
+
+    await updateGoalInDB(id, { 
+      isArchived: false,
+      isCompleted: false,
+      archivedAt: null
+    });
+  };
+
+  const deleteArchivedGoal = async (id) => {
+    if (!userId) return;
+
+    try {
+      await deleteDoc(doc(db, "goals", id));
+    } catch (error) {
+      console.error("Error deleting archived goal:", error);
+      alert("Failed to delete archived goal. Please try again.");
+    }
+  };
+
+  const toggleStickyType = async (id) => {
+    const goal = goals.find(g => g.id === id);
+    if (!goal) return;
+
+    const newStickyType = goal.stickyType === "pin" ? "tape" : "pin";
+    await updateGoalInDB(id, { stickyType: newStickyType });
+  };
+
+  const changeTextScale = async (id) => {
+    const goal = goals.find(g => g.id === id);
+    if (!goal) return;
+
+    const currentIndex = TEXT_SCALES.indexOf(goal.textScale || 1.0);
+    const nextIndex = (currentIndex + 1) % TEXT_SCALES.length;
+    const newScale = TEXT_SCALES[nextIndex];
+    
+    await updateGoalInDB(id, { textScale: newScale });
   };
 
   // Modal handlers
@@ -115,9 +243,19 @@ export default function Goals() {
       const newX = e.clientX - containerRect.left - dragOffset.x;
       const newY = e.clientY - containerRect.top - dragOffset.y;
 
+      // Calculate boundaries to keep goal within board
+      const maxX = containerRect.width - draggedGoal.width - 8; // 8px for padding
+      const maxY = containerRect.height - draggedGoal.height - 8;
+
+      const boundedX = Math.max(0, Math.min(newX, maxX));
+      const boundedY = Math.max(0, Math.min(newY, maxY));
+
+      const newPosition = { x: boundedX, y: boundedY };
+      
+      // Update local state immediately for smooth dragging
       setGoals(goals.map(goal =>
         goal.id === draggedGoal.id
-          ? { ...goal, position: { x: Math.max(0, newX), y: Math.max(0, newY) } }
+          ? { ...goal, position: newPosition }
           : goal
       ));
     }
@@ -128,16 +266,49 @@ export default function Goals() {
       
       const newWidth = Math.max(180, resizeStart.width + deltaX);
       const newHeight = Math.max(100, resizeStart.height + deltaY);
+
+      // Calculate max size to keep within board
+      const container = document.getElementById('goals-container');
+      const containerRect = container.getBoundingClientRect();
+      const goal = goals.find(g => g.id === resizingGoal.id);
       
-      setGoals(goals.map(goal =>
-        goal.id === resizingGoal.id
-          ? { ...goal, width: newWidth, height: newHeight }
-          : goal
-      ));
+      if (goal) {
+        const maxWidth = containerRect.width - goal.position.x - 8;
+        const maxHeight = containerRect.height - goal.position.y - 8;
+        
+        const boundedWidth = Math.min(newWidth, maxWidth);
+        const boundedHeight = Math.min(newHeight, maxHeight);
+        
+        // Update local state immediately for smooth resizing
+        setGoals(goals.map(g =>
+          g.id === resizingGoal.id
+            ? { ...g, width: boundedWidth, height: boundedHeight }
+            : g
+        ));
+      }
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = async () => {
+    // Save position to database when drag ends
+    if (draggedGoal) {
+      const goal = goals.find(g => g.id === draggedGoal.id);
+      if (goal) {
+        await updateGoalInDB(draggedGoal.id, { position: goal.position });
+      }
+    }
+    
+    // Save size to database when resize ends
+    if (resizingGoal) {
+      const goal = goals.find(g => g.id === resizingGoal.id);
+      if (goal) {
+        await updateGoalInDB(resizingGoal.id, { 
+          width: goal.width, 
+          height: goal.height 
+        });
+      }
+    }
+    
     setDraggedGoal(null);
     setResizingGoal(null);
   };
@@ -149,13 +320,9 @@ export default function Goals() {
     setEditText(goal.text);
   };
 
-  const handleEditSave = (goalId) => {
+  const handleEditSave = async (goalId) => {
     if (editText.trim()) {
-      setGoals(goals.map(goal =>
-        goal.id === goalId
-          ? { ...goal, text: editText }
-          : goal
-      ));
+      await updateGoalInDB(goalId, { text: editText });
     }
     setEditingGoal(null);
     setEditText("");
@@ -194,7 +361,7 @@ export default function Goals() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 mb-8">
+          <div className="flex flex-wrap gap-4 mb-8">
             <button
               onClick={() => setShowPresetModal(true)}
               className={goalStyles.buttons.preset(isEarthy)}
@@ -206,6 +373,12 @@ export default function Goals() {
               className={goalStyles.buttons.custom(isEarthy)}
             >
               + Create Custom Goal
+            </button>
+            <button
+              onClick={() => setShowArchiveModal(true)}
+              className={goalStyles.buttons.archive(isEarthy)}
+            >
+              📦 View Archive ({archivedGoals.length})
             </button>
           </div>
 
@@ -227,16 +400,17 @@ export default function Goals() {
               goals.map(goal => (
                 <div
                   key={goal.id}
-                  className={goalStyles.card.container(
+                  className={`${goalStyles.card.container(
                     editingGoal === goal.id,
                     draggedGoal?.id === goal.id,
                     resizingGoal?.id === goal.id
-                  )}
+                  )} ${goal.isCompleted ? 'opacity-50' : ''}`}
                   style={{
                     left: `${goal.position.x}px`,
                     top: `${goal.position.y}px`,
                     width: `${goal.width}px`,
                     height: `${goal.height}px`,
+                    transition: 'opacity 0.3s ease',
                   }}
                   onMouseDown={(e) => editingGoal !== goal.id && handleMouseDown(e, goal)}
                   onDoubleClick={(e) => handleDoubleClick(e, goal)}
@@ -272,6 +446,20 @@ export default function Goals() {
                         </button>
                       )}
                     </div>
+
+                    {/* Completion Checkbox - Top Left */}
+                    {editingGoal !== goal.id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleComplete(goal.id);
+                        }}
+                        className={goalStyles.buttons.complete(isEarthy, goal.isCompleted)}
+                        title={goal.isCompleted ? "Mark as incomplete" : "Mark as complete"}
+                      >
+                        {goal.isCompleted ? "✓" : ""}
+                      </button>
+                    )}
 
                     {/* Delete Button - Top Right */}
                     {editingGoal !== goal.id && (
@@ -343,6 +531,20 @@ export default function Goals() {
                       >
                         {goal.text}
                       </div>
+                    )}
+
+                    {/* Archive Button - Bottom Center (Green Tick) */}
+                    {editingGoal !== goal.id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          archiveGoal(goal.id);
+                        }}
+                        className={goalStyles.buttons.archiveBottomTick(isEarthy)}
+                        title="Archive goal"
+                      >
+                        ✓
+                      </button>
                     )}
 
                     {/* Resize Handle */}
@@ -427,6 +629,87 @@ export default function Goals() {
               </div>
               <button
                 onClick={() => setShowPresetModal(false)}
+                className={goalStyles.modal.closeButton(isEarthy)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Archive Modal */}
+        {showArchiveModal && (
+          <div className={goalStyles.modal.overlay}>
+            <div
+              className={goalStyles.modal.containerLarge(isEarthy)}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className={goalStyles.modal.title(isEarthy)}>
+                Archived Goals ({archivedGoals.length})
+              </h2>
+              {archivedGoals.length === 0 ? (
+                <p className={`text-center py-8 ${isEarthy ? "text-brown-600" : "text-slate-blue"}`}>
+                  No archived goals yet.
+                </p>
+              ) : (
+                <div className="space-y-3 mb-4 max-h-[60vh] overflow-y-auto">
+                  {archivedGoals.map((goal) => (
+                    <div
+                      key={goal.id}
+                      className={`p-4 rounded-lg border-2 ${
+                        isEarthy
+                          ? "border-tan-300 bg-cream-50"
+                          : "border-cool-grey bg-pale-lavender"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <p className={`font-medium mb-1 ${
+                            isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                          }`}>
+                            {goal.text}
+                          </p>
+                          <p className={`text-xs ${
+                            isEarthy ? "text-brown-600" : "text-slate-blue"
+                          }`}>
+                            Archived: {new Date(goal.archivedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => restoreGoal(goal.id)}
+                            className={`px-3 py-1 rounded text-xs font-semibold ${
+                              isEarthy
+                                ? "bg-rust-500 hover:bg-rust-600"
+                                : "bg-slate-blue hover:bg-charcoal-grey"
+                            } text-white transition-colors`}
+                            title="Restore to board"
+                          >
+                            ↩ Restore
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm('Permanently delete this archived goal?')) {
+                                deleteArchivedGoal(goal.id);
+                              }
+                            }}
+                            className={`px-3 py-1 rounded text-xs font-semibold ${
+                              isEarthy
+                                ? "bg-tan-300 hover:bg-tan-400 text-brown-800"
+                                : "bg-cool-grey hover:bg-slate-blue text-white"
+                            } transition-colors`}
+                            title="Delete permanently"
+                          >
+                            🗑 Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <button
+                onClick={() => setShowArchiveModal(false)}
                 className={goalStyles.modal.closeButton(isEarthy)}
               >
                 Close

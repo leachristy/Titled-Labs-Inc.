@@ -27,6 +27,30 @@ export const goalStyles = {
         : "bg-blue-grey hover:bg-slate-blue"
     } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`,
 
+    archive: (isEarthy) => `${
+      isEarthy
+        ? "bg-tan-500 hover:bg-tan-600"
+        : "bg-cool-grey hover:bg-slate-blue"
+    } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`,
+
+    complete: (isEarthy, isCompleted) => `absolute -top-2 -left-2 w-6 h-6 rounded border-2 ${
+      isCompleted
+        ? isEarthy
+          ? "bg-rust-500 border-rust-600"
+          : "bg-slate-blue border-charcoal-grey"
+        : isEarthy
+        ? "bg-white border-tan-400 hover:border-rust-500"
+        : "bg-white border-cool-grey hover:border-slate-blue"
+    } text-white flex items-center justify-center text-xs font-bold shadow-md transition-all z-10 cursor-pointer`,
+
+    archiveSmall: (isEarthy) => `w-6 h-6 rounded-full ${
+      isEarthy
+        ? "bg-tan-500 hover:bg-tan-600"
+        : "bg-cool-grey hover:bg-slate-blue"
+    } text-white flex items-center justify-center text-xs shadow-md transition-colors`,
+
+    archiveBottomTick: (isEarthy) => `absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center text-lg font-bold shadow-lg transition-all z-10 cursor-pointer hover:scale-110`,
+
     delete: (isEarthy) => `absolute -top-2 -right-2 w-6 h-6 rounded-full ${
       isEarthy
         ? "bg-rust-400 hover:bg-rust-500"
@@ -53,7 +77,7 @@ export const goalStyles = {
   },
 
   // Goals board styles
-  board: (isEarthy) => `relative min-h-[600px] ${
+  board: (isEarthy) => `relative min-h-[800px] w-full overflow-hidden ${
     isEarthy ? "bg-tan-50 border-tan-300" : "bg-white border-cool-grey"
   } border-2 rounded-lg shadow-inner p-4`,
 
