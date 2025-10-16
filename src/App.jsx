@@ -20,6 +20,7 @@ import { AuthContextProvider } from "./contexts/AuthContext";
 import Protected from "./components/Protected";
 import { SelfCare } from "./webapp-pages/SelfCare";
 import JournalEntries from "./webapp-pages/selfcare-features/JournalEntries";
+import Goals from "./webapp-pages/selfcare-features/Goal";
 
 
 export default function App() {
@@ -59,6 +60,14 @@ export default function App() {
               element={
                 <Protected>
                   <JournalEntries />
+                </Protected>
+              }
+            />
+            <Route
+              path="/goals"
+              element={
+                <Protected>
+                  <Goals />
                 </Protected>
               }
             />

@@ -33,6 +33,10 @@ export const SelfCare = () => {
     navigate("/journal");
   };
 
+  const handleGoalsClick = () => {
+    navigate("/goals");
+  };
+
   return (
     <>
       <UntiltNavBar />
@@ -67,7 +71,7 @@ export const SelfCare = () => {
 
           <SelfCareSection title="Goals" isEarthy={isEarthy}>
             Goals feature preview here
-            <CustomButton isEarthy={isEarthy} onClick={handleClick}>
+            <CustomButton isEarthy={isEarthy} onClick={handleGoalsClick}>
               View Page
             </CustomButton>
           </SelfCareSection>

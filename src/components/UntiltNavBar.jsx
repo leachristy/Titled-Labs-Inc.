@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
 import logoImage from "../assets/Thong.png";
 
 export default function UntiltNavBar() {
-  const { user } = UserAuth();
+  const { user, logOut } = UserAuth();
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const links = [
     { name: "Dashboard", path: "/dashboard" },
@@ -16,6 +17,15 @@ export default function UntiltNavBar() {
     { name: "AI Chat", path: "/aichat" },
     { name: "Community", path: "/community" },
   ];
+
+  const handleSignOut = async () => {
+    try {
+      await logOut();
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <nav
@@ -64,11 +74,21 @@ export default function UntiltNavBar() {
           <div className="hidden lg:flex items-center ml-6 space-x-3">
             <div
               className={`${
-                isEarthy ? "text-brown-700 hover:text-rust-500" : "text-charcoal-grey hover:text-slate-blue"
-              } px-3 py-2 rounded-md text-sm font-medium transition-colors`}
+                isEarthy ? "text-brown-700" : "text-charcoal-grey"
+              } px-3 py-2 rounded-md text-sm font-medium`}
             >
               {user?.displayName?.split(" ")[0] || "Unknown"}
             </div>
+            <button
+              onClick={handleSignOut}
+              className={`${
+                isEarthy 
+                  ? "bg-rust-500 hover:bg-rust-600" 
+                  : "bg-slate-blue hover:bg-charcoal-grey"
+              } text-white px-4 py-2 rounded-md text-sm font-medium transition-colors`}
+            >
+              Sign Out
+            </button>
           </div>
 
           {/* Mobile Hamburger */}
@@ -122,11 +142,26 @@ export default function UntiltNavBar() {
             {/* Mobile User Display */}
             <div
               className={`block w-full text-center px-4 py-2 rounded-md text-base font-medium ${
-                isEarthy ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200" : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
+                isEarthy ? "text-brown-700" : "text-charcoal-grey"
               }`}
             >
               {user?.displayName || "Unknown"}
             </div>
+
+            {/* Mobile Sign Out Button */}
+            <button
+              onClick={() => {
+                handleSignOut();
+                setIsMenuOpen(false);
+              }}
+              className={`block w-full text-center px-4 py-2 rounded-md text-base font-medium ${
+                isEarthy 
+                  ? "bg-rust-500 hover:bg-rust-600" 
+                  : "bg-slate-blue hover:bg-charcoal-grey"
+              } text-white mt-2`}
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </div>
