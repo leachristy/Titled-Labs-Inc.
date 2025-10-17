@@ -5,7 +5,7 @@ import { UserAuth } from "../contexts/AuthContext.jsx";
 import NavBar from "../components/NavBar";
 
 export default function SignUp() {
-  const { googleSignIn, user } = UserAuth();
+  const { googleSignIn, doCreateUserWithEmailAndPassword, user } = UserAuth();
   const navigate = useNavigate();
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
@@ -48,13 +48,15 @@ export default function SignUp() {
 
     try {
       // Add your Firebase auth logic here
-      console.log("Signup attempt:", formData);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await doCreateUserWithEmailAndPassword(
+        formData.firstName,
+        formData.lastName,
+        formData.email,
+        formData.password
+      );
 
       // On success, redirect to home or dashboard
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       setError("An error occurred during signup. Please try again.");
       console.error(error);
