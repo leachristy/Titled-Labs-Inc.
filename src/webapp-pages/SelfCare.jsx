@@ -1,8 +1,8 @@
-import React from 'react';
-import UntiltNavBar from '../components/UntiltNavBar';
+import React from "react";
+import UntiltNavBar from "../components/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
-import CustomButton from '../components/Button';
-import { useNavigate } from 'react-router-dom';
+import CustomButton from "../components/Button";
+import { useNavigate } from "react-router-dom";
 
 const SelfCareSection = ({ title, children, isEarthy }) => (
   <div>
@@ -25,10 +25,6 @@ export const SelfCare = () => {
 
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    console.log("Button clicked!");
-  };
-
   const handleJournalClick = () => {
     navigate("/journal");
   };
@@ -41,6 +37,10 @@ export const SelfCare = () => {
     navigate("/breathing");
   };
 
+  const handleGuideVideosClick = () => {
+    navigate("/guide-videos");
+  };
+
   return (
     <>
       <UntiltNavBar />
@@ -49,7 +49,9 @@ export const SelfCare = () => {
         className={`min-h-screen px-4 pt-24 ${
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"
         }`}
-        style={{ backgroundColor: isEarthy ? undefined : "var(--pale-lavender)" }}
+        style={{
+          backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
+        }}
       >
         <div className="flex flex-col gap-4 p-4">
           <SelfCareSection title="Breathing Exercises" isEarthy={isEarthy}>
@@ -61,7 +63,7 @@ export const SelfCare = () => {
 
           <SelfCareSection title="Guided Videos" isEarthy={isEarthy}>
             Guided videos feature preview here
-            <CustomButton isEarthy={isEarthy} onClick={handleClick}>
+            <CustomButton isEarthy={isEarthy} onClick={handleGuideVideosClick}>
               View Page
             </CustomButton>
           </SelfCareSection>
