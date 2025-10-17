@@ -3,7 +3,7 @@ import { UserAuth } from "../contexts/AuthContext";
 import UntiltNavBar from "../components/UntiltNavBar";
 
 export default function Dashboard() {
-  const { user } = UserAuth();
+  const { user, profile } = UserAuth();
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
@@ -35,9 +35,13 @@ export default function Dashboard() {
               }}
             >
               <p className="mb-2 text-2xl font-semibold">
-                Welcome {user?.displayName || "Guest"},
+                Welcome{", "}
+                {[profile?.firstName, profile?.lastName]
+                  .filter(Boolean)
+                  .join(" ") || "Guest"}
+                {"!"}
               </p>
-              <p className="text-lg opacity-80">new features on the way!</p>
+              <p className="text-lg opacity-80">New features on the way!</p>
             </div>
           </div>
         </div>
