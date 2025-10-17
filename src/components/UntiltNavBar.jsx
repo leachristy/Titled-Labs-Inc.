@@ -9,11 +9,23 @@ export default function UntiltNavBar() {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSelfCareOpen, setIsSelfCareOpen] = useState(false);
+  const [isSelfCareOpenMobile, setIsSelfCareOpenMobile] = useState(false);
   const navigate = useNavigate();
 
   const links = [
     { name: "Dashboard", path: "/dashboard" },
-    { name: "Self Care", path: "/selfcare" },
+    { 
+      name: "Self Care", 
+      path: "/selfcare",
+      hasDropdown: true,
+      subLinks: [
+        { name: "Breathing Exercises", path: "/breathing" },
+        { name: "Guided Videos", path: "/guide-videos" },
+        { name: "Journal Entries", path: "/journal" },
+        { name: "Goals", path: "/goals" },
+      ]
+    },
     { name: "AI Chat", path: "/aichat" },
     { name: "Community", path: "/community" },
   ];
@@ -33,7 +45,7 @@ export default function UntiltNavBar() {
         isEarthy
           ? "bg-cream-100 border-tan-200"
           : "bg-pale-lavender border-cool-grey"
-      } shadow-md fixed top-0 w-full z-50 border-b opacity-90`}
+      } shadow-md fixed top-0 w-full z-50 border-b opacity-90 hover:opacity-100 transition-opacity duration-200`}
     >
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
@@ -58,25 +70,103 @@ export default function UntiltNavBar() {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-6">
             {links.map((link) => (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                className={({ isActive }) =>
-                  `px-3 py-2 rounded-md text-sm font-medium transition ${
-                    isActive
-                      ? `${
-                          isEarthy ? "bg-rust-500" : "bg-slate-blue"
-                        } text-white`
-                      : `${
-                          isEarthy
-                            ? "text-brown-700 hover:text-rust-500"
-                            : "text-charcoal-grey hover:text-slate-blue"
-                        }`
-                  }`
-                }
-              >
-                {link.name}
-              </NavLink>
+              link.hasDropdown ? (
+                <div
+                  key={link.path}
+                  className="relative"
+                  onMouseEnter={() => setIsSelfCareOpen(true)}
+                  onMouseLeave={() => setIsSelfCareOpen(false)}
+                >
+                  <NavLink
+                    to={link.path}
+                    className={({ isActive }) =>
+                      `px-3 py-2 rounded-md text-sm font-medium transition flex items-center gap-1 ${
+                        isActive
+                          ? `${
+                              isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                            } text-white`
+                          : `${
+                              isEarthy
+                                ? "text-brown-700 hover:text-rust-500"
+                                : "text-charcoal-grey hover:text-slate-blue"
+                            }`
+                      }`
+                    }
+                  >
+                    {link.name}
+                    <svg
+                      className={`w-4 h-4 transition-transform ${
+                        isSelfCareOpen ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </NavLink>
+
+                  {/* Dropdown Menu */}
+                  <div
+                    className={`absolute top-full left-0 -mt-0 w-56 rounded-lg shadow-lg overflow-hidden transition-all duration-100 ${
+                      isSelfCareOpen
+                        ? "opacity-100 translate-y-0 pointer-events-auto"
+                        : "opacity-0 -translate-y-2 pointer-events-none"
+                    } ${
+                      isEarthy
+                        ? "bg-cream-50 border-2 border-tan-300"
+                        : "bg-white border-2 border-cool-grey"
+                    }`}
+                  >
+                    {link.subLinks.map((subLink) => (
+                      <NavLink
+                        key={subLink.path}
+                        to={subLink.path}
+                        className={({ isActive }) =>
+                          `block px-4 py-3 text-sm font-medium transition ${
+                            isActive
+                              ? `${
+                                  isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                                } text-white`
+                              : `${
+                                  isEarthy
+                                    ? "text-brown-700 hover:bg-tan-100 hover:text-rust-500"
+                                    : "text-charcoal-grey hover:bg-pale-lavender hover:text-slate-blue"
+                                }`
+                          }`
+                        }
+                      >
+                        {subLink.name}
+                      </NavLink>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-md text-sm font-medium transition ${
+                      isActive
+                        ? `${
+                            isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                          } text-white`
+                        : `${
+                            isEarthy
+                              ? "text-brown-700 hover:text-rust-500"
+                              : "text-charcoal-grey hover:text-slate-blue"
+                          }`
+                    }`
+                  }
+                >
+                  {link.name}
+                </NavLink>
+              )
             ))}
           </div>
 
@@ -141,7 +231,7 @@ export default function UntiltNavBar() {
         {/* Mobile Dropdown */}
         <div
           className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            isMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
           <div
@@ -150,26 +240,112 @@ export default function UntiltNavBar() {
             } rounded-lg mx-2 mb-2`}
           >
             {links.map((link) => (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={({ isActive }) =>
-                  `block px-4 py-3 rounded-md text-base font-medium transition ${
-                    isActive
-                      ? `${
-                          isEarthy ? "bg-rust-500" : "bg-slate-blue"
-                        } text-white`
-                      : `${
-                          isEarthy
-                            ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
-                            : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
+              link.hasDropdown ? (
+                <div key={link.path}>
+                  {/* Main Self Care Link with Toggle */}
+                  <div className="flex items-center">
+                    <NavLink
+                      to={link.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `flex-1 px-4 py-3 rounded-md text-base font-medium transition ${
+                          isActive
+                            ? `${
+                                isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                              } text-white`
+                            : `${
+                                isEarthy
+                                  ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
+                                  : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
+                              }`
                         }`
-                  }`
-                }
-              >
-                {link.name}
-              </NavLink>
+                      }
+                    >
+                      {link.name}
+                    </NavLink>
+                    <button
+                      onClick={() => setIsSelfCareOpenMobile(!isSelfCareOpenMobile)}
+                      className={`px-3 py-3 ${
+                        isEarthy
+                          ? "text-brown-700 hover:text-rust-500"
+                          : "text-charcoal-grey hover:text-slate-blue"
+                      }`}
+                    >
+                      <svg
+                        className={`w-5 h-5 transition-transform ${
+                          isSelfCareOpenMobile ? "rotate-180" : ""
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Sub Links */}
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ${
+                      isSelfCareOpenMobile ? "max-h-64" : "max-h-0"
+                    }`}
+                  >
+                    <div className="pl-6 space-y-1 mt-1">
+                      {link.subLinks.map((subLink) => (
+                        <NavLink
+                          key={subLink.path}
+                          to={subLink.path}
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setIsSelfCareOpenMobile(false);
+                          }}
+                          className={({ isActive }) =>
+                            `block px-4 py-2 rounded-md text-sm font-medium transition ${
+                              isActive
+                                ? `${
+                                    isEarthy ? "bg-rust-400" : "bg-slate-blue"
+                                  } text-white`
+                                : `${
+                                    isEarthy
+                                      ? "text-brown-600 hover:text-rust-500 hover:bg-cream-200"
+                                      : "text-slate-blue hover:text-charcoal-grey hover:bg-pale-lavender"
+                                  }`
+                            }`
+                          }
+                        >
+                          • {subLink.name}
+                        </NavLink>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `block px-4 py-3 rounded-md text-base font-medium transition ${
+                      isActive
+                        ? `${
+                            isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                          } text-white`
+                        : `${
+                            isEarthy
+                              ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
+                              : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
+                          }`
+                    }`
+                  }
+                >
+                  {link.name}
+                </NavLink>
+              )
             ))}
 
             {/* Mobile User Display */}
