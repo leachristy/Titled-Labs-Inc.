@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage, db, auth } from "../src/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import BadgeGallery from "./BadgeGallery";
-import Confirmation from "./Confirmation";
+import { doc, updateDoc } from "firebase/firestore";
+import { updateProfile } from "firebase/auth";
 import defaultPic from "../assets/default-profile.jpg";
 
 export default function EditProfile({ userId, profile, onSave, onCancel }) {
@@ -11,7 +10,7 @@ export default function EditProfile({ userId, profile, onSave, onCancel }) {
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
 
-  // Define color palette constants
+  // Color palette constants
   const BACKGROUND_LIGHT = "#ECDAC8";
   const TEXT_DARK = "#955749";
   const PRIMARY_BUTTON = "#BF5B3C";
@@ -19,85 +18,88 @@ export default function EditProfile({ userId, profile, onSave, onCancel }) {
   const INPUT_BORDER = "#D1A693";
   const INPUT_BACKGROUND = "#F9F6F1";
 
-  // Styles for the component
+  // Styles
   const styles = {
     form: {
-      display: 'flex',
-      flexDirection: 'column',
-      width: '100%',
-      maxWidth: '500px', 
-      margin: '0 auto',
-      padding: '20px 0',
+      display: "flex",
+      flexDirection: "column",
+      width: "100%",
+      maxWidth: "500px",
+      margin: "0 auto",
+      padding: "20px 0",
     },
     label: {
       color: TEXT_DARK,
-      fontWeight: 'bold',
-      marginTop: '15px',
-      marginBottom: '5px',
-      textAlign: 'left',
+      fontWeight: "bold",
+      marginTop: "15px",
+      marginBottom: "5px",
+      textAlign: "left",
     },
     input: {
-      padding: '10px 15px',
+      padding: "10px 15px",
       border: `1px solid ${INPUT_BORDER}`,
-      borderRadius: '4px',
+      borderRadius: "4px",
       backgroundColor: INPUT_BACKGROUND,
       color: TEXT_DARK,
-      fontSize: '16px',
+      fontSize: "16px",
     },
     fileInputContainer: {
-        marginBottom: '10px',
-        textAlign: 'left',
+      marginBottom: "10px",
+      textAlign: "left",
     },
     error: {
       backgroundColor: PRIMARY_BUTTON,
-      color: 'white',
-      padding: '10px',
-      borderRadius: '4px',
-      marginBottom: '20px',
-      textAlign: 'center',
+      color: "white",
+      padding: "10px",
+      borderRadius: "4px",
+      marginBottom: "20px",
+      textAlign: "center",
     },
     loading: {
-        color: TEXT_DARK,
-        textAlign: 'center',
-        margin: '10px 0',
+      color: TEXT_DARK,
+      textAlign: "center",
+      margin: "10px 0",
     },
     button: {
-      backgroundColor: PRIMARY_BUTTON, // #BF5B3C
-      color: 'white',
-      border: 'none',
-      padding: '10px 20px',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      margin: '0 5px',
-      fontWeight: 'bold',
-      transition: 'background-color 0.3s ease',
-      minWidth: '120px',
+      backgroundColor: PRIMARY_BUTTON,
+      color: "white",
+      border: "none",
+      padding: "10px 20px",
+      borderRadius: "4px",
+      cursor: "pointer",
+      margin: "0 5px",
+      fontWeight: "bold",
+      transition: "background-color 0.3s ease",
+      minWidth: "120px",
     },
     cancelButton: {
       backgroundColor: INPUT_BORDER,
       color: TEXT_DARK,
-      border: 'none',
-      padding: '10px 20px',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      margin: '0 5px',
-      fontWeight: 'bold',
-      transition: 'background-color 0.3s ease',
-      minWidth: '120px',
+      border: "none",
+      padding: "10px 20px",
+      borderRadius: "4px",
+      cursor: "pointer",
+      margin: "0 5px",
+      fontWeight: "bold",
+      transition: "background-color 0.3s ease",
+      minWidth: "120px",
     },
     buttonGroup: {
-      marginTop: '30px',
-      display: 'flex',
-      justifyContent: 'center',
-    }
+      marginTop: "30px",
+      display: "flex",
+      justifyContent: "center",
+    },
   };
 
+  // Validation helpers
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
   const validateName = (name) => /^[A-Za-z]{1,50}$/.test(name);
 
+  // Handle profile image upload
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
       setError("Only .jpg, .jpeg, or .png allowed");
       return;
@@ -108,27 +110,54 @@ export default function EditProfile({ userId, profile, onSave, onCancel }) {
       const storageRef = ref(storage, `profiles/${userId}/${file.name}`);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
-      setForm({ ...form, profilePic: url });
+      setForm({ ...form, photoUrl: url });
       setError("");
     } catch (err) {
+      console.error("Upload error:", err);
       setError("Failed to upload image");
     } finally {
       setUploading(false);
     }
   };
 
-  const handleSubmit = (e) => {
+  // Handle save
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateName(form.firstName) || !validateName(form.lastName)) {
       return setError("Names must contain only letters (max 50 chars).");
     }
     if (form.email && !validateEmail(form.email)) {
-        return setError("Please enter a valid email address.");
+      return setError("Please enter a valid email address.");
     }
 
-    setError("");
-    onSave(form);
+    try {
+      // Update Firestore user document
+      const userRef = doc(db, "users", userId);
+      await updateDoc(userRef, {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        photoUrl: form.photoUrl || profile.photoUrl || defaultPic,
+        updatedAt: new Date(),
+      });
+
+      // Sync with Firebase Auth user
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, {
+          displayName: `${form.firstName} ${form.lastName}`,
+          photoURL: form.photoUrl || profile.photoUrl || defaultPic,
+        });
+      }
+
+      onSave({
+        ...form,
+        photoUrl: form.photoUrl || profile.photoUrl,
+      });
+      setError("");
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setError("Failed to update profile. Please try again.");
+    }
   };
 
   return (
@@ -152,9 +181,12 @@ export default function EditProfile({ userId, profile, onSave, onCancel }) {
       <label style={styles.label}>Email</label>
       <input
         value={form.email || ""}
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-        style={{ ...styles.input, backgroundColor: '#eee', cursor: 'not-allowed' }}
         disabled
+        style={{
+          ...styles.input,
+          backgroundColor: "#eee",
+          cursor: "not-allowed",
+        }}
       />
 
       <label style={styles.label}>Profile Picture</label>
@@ -166,24 +198,31 @@ export default function EditProfile({ userId, profile, onSave, onCancel }) {
         />
       </div>
 
-
       {uploading && <p style={styles.loading}>Uploading profile picture...</p>}
 
       <div style={styles.buttonGroup}>
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           style={styles.button}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = HOVER_BUTTON)}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = PRIMARY_BUTTON)}
+          onMouseOver={(e) =>
+            (e.currentTarget.style.backgroundColor = HOVER_BUTTON)
+          }
+          onMouseOut={(e) =>
+            (e.currentTarget.style.backgroundColor = PRIMARY_BUTTON)
+          }
         >
           Save Changes
         </button>
-        <button 
-          type="button" 
-          onClick={onCancel} 
+        <button
+          type="button"
+          onClick={onCancel}
           style={styles.cancelButton}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = PRIMARY_BUTTON)}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = INPUT_BORDER)}
+          onMouseOver={(e) =>
+            (e.currentTarget.style.backgroundColor = PRIMARY_BUTTON)
+          }
+          onMouseOut={(e) =>
+            (e.currentTarget.style.backgroundColor = INPUT_BORDER)
+          }
         >
           Cancel
         </button>
