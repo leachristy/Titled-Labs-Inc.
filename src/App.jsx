@@ -24,6 +24,8 @@ import { SelfCare } from "./webapp-pages/SelfCare";
 import JournalEntries from "./webapp-pages/selfcare-features/JournalEntries";
 import Goals from "./webapp-pages/selfcare-features/Goal";
 import BreathingExercises from "./webapp-pages/selfcare-features/BreathingExercises";
+import GuidedVideos from "./webapp-pages/selfcare-features/GuideVideos/GuideVideos";
+import VideoWatch from "./webapp-pages/selfcare-features/GuideVideos/VideoWatch";
 import ProfilePage from "./pages/ProfilePage"
 
 
@@ -72,6 +74,22 @@ export default function App() {
               element={
                 <Protected>
                   <JournalEntries />
+                </Protected>
+              }
+            />
+            <Route
+              path="/guide-videos"
+              element={
+                <Protected>
+                  <GuidedVideos />
+                </Protected>
+              }
+            />
+            <Route
+              path="/guide-videos/:id"
+              element={
+                <Protected>
+                  <VideoWatch />
                 </Protected>
               }
             />
