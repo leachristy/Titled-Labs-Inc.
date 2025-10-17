@@ -37,6 +37,10 @@ export const SelfCare = () => {
     navigate("/goals");
   };
 
+  const handleBreathingClick = () => {
+    navigate("/breathing");
+  };
+
   return (
     <>
       <UntiltNavBar />
@@ -50,7 +54,7 @@ export const SelfCare = () => {
         <div className="flex flex-col gap-4 p-4">
           <SelfCareSection title="Breathing Exercises" isEarthy={isEarthy}>
             Breathing exercises feature preview here
-            <CustomButton isEarthy={isEarthy} onClick={handleClick}>
+            <CustomButton isEarthy={isEarthy} onClick={handleBreathingClick}>
               View Page
             </CustomButton>
           </SelfCareSection>
