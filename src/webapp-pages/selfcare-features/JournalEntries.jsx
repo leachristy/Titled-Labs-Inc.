@@ -99,7 +99,7 @@ export default function JournalEntries() {
       <UntiltNavBar />
       <div className={`min-h-screen mt-15 px-6 py-10 ${isEarthy ? "bg-cream-100" : "bg-pale-lavender"}`}>
         <div className="max-w-5xl mx-auto">
-          {/* 👇 Back Button */}
+          {/* Back Button */}
           <button
             onClick={() => navigate("/selfcare")}
             className={`mb-6 px-4 py-2 rounded-lg flex items-center gap-2 font-medium shadow-sm ${
