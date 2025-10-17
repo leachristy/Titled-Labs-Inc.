@@ -97,7 +97,7 @@ export default function JournalEntries() {
   return (
     <>
       <UntiltNavBar />
-      <div className={`min-h-screen mt-20 px-6 py-10 ${isEarthy ? "bg-cream-100" : "bg-indigo-50"}`}>
+      <div className={`min-h-screen mt-15 px-6 py-10 ${isEarthy ? "bg-cream-100" : "bg-pale-lavender"}`}>
         <div className="max-w-5xl mx-auto">
           {/* 👇 Back Button */}
           <button
@@ -112,7 +112,7 @@ export default function JournalEntries() {
           </button>
           {/* Header */}
           <div className="mb-8 text-center">
-            <h1 className={`text-4xl font-bold ${isEarthy ? "text-brown-800" : "text-indigo-900"}`}>
+            <h1 className={`text-4xl font-bold ${isEarthy ? "text-brown-800" : "text-charcoal-grey"}`}>
               My Journal
             </h1>
             <p className={`mt-2 ${isEarthy ? "text-brown-600" : "text-slate-600"}`}>
@@ -126,9 +126,9 @@ export default function JournalEntries() {
               onClick={() => setShowPromptModal(true)}
               className={`px-4 py-2 rounded-lg font-semibold ${
                 isEarthy
-                  ? "bg-rust-500 hover:bg-rust-600 text-white"
-                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
-              } transition`}
+                  ? "bg-rust-500 hover:bg-rust-600"
+                  : "bg-slate-blue hover:bg-charcoal-grey"
+              } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`}
             >
               ✏️ Choose a Prompt
             </button>
@@ -136,9 +136,9 @@ export default function JournalEntries() {
               onClick={() => setShowAddModal(true)}
               className={`px-4 py-2 rounded-lg font-semibold ${
                 isEarthy
-                  ? "bg-tan-400 hover:bg-tan-500 text-brown-900"
-                  : "bg-purple-300 hover:bg-purple-400 text-indigo-900"
-              } transition`}
+                  ? "bg-terracotta-400 hover:bg-terracotta-500"
+                  : "bg-blue-grey hover:bg-slate-blue"
+              } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`}
             >
               ➕ New Entry
             </button>
@@ -250,9 +250,9 @@ export default function JournalEntries() {
                   disabled={!newEntryText.trim()}
                   className={`px-4 py-2 rounded-lg ${
                     isEarthy
-                      ? "bg-rust-500 hover:bg-rust-600 text-white"
-                      : "bg-indigo-600 hover:bg-indigo-700 text-white"
-                  } transition disabled:opacity-50`}
+                    ? "bg-rust-500 hover:bg-rust-600"
+                    : "bg-slate-blue hover:bg-charcoal-grey"
+                } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform`}
                 >
                   Add
                 </button>
@@ -287,9 +287,9 @@ export default function JournalEntries() {
                     }}
                     className={`p-3 rounded-lg text-left ${
                       isEarthy
-                        ? "bg-tan-200 hover:bg-tan-300 text-brown-800"
-                        : "bg-indigo-100 hover:bg-indigo-200 text-indigo-900"
-                    } transition`}
+                      ? "bg-tan-500 hover:bg-tan-600"
+                      : "bg-cool-grey hover:bg-slate-blue"
+                  } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`}
                   >
                     {prompt}
                   </button>
