@@ -1,223 +1,653 @@
+import { useState, useEffect } from "react";
 import UntiltNavBar from "../components/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
+import { UserAuth } from "../contexts/AuthContext";
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+  doc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  deleteDoc,
+} from "firebase/firestore";
+import { db } from "../src/firebase";
 
 export default function Community() {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  const { user, profile } = UserAuth();
+
+  const [posts, setPosts] = useState([]);
+  const [newPostTitle, setNewPostTitle] = useState("");
+  const [newPostContent, setNewPostContent] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [isCreatingPost, setIsCreatingPost] = useState(false);
+  const [expandedPost, setExpandedPost] = useState(null);
+  const [commentText, setCommentText] = useState({});
+
+  const categories = [
+    "All",
+    "Mental Health",
+    "Self Care",
+    "Success Stories",
+    "Questions",
+    "Resources",
+    "General",
+  ];
+
+  // Fetch posts from Firebase
+  useEffect(() => {
+    const q = query(collection(db, "communityPosts"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const postsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPosts(postsData);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Create new post
+  const handleCreatePost = async (e) => {
+    e.preventDefault();
+    if (!newPostTitle.trim() || !newPostContent.trim()) return;
+
+    try {
+      await addDoc(collection(db, "communityPosts"), {
+        title: newPostTitle,
+        content: newPostContent,
+        category: selectedCategory === "All" ? "General" : selectedCategory,
+        authorId: user.uid,
+        authorName: profile?.firstName
+          ? `${profile.firstName} ${profile.lastName || ""}`
+          : "Anonymous",
+        authorAvatar: profile?.photoUrl || null,
+        upvotes: [],
+        downvotes: [],
+        comments: [],
+        createdAt: serverTimestamp(),
+      });
+
+      setNewPostTitle("");
+      setNewPostContent("");
+      setIsCreatingPost(false);
+    } catch (error) {
+      console.error("Error creating post:", error);
+    }
+  };
+
+  // Handle upvote
+  const handleUpvote = async (postId, upvotes, downvotes) => {
+    const postRef = doc(db, "communityPosts", postId);
+    const hasUpvoted = upvotes?.includes(user.uid);
+    const hasDownvoted = downvotes?.includes(user.uid);
+
+    try {
+      if (hasUpvoted) {
+        await updateDoc(postRef, { upvotes: arrayRemove(user.uid) });
+      } else {
+        if (hasDownvoted) {
+          await updateDoc(postRef, { downvotes: arrayRemove(user.uid) });
+        }
+        await updateDoc(postRef, { upvotes: arrayUnion(user.uid) });
+      }
+    } catch (error) {
+      console.error("Error upvoting:", error);
+    }
+  };
+
+  // Handle downvote
+  const handleDownvote = async (postId, upvotes, downvotes) => {
+    const postRef = doc(db, "communityPosts", postId);
+    const hasUpvoted = upvotes?.includes(user.uid);
+    const hasDownvoted = downvotes?.includes(user.uid);
+
+    try {
+      if (hasDownvoted) {
+        await updateDoc(postRef, { downvotes: arrayRemove(user.uid) });
+      } else {
+        if (hasUpvoted) {
+          await updateDoc(postRef, { upvotes: arrayRemove(user.uid) });
+        }
+        await updateDoc(postRef, { downvotes: arrayUnion(user.uid) });
+      }
+    } catch (error) {
+      console.error("Error downvoting:", error);
+    }
+  };
+
+  // Add comment
+  const handleAddComment = async (postId) => {
+    const text = commentText[postId]?.trim();
+    if (!text) return;
+
+    const postRef = doc(db, "communityPosts", postId);
+    const newComment = {
+      id: Date.now().toString(),
+      text,
+      authorId: user.uid,
+      authorName: profile?.firstName
+        ? `${profile.firstName} ${profile.lastName || ""}`
+        : "Anonymous",
+      authorAvatar: profile?.photoUrl || null,
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      await updateDoc(postRef, {
+        comments: arrayUnion(newComment),
+      });
+      setCommentText({ ...commentText, [postId]: "" });
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
+
+  // Delete post
+  const handleDeletePost = async (postId, authorId) => {
+    if (user.uid !== authorId) return;
+
+    try {
+      await deleteDoc(doc(db, "communityPosts", postId));
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
+
+  // Filter posts by category
+  const filteredPosts =
+    selectedCategory === "All"
+      ? posts
+      : posts.filter((post) => post.category === selectedCategory);
+
+  // Get vote count
+  const getVoteCount = (upvotes = [], downvotes = []) => {
+    return upvotes.length - downvotes.length;
+  };
+
+  // Format time ago
+  const timeAgo = (timestamp) => {
+    if (!timestamp) return "just now";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const seconds = Math.floor((new Date() - date) / 1000);
+
+    let interval = Math.floor(seconds / 31536000);
+    if (interval > 1) return `${interval} years ago`;
+    if (interval === 1) return "1 year ago";
+
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) return `${interval} months ago`;
+    if (interval === 1) return "1 month ago";
+
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) return `${interval} days ago`;
+    if (interval === 1) return "1 day ago";
+
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) return `${interval} hours ago`;
+    if (interval === 1) return "1 hour ago";
+
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) return `${interval} minutes ago`;
+    if (interval === 1) return "1 minute ago";
+
+    return "just now";
+  };
 
   return (
     <>
       <title>Untilt - Community</title>
       <UntiltNavBar />
       <div
-        className={`min-h-screen pt-24 px-4 ${
+        className={`min-h-screen pt-20 pb-12 ${
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"
         }`}
         style={{
           backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
         }}
       >
-        <div className="max-w-4xl mx-auto">
-          <h1
-            className={`text-3xl font-bold mb-6 text-center ${
-              isEarthy ? "text-brown-800" : "text-charcoal-grey"
-            }`}
-            style={{ color: isEarthy ? undefined : "var(--charcoal-grey)" }}
-          >
-            Community Chat
-          </h1>
-
-          <div
-            className={`rounded-lg shadow-lg h-96 mb-4 p-4 overflow-y-auto bg-white ${
-              isEarthy ? "border-tan-200" : "border-cool-grey"
-            } border`}
-            style={{ borderColor: isEarthy ? undefined : "var(--cool-grey)" }}
-          >
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${
-                    isEarthy ? "bg-rust-500" : "bg-slate-blue"
-                  }`}
-                  style={{
-                    backgroundColor: isEarthy ? undefined : "var(--slate-blue)",
-                  }}
-                >
-                  A
-                </div>
-                <div
-                  className={`rounded-lg p-3 max-w-xs ${
-                    isEarthy
-                      ? "bg-cream-100 border-tan-200"
-                      : "bg-pale-lavender border-cool-grey"
-                  } border`}
-                  style={{
-                    backgroundColor: isEarthy
-                      ? undefined
-                      : "var(--pale-lavender)",
-                    borderColor: isEarthy ? undefined : "var(--cool-grey)",
-                  }}
-                >
-                  <p
-                    className={`text-sm ${
-                      isEarthy ? "text-brown-800" : "text-charcoal-grey"
-                    }`}
-                    style={{
-                      color: isEarthy ? undefined : "var(--charcoal-grey)",
-                    }}
-                  >
-                    Welcome everyone! How is everyone feeling today?
-                  </p>
-                  <span
-                    className={`text-xs ${
-                      isEarthy ? "text-brown-600" : "text-slate-blue"
-                    }`}
-                    style={{
-                      color: isEarthy ? undefined : "var(--slate-blue)",
-                    }}
-                  >
-                    Alex - 2:30 PM
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${
-                    isEarthy ? "bg-terracotta-400" : "bg-blue-grey"
-                  }`}
-                  style={{
-                    backgroundColor: isEarthy ? undefined : "var(--blue-grey)",
-                  }}
-                >
-                  M
-                </div>
-                <div
-                  className={`rounded-lg p-3 max-w-xs ${
-                    isEarthy
-                      ? "bg-cream-100 border-tan-200"
-                      : "bg-pale-lavender border-cool-grey"
-                  } border`}
-                  style={{
-                    backgroundColor: isEarthy
-                      ? undefined
-                      : "var(--pale-lavender)",
-                    borderColor: isEarthy ? undefined : "var(--cool-grey)",
-                  }}
-                >
-                  <p
-                    className={`text-sm ${
-                      isEarthy ? "text-brown-800" : "text-charcoal-grey"
-                    }`}
-                    style={{
-                      color: isEarthy ? undefined : "var(--charcoal-grey)",
-                    }}
-                  >
-                    Having a better day today, thanks for asking!
-                  </p>
-                  <span
-                    className={`text-xs ${
-                      isEarthy ? "text-brown-600" : "text-slate-blue"
-                    }`}
-                    style={{
-                      color: isEarthy ? undefined : "var(--slate-blue)",
-                    }}
-                  >
-                    Maria - 2:32 PM
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${
-                    isEarthy ? "bg-rust-600" : "bg-charcoal-grey"
-                  }`}
-                  style={{
-                    backgroundColor: isEarthy
-                      ? undefined
-                      : "var(--charcoal-grey)",
-                  }}
-                >
-                  J
-                </div>
-                <div
-                  className={`rounded-lg p-3 max-w-xs ${
-                    isEarthy
-                      ? "bg-cream-100 border-tan-200"
-                      : "bg-pale-lavender border-cool-grey"
-                  } border`}
-                  style={{
-                    backgroundColor: isEarthy
-                      ? undefined
-                      : "var(--pale-lavender)",
-                    borderColor: isEarthy ? undefined : "var(--cool-grey)",
-                  }}
-                >
-                  <p
-                    className={`text-sm ${
-                      isEarthy ? "text-brown-800" : "text-charcoal-grey"
-                    }`}
-                    style={{
-                      color: isEarthy ? undefined : "var(--charcoal-grey)",
-                    }}
-                  >
-                    The breathing exercises really helped me this week.
-                  </p>
-                  <span
-                    className={`text-xs ${
-                      isEarthy ? "text-brown-600" : "text-slate-blue"
-                    }`}
-                    style={{
-                      color: isEarthy ? undefined : "var(--slate-blue)",
-                    }}
-                  >
-                    Jordan - 2:35 PM
-                  </span>
-                </div>
-              </div>
-            </div>
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Header */}
+          <div className="mb-8 mt-4">
+            <h1
+              className={`text-4xl font-bold mb-2 ${
+                isEarthy ? "text-brown-800" : "text-charcoal-grey"
+              }`}
+            >
+              Community Forum
+            </h1>
+            <p
+              className={`text-lg ${
+                isEarthy ? "text-brown-600" : "text-slate-blue"
+              }`}
+            >
+              Share your experiences, ask questions, and support others in their wellness journey.
+            </p>
           </div>
 
-          <div
-            className={`rounded-lg shadow-lg p-4 bg-white ${
-              isEarthy ? "border-tan-200" : "border-cool-grey"
-            } border`}
-            style={{ borderColor: isEarthy ? undefined : "var(--cool-grey)" }}
-          >
-            <div className="flex space-x-3">
-              <input
-                type="text"
-                placeholder="Type your message..."
-                className={`flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 ${
-                  isEarthy
-                    ? "border-tan-300 focus:ring-rust-500"
-                    : "border-cool-grey focus:ring-slate-blue"
-                }`}
-                style={{
-                  borderColor: isEarthy ? undefined : "var(--cool-grey)",
-                }}
-              />
-              <button
-                className={`px-6 py-2 text-white rounded-lg transition ${
-                  isEarthy
-                    ? "bg-rust-500 hover:bg-rust-600"
-                    : "bg-slate-blue hover:bg-charcoal-grey"
-                }`}
-                style={{
-                  backgroundColor: isEarthy ? undefined : "var(--slate-blue)",
-                }}
-                onMouseEnter={(e) =>
-                  !isEarthy &&
-                  (e.target.style.backgroundColor = "var(--charcoal-grey)")
-                }
-                onMouseLeave={(e) =>
-                  !isEarthy &&
-                  (e.target.style.backgroundColor = "var(--slate-blue)")
-                }
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <div
+                className={`rounded-lg shadow-lg p-4 bg-white ${
+                  isEarthy ? "border-tan-200" : "border-cool-grey"
+                } border sticky top-24`}
               >
-                Send
-              </button>
+                <h2
+                  className={`text-lg font-bold mb-4 ${
+                    isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                  }`}
+                >
+                  Categories
+                </h2>
+                <div className="space-y-2">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      className={`w-full text-left px-4 py-2 rounded-lg transition font-medium ${
+                        selectedCategory === category
+                          ? isEarthy
+                            ? "bg-rust-500 text-white"
+                            : "bg-slate-blue text-white"
+                          : isEarthy
+                          ? "text-brown-700 hover:bg-cream-100"
+                          : "text-charcoal-grey hover:bg-pale-lavender"
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setIsCreatingPost(!isCreatingPost)}
+                  className={`w-full mt-6 px-4 py-3 rounded-lg font-bold text-white transition shadow-md hover:shadow-lg ${
+                    isEarthy
+                      ? "bg-rust-500 hover:bg-rust-600"
+                      : "bg-slate-blue hover:bg-charcoal-grey"
+                  }`}
+                >
+                  + Create Post
+                </button>
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="lg:col-span-3">
+              {/* Create Post Form */}
+              {isCreatingPost && (
+                <div
+                  className={`rounded-lg shadow-lg p-6 mb-6 bg-white ${
+                    isEarthy ? "border-tan-200" : "border-cool-grey"
+                  } border`}
+                >
+                  <h2
+                    className={`text-xl font-bold mb-4 ${
+                      isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                    }`}
+                  >
+                    Create a New Post
+                  </h2>
+                  <form onSubmit={handleCreatePost} className="space-y-4">
+                    <div>
+                      <label
+                        className={`block text-sm font-medium mb-2 ${
+                          isEarthy ? "text-brown-700" : "text-charcoal-grey"
+                        }`}
+                      >
+                        Category
+                      </label>
+                      <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 ${
+                          isEarthy
+                            ? "border-tan-300 focus:ring-rust-500"
+                            : "border-cool-grey focus:ring-slate-blue"
+                        }`}
+                      >
+                        {categories.filter((c) => c !== "All").map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label
+                        className={`block text-sm font-medium mb-2 ${
+                          isEarthy ? "text-brown-700" : "text-charcoal-grey"
+                        }`}
+                      >
+                        Title
+                      </label>
+                      <input
+                        type="text"
+                        value={newPostTitle}
+                        onChange={(e) => setNewPostTitle(e.target.value)}
+                        placeholder="What's on your mind?"
+                        className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 ${
+                          isEarthy
+                            ? "border-tan-300 focus:ring-rust-500"
+                            : "border-cool-grey focus:ring-slate-blue"
+                        }`}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label
+                        className={`block text-sm font-medium mb-2 ${
+                          isEarthy ? "text-brown-700" : "text-charcoal-grey"
+                        }`}
+                      >
+                        Content
+                      </label>
+                      <textarea
+                        value={newPostContent}
+                        onChange={(e) => setNewPostContent(e.target.value)}
+                        placeholder="Share your thoughts, experiences, or questions..."
+                        rows="6"
+                        className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 resize-none ${
+                          isEarthy
+                            ? "border-tan-300 focus:ring-rust-500"
+                            : "border-cool-grey focus:ring-slate-blue"
+                        }`}
+                        required
+                      />
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        type="submit"
+                        className={`flex-1 px-6 py-2 rounded-lg font-bold text-white transition ${
+                          isEarthy
+                            ? "bg-rust-500 hover:bg-rust-600"
+                            : "bg-slate-blue hover:bg-charcoal-grey"
+                        }`}
+                      >
+                        Post
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsCreatingPost(false)}
+                        className={`px-6 py-2 rounded-lg font-medium transition ${
+                          isEarthy
+                            ? "bg-tan-200 hover:bg-tan-300 text-brown-800"
+                            : "bg-gray-200 hover:bg-gray-300 text-charcoal-grey"
+                        }`}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* Posts List */}
+              {filteredPosts.length === 0 ? (
+                <div
+                  className={`rounded-lg shadow-lg p-12 bg-white text-center ${
+                    isEarthy ? "border-tan-200" : "border-cool-grey"
+                  } border`}
+                >
+                  <p
+                    className={`text-lg ${
+                      isEarthy ? "text-brown-600" : "text-slate-blue"
+                    }`}
+                  >
+                    No posts yet. Be the first to start a conversation!
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className={`rounded-lg shadow-lg bg-white ${
+                        isEarthy ? "border-tan-200" : "border-cool-grey"
+                      } border overflow-hidden`}
+                    >
+                      <div className="flex">
+                        {/* Vote Section */}
+                        <div
+                          className={`flex flex-col items-center p-4 ${
+                            isEarthy ? "bg-cream-50" : "bg-gray-50"
+                          }`}
+                        >
+                          <button
+                            onClick={() =>
+                              handleUpvote(post.id, post.upvotes, post.downvotes)
+                            }
+                            className={`transition ${
+                              post.upvotes?.includes(user.uid)
+                                ? isEarthy
+                                  ? "text-rust-600"
+                                  : "text-slate-blue"
+                                : isEarthy
+                                ? "text-brown-400 hover:text-rust-500"
+                                : "text-gray-400 hover:text-slate-blue"
+                            }`}
+                          >
+                            <svg
+                              className="w-6 h-6"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M10 3l6 7h-5v7H9v-7H4l6-7z" />
+                            </svg>
+                          </button>
+                          <span
+                            className={`text-lg font-bold my-1 ${
+                              isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                            }`}
+                          >
+                            {getVoteCount(post.upvotes, post.downvotes)}
+                          </span>
+                          <button
+                            onClick={() =>
+                              handleDownvote(post.id, post.upvotes, post.downvotes)
+                            }
+                            className={`transition ${
+                              post.downvotes?.includes(user.uid)
+                                ? isEarthy
+                                  ? "text-rust-600"
+                                  : "text-slate-blue"
+                                : isEarthy
+                                ? "text-brown-400 hover:text-rust-500"
+                                : "text-gray-400 hover:text-slate-blue"
+                            }`}
+                          >
+                            <svg
+                              className="w-6 h-6"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M10 17l-6-7h5V3h2v7h5l-6 7z" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* Post Content */}
+                        <div className="flex-1 p-4">
+                          {/* Post Header */}
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <span
+                                className={`px-2 py-1 text-xs font-semibold rounded ${
+                                  isEarthy
+                                    ? "bg-tan-200 text-brown-800"
+                                    : "bg-blue-100 text-slate-blue"
+                                }`}
+                              >
+                                {post.category}
+                              </span>
+                              <span
+                                className={`text-sm ${
+                                  isEarthy ? "text-brown-600" : "text-gray-600"
+                                }`}
+                              >
+                                Posted by {post.authorName} • {timeAgo(post.createdAt)}
+                              </span>
+                            </div>
+                            {user.uid === post.authorId && (
+                              <button
+                                onClick={() => handleDeletePost(post.id, post.authorId)}
+                                className="text-red-500 hover:text-red-700 text-sm font-medium"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Post Title & Content */}
+                          <h3
+                            className={`text-xl font-bold mb-2 ${
+                              isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                            }`}
+                          >
+                            {post.title}
+                          </h3>
+                          <p
+                            className={`text-sm mb-4 whitespace-pre-wrap ${
+                              isEarthy ? "text-brown-700" : "text-gray-700"
+                            }`}
+                          >
+                            {post.content}
+                          </p>
+
+                          {/* Post Actions */}
+                          <div className="flex items-center space-x-4">
+                            <button
+                              onClick={() =>
+                                setExpandedPost(
+                                  expandedPost === post.id ? null : post.id
+                                )
+                              }
+                              className={`flex items-center space-x-1 text-sm font-medium transition ${
+                                isEarthy
+                                  ? "text-brown-600 hover:text-rust-500"
+                                  : "text-gray-600 hover:text-slate-blue"
+                              }`}
+                            >
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                                />
+                              </svg>
+                              <span>
+                                {post.comments?.length || 0} Comments
+                              </span>
+                            </button>
+                          </div>
+
+                          {/* Comments Section */}
+                          {expandedPost === post.id && (
+                            <div className="mt-4 pt-4 border-t">
+                              {/* Add Comment */}
+                              <div className="mb-4">
+                                <textarea
+                                  value={commentText[post.id] || ""}
+                                  onChange={(e) =>
+                                    setCommentText({
+                                      ...commentText,
+                                      [post.id]: e.target.value,
+                                    })
+                                  }
+                                  placeholder="Write a comment..."
+                                  rows="2"
+                                  className={`w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 resize-none ${
+                                    isEarthy
+                                      ? "border-tan-300 focus:ring-rust-500"
+                                      : "border-cool-grey focus:ring-slate-blue"
+                                  }`}
+                                />
+                                <button
+                                  onClick={() => handleAddComment(post.id)}
+                                  className={`mt-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition ${
+                                    isEarthy
+                                      ? "bg-rust-500 hover:bg-rust-600"
+                                      : "bg-slate-blue hover:bg-charcoal-grey"
+                                  }`}
+                                >
+                                  Comment
+                                </button>
+                              </div>
+
+                              {/* Comments List */}
+                              <div className="space-y-3">
+                                {post.comments?.map((comment) => (
+                                  <div
+                                    key={comment.id}
+                                    className={`p-3 rounded-lg ${
+                                      isEarthy ? "bg-cream-50" : "bg-gray-50"
+                                    }`}
+                                  >
+                                    <div className="flex items-start space-x-3">
+                                      <div
+                                        className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                                          isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                                        }`}
+                                      >
+                                        {comment.authorName.charAt(0).toUpperCase()}
+                                      </div>
+                                      <div className="flex-1">
+                                        <div className="flex items-center space-x-2 mb-1">
+                                          <span
+                                            className={`text-sm font-semibold ${
+                                              isEarthy
+                                                ? "text-brown-800"
+                                                : "text-charcoal-grey"
+                                            }`}
+                                          >
+                                            {comment.authorName}
+                                          </span>
+                                          <span
+                                            className={`text-xs ${
+                                              isEarthy
+                                                ? "text-brown-600"
+                                                : "text-gray-500"
+                                            }`}
+                                          >
+                                            {timeAgo(comment.createdAt)}
+                                          </span>
+                                        </div>
+                                        <p
+                                          className={`text-sm ${
+                                            isEarthy
+                                              ? "text-brown-700"
+                                              : "text-gray-700"
+                                          }`}
+                                        >
+                                          {comment.text}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
