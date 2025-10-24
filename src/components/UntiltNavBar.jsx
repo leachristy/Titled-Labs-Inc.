@@ -82,13 +82,14 @@ export default function UntiltNavBar() {
 
           {/* Desktop User Display */}
           <div className="hidden lg:flex items-center ml-6 space-x-3">
-            <div
+            <NavLink
+            to={"/profile"}
               className={`${
                 isEarthy ? "text-brown-700" : "text-charcoal-grey"
               } px-3 py-2 rounded-md text-sm font-medium`}
             >
               {profile?.firstName || "Unknown"}
-            </div>
+            </NavLink>
             <button
               onClick={handleSignOut}
               className={`${

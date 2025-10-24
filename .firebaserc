@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "untilt-db"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }

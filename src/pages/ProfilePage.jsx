@@ -1,69 +1,40 @@
-import React, { useState, useEffect } from "react";
-import { auth, db } from "../src/firebase";
-import { doc, getDoc, deleteDoc, updateDoc, setDoc } from "firebase/firestore";
-import { onAuthStateChanged, signOut, deleteUser } from "firebase/auth";
+// src/pages/ProfilePage.jsx (or wherever yours lives)
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
+import ThemeToggle from "../components/ThemeToggle";
+import { db, auth } from "../src/firebase";
+import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { deleteUser, signOut } from "firebase/auth";
 import EditProfile from "../components/EditProfile";
 import BadgeGallery from "../components/BadgeGallery";
 import Confirmation from "../components/Confirmation";
 import defaultPic from "../assets/default-profile.jpg";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
+  const { user, profile } = UserAuth();  
+  const { currentTheme } = useTheme();
+  const isEarthy = currentTheme === "earthy";
+  const navigate = useNavigate();
+
   const [isEditing, setIsEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [message, setMessage] = useState("");
 
-  // Define color palette constants
-  const BACKGROUND_LIGHT = "#ECDAC8";
-  const TEXT_DARK = "#955749";
-  const PRIMARY_BUTTON = "#BF5B3C";
-  const HOVER_BUTTON = "#D8966F";
-
-  // NEW: Navigation handler
   const handleBack = () => {
-    // Navigate to the specified dashboard path
-    window.location.href = "/dashboard"; 
+    navigate("/dashboard");
   };
-
-  // Load user and profile data
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        const profileRef = doc(db, "users", firebaseUser.uid);
-        const snap = await getDoc(profileRef);
-
-        if (snap.exists()) {
-          setProfile(snap.data());
-        } else {
-          const defaultProfile = {
-            firstName: firebaseUser.displayName?.split(" ")[0] || "",
-            lastName: firebaseUser.displayName?.split(" ")[1] || "",
-            email: firebaseUser.email,
-            profilePic: firebaseUser.photoURL || "",
-            badges: [],
-          };
-          await setDoc(profileRef, defaultProfile);
-          setProfile(defaultProfile);
-        }
-      } else {
-        window.location.href = "/login";
-      }
-    });
-
-    return unsubscribe;
-  }, []);
 
   const handleSave = async (updatedProfile) => {
     try {
       await updateDoc(doc(db, "users", user.uid), updatedProfile);
-      setProfile(updatedProfile);
-      setIsEditing(false);
       setMessage("Profile updated successfully!");
+      setIsEditing(false);
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      setMessage("Error updating profile");
+      console.error("Error updating profile:", err);
+      setMessage("Error updating profile. Please try again.");
     }
   };
 
@@ -73,151 +44,122 @@ export default function ProfilePage() {
       await deleteUser(user);
       await signOut(auth);
       setMessage("Account successfully deleted");
-      setTimeout(() => (window.location.href = "/signup"), 2000);
+      setTimeout(() => navigate("/signup"), 1200);
     } catch (err) {
+      console.error(err);
       setMessage("Error deleting account. Try again.");
     }
   };
 
-  if (!profile) return <p style={{ backgroundColor: BACKGROUND_LIGHT, color: TEXT_DARK, minHeight: '100vh', padding: '20px' }}>Loading profile...</p>;
+  if (!profile) {
+    return (
+      <div
+        className={`min-h-screen flex items-center justify-center ${
+          isEarthy ? "bg-cream-100 text-brown-800" : "bg-pale-lavender text-charcoal-grey"
+        }`}
+      >
+        Loading profile...
+      </div>
+    );
+  }
 
-  // Inline styles for the theme
-  const styles = {
-    container: {
-      backgroundColor: BACKGROUND_LIGHT, // #ECDAC8
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: '40px 20px',
-      color: TEXT_DARK, // #955749
-      position: 'relative', // Necessary for absolute positioning of the back button
-    },
-    profileBox: {
-      backgroundColor: 'white',
-      padding: '40px',
-      borderRadius: '8px',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-      width: '100%',
-      maxWidth: '600px', 
-      textAlign: 'center',
-    },
-    header: {
-      color: TEXT_DARK,
-      marginBottom: '20px',
-    },
-    messageBanner: {
-      backgroundColor: '#D1A693', // #D1A693
-      color: 'white',
-      padding: '10px',
-      borderRadius: '4px',
-      marginBottom: '20px',
-      width: '100%',
-      maxWidth: '600px', 
-      textAlign: 'center',
-    },
-    profilePic: {
-      width: '120px',
-      height: '120px',
-      borderRadius: '50%',
-      objectFit: 'cover',
-      border: `4px solid ${TEXT_DARK}`,
-      // Centering styles
-      display: 'block', 
-      margin: '0 auto 15px auto', 
-    },
-    button: {
-      backgroundColor: PRIMARY_BUTTON, // #BF5B3C
-      color: 'white',
-      border: 'none',
-      padding: '10px 20px',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      margin: '0 5px',
-      fontWeight: 'bold',
-      transition: 'background-color 0.3s ease',
-    },
-    deleteButton: {
-      backgroundColor: TEXT_DARK, // #955749 for contrast and danger
-      color: 'white',
-      border: 'none',
-      padding: '10px 20px',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      margin: '0 5px',
-      fontWeight: 'bold',
-      transition: 'background-color 0.3s ease',
-    },
-    buttonGroup: {
-      marginTop: '30px',
-      display: 'flex',
-      justifyContent: 'center',
-    },
-    // NEW: Style for the Back button
-    backButton: {
-      backgroundColor: 'transparent', 
-      color: TEXT_DARK,
-      border: 'none',
-      cursor: 'pointer',
-      position: 'absolute', 
-      top: '40px', // Adjusted to match the container padding
-      left: '40px', // Adjusted to match the container padding
-      fontWeight: 'bold',
-      fontSize: '1em',
-      zIndex: 10,
-      textDecoration: 'none',
-      padding: '0',
-    },
-  };
+  const isGoogleUser = user?.providerData?.[0]?.providerId === "google.com";
+  const googlePhoto =
+    user?.photoURL ||
+    user?.providerData?.[0]?.photoURL ||
+    profile?.photoUrl ||
+    null;
+
+  const displayPhoto = isGoogleUser ? googlePhoto || defaultPic : defaultPic;
 
   return (
-    <div className="profile-container" style={styles.container}>
-      
-      {/* NEW: Back Button */}
-      <button 
-        onClick={handleBack} 
-        style={styles.backButton}
-        onMouseOver={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-        onMouseOut={(e) => (e.currentTarget.style.textDecoration = 'none')}
+    <div
+      className={`relative min-h-screen pt-20 px-6 flex flex-col items-center ${
+        isEarthy ? "bg-cream-100 text-brown-800" : "bg-pale-lavender text-charcoal-grey"
+      }`}
+    >
+      {/* Theme toggle */}
+      <div className="fixed top-4 right-4">
+        <ThemeToggle />
+      </div>
+
+      {/* Back to Dashboard */}
+      <div className="fixed top-4 left-4">
+        <button
+          onClick={handleBack}
+          className={`px-4 py-2 rounded font-semibold transition ${
+            isEarthy
+              ? "bg-rust-500 hover:bg-rust-600 text-white"
+              : "bg-slate-blue hover:bg-charcoal-grey text-white"
+          }`}
+        >
+          ← Back to Dashboard
+        </button>
+      </div>
+
+      {/* Message banner */}
+      {message && (
+        <div
+          className={`w-full max-w-lg text-center py-3 px-4 rounded mb-6 ${
+            isEarthy ? "bg-tan-400 text-white" : "bg-slate-blue text-white"
+          }`}
+        >
+          {message}
+        </div>
+      )}
+
+      {/* Profile card */}
+      <div
+        className={`w-full max-w-lg rounded-lg shadow-md p-8 text-center ${
+          isEarthy ? "bg-white text-brown-800" : "bg-white text-charcoal-grey"
+        }`}
       >
-        &larr; Back to Dashboard
-      </button>
-
-      {message && <div style={styles.messageBanner}>{message}</div>}
-
-      <div style={styles.profileBox}>
-        <h2 style={styles.header}>Your Wellness Profile</h2>
         {!isEditing ? (
           <>
+            {/* Profile image with safe fallback */}
             <img
-              src={profile.profilePic || defaultPic}
+              src={displayPhoto}
+              onError={(e) => (e.currentTarget.src = defaultPic)}
               alt="Profile"
-              style={styles.profilePic}
+              className="w-32 h-32 rounded-full object-cover border-4 border-opacity-40 border-brown-700 mx-auto mb-4"
             />
-            <h3 style={{ margin: '10px 0 5px' }}>
+
+            {/* Name */}
+            <h2 className="text-2xl font-semibold mb-1">
               {profile.firstName} {profile.lastName}
-            </h3>
-            <p style={{ color: '#D1A693' }}>{profile.email}</p>
+            </h2>
 
-            <BadgeGallery
-              badges={Array.isArray(profile.badges) ? profile.badges : []}
-            />
+            {/* Email */}
+            <p
+              className={`text-sm mb-3 ${
+                isEarthy ? "text-brown-600" : "text-slate-blue"
+              }`}
+            >
+              {profile.email}
+            </p>
 
-            <div style={styles.buttonGroup}>
+            {/* Badges */}
+            <BadgeGallery badges={Array.isArray(profile.badges) ? profile.badges : []} />
+
+            {/* Actions */}
+            <div className="flex justify-center gap-3 mt-6">
               <button
                 onClick={() => setIsEditing(true)}
-                style={styles.button}
-                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = HOVER_BUTTON)}
-                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = PRIMARY_BUTTON)}
+                className={`px-5 py-2 rounded font-semibold transition ${
+                  isEarthy
+                    ? "bg-rust-500 hover:bg-rust-600 text-white"
+                    : "bg-slate-blue hover:bg-charcoal-grey text-white"
+                }`}
               >
                 Edit Profile
               </button>
               <button
-                className="delete"
                 onClick={() => setConfirmDelete(true)}
-                style={styles.deleteButton}
-                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = PRIMARY_BUTTON)}
-                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = TEXT_DARK)}
+                className={`px-5 py-2 rounded font-semibold transition ${
+                  isEarthy
+                    ? "bg-brown-700 hover:bg-rust-500 text-white"
+                    : "bg-charcoal-grey hover:bg-slate-blue text-white"
+                }`}
               >
                 Delete Account
               </button>
@@ -235,7 +177,7 @@ export default function ProfilePage() {
 
       {confirmDelete && (
         <Confirmation
-          message="Are you sure you want to permanently delete your account and all associated data? This action cannot be undone."
+          message="Are you sure you want to permanently delete your account and all data?"
           onConfirm={handleDelete}
           onCancel={() => setConfirmDelete(false)}
         />
