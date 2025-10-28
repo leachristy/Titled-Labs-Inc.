@@ -29,6 +29,7 @@ export default function Community() {
   const [isCreatingPost, setIsCreatingPost] = useState(false);
   const [expandedPost, setExpandedPost] = useState(null);
   const [commentText, setCommentText] = useState({});
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
 
   const categories = [
     "All",
@@ -309,8 +310,8 @@ export default function Community() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
+            {/* Sidebar - Desktop */}
+            <div className="hidden lg:block lg:col-span-1">
               <div
                 className={`rounded-lg shadow-lg p-4 bg-white ${
                   isEarthy ? "border-tan-200" : "border-cool-grey"
@@ -354,6 +355,79 @@ export default function Community() {
                   + Create Post
                 </button>
               </div>
+            </div>
+
+            {/* Mobile/Tablet Category Dropdown */}
+            <div className="lg:hidden col-span-1">
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition shadow-md flex items-center justify-between ${
+                    isEarthy
+                      ? "bg-white border-2 border-tan-200 text-brown-800 hover:bg-cream-50"
+                      : "bg-white border-2 border-cool-grey text-charcoal-grey hover:bg-pale-lavender"
+                  }`}
+                >
+                  <span>Category: {selectedCategory}</span>
+                  <svg
+                    className={`w-5 h-5 transition-transform ${
+                      isCategoryMenuOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setIsCreatingPost(!isCreatingPost)}
+                  className={`px-4 py-3 rounded-lg font-bold text-white transition shadow-md ${
+                    isEarthy
+                      ? "bg-rust-500 hover:bg-rust-600"
+                      : "bg-slate-blue hover:bg-charcoal-grey"
+                  }`}
+                >
+                  + Create
+                </button>
+              </div>
+
+              {/* Category Dropdown Menu */}
+              {isCategoryMenuOpen && (
+                <div
+                  className={`rounded-lg shadow-lg p-3 mb-4 bg-white ${
+                    isEarthy ? "border-tan-200" : "border-cool-grey"
+                  } border`}
+                >
+                  <div className="grid grid-cols-2 gap-2">
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setIsCategoryMenuOpen(false);
+                        }}
+                        className={`px-3 py-2 rounded-lg transition font-medium text-sm ${
+                          selectedCategory === category
+                            ? isEarthy
+                              ? "bg-rust-500 text-white"
+                              : "bg-slate-blue text-white"
+                            : isEarthy
+                            ? "text-brown-700 hover:bg-cream-100"
+                            : "text-charcoal-grey hover:bg-pale-lavender"
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Main Content */}
