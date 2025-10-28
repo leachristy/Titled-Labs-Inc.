@@ -350,15 +350,27 @@ export default function UntiltNavBar() {
             ))}
 
             {/* Mobile User Display */}
-            <div
-              className={`block w-full text-center px-4 py-2 rounded-md text-base font-medium ${
-                isEarthy ? "text-brown-700" : "text-charcoal-grey"
-              }`}
+            <NavLink
+              to="/profile"
+              onClick={() => setIsMenuOpen(false)}
+              className={({ isActive }) =>
+                `block w-full text-center px-4 py-3 rounded-md text-base font-medium transition ${
+                  isActive
+                    ? `${
+                        isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                      } text-white`
+                    : `${
+                        isEarthy
+                          ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
+                          : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
+                      }`
+                }`
+              }
             >
               {[profile?.firstName, profile?.lastName]
                 .filter(Boolean)
                 .join(" ") || "Unknown"}
-            </div>
+            </NavLink>
 
             {/* Mobile Sign Out Button */}
             <button
