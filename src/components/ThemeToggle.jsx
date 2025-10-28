@@ -11,9 +11,9 @@ export default function ThemeToggle() {
       aria-label={`Switch to ${currentTheme === 'earthy' ? 'Cool' : 'Earthy'} theme`}
     >
       {currentTheme === 'earthy' ? (
-        // Cool theme icon (snowflake)
+        // Cool theme icon (crescent moon)
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2L9 3m3 3l3-3M12 18v2m0-2l-3 3m3-3l3 3M6 12H4m2 0L3 9m3 3L3 15M18 12h2m-2 0l3-3m-3 3l3 3M9 9l-3-3m0 0v12m0-12h12M15 15l3 3m0 0V6m0 12H6" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
       ) : (
         // Earthy theme icon (sun)
