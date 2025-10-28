@@ -137,6 +137,8 @@ export default function Community() {
         ? `${profile.firstName} ${profile.lastName || ""}`
         : "Anonymous",
       authorAvatar: profile?.photoUrl || null,
+      upvotes: [],
+      downvotes: [],
       createdAt: new Date().toISOString(),
     };
 
@@ -147,6 +149,80 @@ export default function Community() {
       setCommentText({ ...commentText, [postId]: "" });
     } catch (error) {
       console.error("Error adding comment:", error);
+    }
+  };
+
+  // Handle comment upvote
+  const handleCommentUpvote = async (postId, commentId, upvotes, downvotes) => {
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return;
+
+    const hasUpvoted = upvotes?.includes(user.uid);
+    const hasDownvoted = downvotes?.includes(user.uid);
+
+    const updatedComments = post.comments.map((comment) => {
+      if (comment.id === commentId) {
+        let newUpvotes = [...(comment.upvotes || [])];
+        let newDownvotes = [...(comment.downvotes || [])];
+
+        if (hasUpvoted) {
+          newUpvotes = newUpvotes.filter((id) => id !== user.uid);
+        } else {
+          if (hasDownvoted) {
+            newDownvotes = newDownvotes.filter((id) => id !== user.uid);
+          }
+          newUpvotes.push(user.uid);
+        }
+
+        return { ...comment, upvotes: newUpvotes, downvotes: newDownvotes };
+      }
+      return comment;
+    });
+
+    try {
+      const postRef = doc(db, "communityPosts", postId);
+      await updateDoc(postRef, {
+        comments: updatedComments,
+      });
+    } catch (error) {
+      console.error("Error upvoting comment:", error);
+    }
+  };
+
+  // Handle comment downvote
+  const handleCommentDownvote = async (postId, commentId, upvotes, downvotes) => {
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return;
+
+    const hasUpvoted = upvotes?.includes(user.uid);
+    const hasDownvoted = downvotes?.includes(user.uid);
+
+    const updatedComments = post.comments.map((comment) => {
+      if (comment.id === commentId) {
+        let newUpvotes = [...(comment.upvotes || [])];
+        let newDownvotes = [...(comment.downvotes || [])];
+
+        if (hasDownvoted) {
+          newDownvotes = newDownvotes.filter((id) => id !== user.uid);
+        } else {
+          if (hasUpvoted) {
+            newUpvotes = newUpvotes.filter((id) => id !== user.uid);
+          }
+          newDownvotes.push(user.uid);
+        }
+
+        return { ...comment, upvotes: newUpvotes, downvotes: newDownvotes };
+      }
+      return comment;
+    });
+
+    try {
+      const postRef = doc(db, "communityPosts", postId);
+      await updateDoc(postRef, {
+        comments: updatedComments,
+      });
+    } catch (error) {
+      console.error("Error downvoting comment:", error);
     }
   };
 
@@ -593,48 +669,121 @@ export default function Community() {
                                 {post.comments?.map((comment) => (
                                   <div
                                     key={comment.id}
-                                    className={`p-3 rounded-lg ${
+                                    className={`rounded-lg ${
                                       isEarthy ? "bg-cream-50" : "bg-gray-50"
                                     }`}
                                   >
-                                    <div className="flex items-start space-x-3">
-                                      <div
-                                        className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
-                                          isEarthy ? "bg-rust-500" : "bg-slate-blue"
-                                        }`}
-                                      >
-                                        {comment.authorName.charAt(0).toUpperCase()}
-                                      </div>
-                                      <div className="flex-1">
-                                        <div className="flex items-center space-x-2 mb-1">
-                                          <span
-                                            className={`text-sm font-semibold ${
-                                              isEarthy
-                                                ? "text-brown-800"
-                                                : "text-charcoal-grey"
-                                            }`}
-                                          >
-                                            {comment.authorName}
-                                          </span>
-                                          <span
-                                            className={`text-xs ${
-                                              isEarthy
-                                                ? "text-brown-600"
-                                                : "text-gray-500"
-                                            }`}
-                                          >
-                                            {timeAgo(comment.createdAt)}
-                                          </span>
-                                        </div>
-                                        <p
-                                          className={`text-sm ${
-                                            isEarthy
-                                              ? "text-brown-700"
-                                              : "text-gray-700"
+                                    <div className="flex">
+                                      {/* Comment Vote Section */}
+                                      <div className="flex flex-col items-center p-2 pr-3">
+                                        <button
+                                          onClick={() =>
+                                            handleCommentUpvote(
+                                              post.id,
+                                              comment.id,
+                                              comment.upvotes || [],
+                                              comment.downvotes || []
+                                            )
+                                          }
+                                          className={`transition ${
+                                            comment.upvotes?.includes(user.uid)
+                                              ? isEarthy
+                                                ? "text-rust-600"
+                                                : "text-slate-blue"
+                                              : isEarthy
+                                              ? "text-brown-400 hover:text-rust-500"
+                                              : "text-gray-400 hover:text-slate-blue"
                                           }`}
                                         >
-                                          {comment.text}
-                                        </p>
+                                          <svg
+                                            className="w-4 h-4"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                          >
+                                            <path d="M10 3l6 7h-5v7H9v-7H4l6-7z" />
+                                          </svg>
+                                        </button>
+                                        <span
+                                          className={`text-sm font-semibold my-0.5 ${
+                                            isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                                          }`}
+                                        >
+                                          {getVoteCount(
+                                            comment.upvotes || [],
+                                            comment.downvotes || []
+                                          )}
+                                        </span>
+                                        <button
+                                          onClick={() =>
+                                            handleCommentDownvote(
+                                              post.id,
+                                              comment.id,
+                                              comment.upvotes || [],
+                                              comment.downvotes || []
+                                            )
+                                          }
+                                          className={`transition ${
+                                            comment.downvotes?.includes(user.uid)
+                                              ? isEarthy
+                                                ? "text-rust-600"
+                                                : "text-slate-blue"
+                                              : isEarthy
+                                              ? "text-brown-400 hover:text-rust-500"
+                                              : "text-gray-400 hover:text-slate-blue"
+                                          }`}
+                                        >
+                                          <svg
+                                            className="w-4 h-4"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                          >
+                                            <path d="M10 17l-6-7h5V3h2v7h5l-6 7z" />
+                                          </svg>
+                                        </button>
+                                      </div>
+
+                                      {/* Comment Content */}
+                                      <div className="flex-1 p-3">
+                                        <div className="flex items-start space-x-3">
+                                          <div
+                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 ${
+                                              isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                                            }`}
+                                          >
+                                            {comment.authorName.charAt(0).toUpperCase()}
+                                          </div>
+                                          <div className="flex-1">
+                                            <div className="flex items-center space-x-2 mb-1">
+                                              <span
+                                                className={`text-sm font-semibold ${
+                                                  isEarthy
+                                                    ? "text-brown-800"
+                                                    : "text-charcoal-grey"
+                                                }`}
+                                              >
+                                                {comment.authorName}
+                                              </span>
+                                              <span
+                                                className={`text-xs ${
+                                                  isEarthy
+                                                    ? "text-brown-600"
+                                                    : "text-gray-500"
+                                                }`}
+                                              >
+                                                {timeAgo(comment.createdAt)}
+                                              </span>
+                                            </div>
+                                            <p
+                                              className={`text-sm ${
+                                                isEarthy
+                                                  ? "text-brown-700"
+                                                  : "text-gray-700"
+                                              }`}
+                                            >
+                                              {comment.text}
+                                            </p>
+                                          </div>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
