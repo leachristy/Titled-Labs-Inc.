@@ -16,6 +16,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../src/firebase";
+import { Link } from "react-router-dom";
 
 export default function Community() {
   const { currentTheme } = useTheme();
@@ -643,7 +644,14 @@ export default function Community() {
                                   isEarthy ? "text-brown-600" : "text-gray-600"
                                 }`}
                               >
-                                Posted by {post.authorName} • {timeAgo(post.createdAt)}
+                                Posted by {" "}
+                                <Link
+                                  to={`/profile/${post.authorId}`}
+                                  className="font-semibold hover:underline"
+                                  >
+                                    {post.authorName}
+                                </Link>{" "} 
+                                • {timeAgo(post.createdAt)}
                               </span>
                             </div>
                             {user.uid === post.authorId && (

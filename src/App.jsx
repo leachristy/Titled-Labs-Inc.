@@ -27,6 +27,9 @@ import BreathingExercises from "./webapp-pages/selfcare-features/BreathingExerci
 import GuidedVideos from "./webapp-pages/selfcare-features/GuideVideos/GuideVideos";
 import VideoWatch from "./webapp-pages/selfcare-features/GuideVideos/VideoWatch";
 import ProfilePage from "./pages/ProfilePage"
+import { FriendProfilePage } from "./pages/FriendProfilePage";
+import { ChatPage } from "./pages/ChatPage";
+import DirectMessages from "./webapp-pages/DirectMessages";
 
 
 export default function App() {
@@ -115,6 +118,23 @@ export default function App() {
                 <Protected>
                   <Community />
                 </Protected>
+              }
+            />
+            <Route
+              path="/messages"
+              element={
+                <Protected>
+                  <DirectMessages />
+                </Protected>
+              }
+            />
+            <Route 
+              path="/profile/:uid" 
+              element={<FriendProfilePage />
+              } 
+            />
+            <Route 
+              path="/chat/:uid" element={<ChatPage />
               }
             />
             <Route
