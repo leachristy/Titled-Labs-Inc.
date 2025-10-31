@@ -30,7 +30,7 @@ export const selfCareResources = [
             "You can view and edit your personal information anytime in your /profile page.",
     },
     {
-        keywords: ["kill", "killing", "kms", "harm", "harming"],
+        keywords: ["kill", "killing", "kms", "harm", "harming", "suicide"],
         response:
             "I am so sorry you are currently feel that way. Please call or text the number 988 to recieve help. Your life matters."
     },
