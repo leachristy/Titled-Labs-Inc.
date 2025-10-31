@@ -25,13 +25,18 @@ export const selfCareResources = [
             "Let's build motivation! Review or create goals at /goals or reflect on achievement in /journal.",
     },
     {
-        keywords: ["profile", "account", "me"],
+        keywords: ["profile", "account"],
         response:
             "You can view and edit your personal information anytime in your /profile page.",
     },
     {
-        keywords: ["kill", "killing", "kms", "harm", "harming"],
+        keywords: ["kill", "killing", "kms", "harm", "harming", "suicide"],
         response:
             "I am so sorry you are currently feel that way. Please call or text the number 988 to recieve help. Your life matters."
+    },
+    {
+        keywords: ["friends", "friend", "meet new people"],
+        response:
+            "It's great to branch out and meet new people! Visit our /community page to start making new friends!"
     }
 ];

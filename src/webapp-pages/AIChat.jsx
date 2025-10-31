@@ -60,6 +60,8 @@ export default function AIChat() {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
+          "HTTP-Referer": "https://untilt.web.app/",
+          "X-Title": "Self-Care Chat",
         },
         body: JSON.stringify({
           model: "mistralai/mistral-7b-instruct",
