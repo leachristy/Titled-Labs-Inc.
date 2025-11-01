@@ -305,25 +305,22 @@ export default function Community() {
       <UntiltNavBar />
       <div
         className={`min-h-screen pt-20 pb-12 ${
-          isEarthy ? "bg-cream-100" : "bg-pale-lavender"
+          isEarthy ? "bg-cream-100" : "bg-[#373E4F]"
         }`}
-        style={{
-          backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
-        }}
       >
         <div className="max-w-7xl mx-auto px-4">
           {/* Header */}
           <div className="mb-8 mt-4">
             <h1
               className={`text-4xl font-bold mb-2 ${
-                isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                isEarthy ? "text-brown-800" : "text-white"
               }`}
             >
               Community Forum
             </h1>
             <p
               className={`text-lg ${
-                isEarthy ? "text-brown-600" : "text-slate-blue"
+                isEarthy ? "text-brown-600" : "text-purple-200"
               }`}
             >
               Share your experiences, ask questions, and support others in their wellness journey.
@@ -334,13 +331,13 @@ export default function Community() {
             {/* Sidebar - Desktop */}
             <div className="hidden lg:block lg:col-span-1">
               <div
-                className={`rounded-lg shadow-lg p-4 bg-white ${
-                  isEarthy ? "border-tan-200" : "border-cool-grey"
+                className={`rounded-lg shadow-lg p-4 ${
+                  isEarthy ? "bg-white border-tan-200" : "bg-[#DFD2D5] border-[#8090B0]"
                 } border sticky top-24`}
               >
                 <h2
                   className={`text-lg font-bold mb-4 ${
-                    isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                    isEarthy ? "text-brown-800" : "text-gray-900"
                   }`}
                 >
                   Categories
@@ -354,10 +351,10 @@ export default function Community() {
                         selectedCategory === category
                           ? isEarthy
                             ? "bg-rust-500 text-white"
-                            : "bg-slate-blue text-white"
+                            : "bg-[#c7b4e2] text-white"
                           : isEarthy
                           ? "text-brown-700 hover:bg-cream-100"
-                          : "text-charcoal-grey hover:bg-pale-lavender"
+                          : "text-gray-900 hover:bg-[#ABAAC0]"
                       }`}
                     >
                       {category}
@@ -370,7 +367,7 @@ export default function Community() {
                   className={`w-full mt-6 px-4 py-3 rounded-lg font-bold text-white transition shadow-md hover:shadow-lg ${
                     isEarthy
                       ? "bg-rust-500 hover:bg-rust-600"
-                      : "bg-slate-blue hover:bg-charcoal-grey"
+                      : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
                   }`}
                 >
                   + Create Post
@@ -386,7 +383,7 @@ export default function Community() {
                   className={`flex-1 px-4 py-3 rounded-lg font-medium transition shadow-md flex items-center justify-between ${
                     isEarthy
                       ? "bg-white border-2 border-tan-200 text-brown-800 hover:bg-cream-50"
-                      : "bg-white border-2 border-cool-grey text-charcoal-grey hover:bg-pale-lavender"
+                      : "bg-[#DFD2D5] border-2 border-[#8090B0] text-gray-900 hover:bg-[#ABAAC0]"
                   }`}
                 >
                   <span>Category: {selectedCategory}</span>
@@ -411,7 +408,7 @@ export default function Community() {
                   className={`px-4 py-3 rounded-lg font-bold text-white transition shadow-md ${
                     isEarthy
                       ? "bg-rust-500 hover:bg-rust-600"
-                      : "bg-slate-blue hover:bg-charcoal-grey"
+                      : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
                   }`}
                 >
                   + Create
@@ -421,8 +418,8 @@ export default function Community() {
               {/* Category Dropdown Menu */}
               {isCategoryMenuOpen && (
                 <div
-                  className={`rounded-lg shadow-lg p-3 mb-4 bg-white ${
-                    isEarthy ? "border-tan-200" : "border-cool-grey"
+                  className={`rounded-lg shadow-lg p-3 mb-4 ${
+                    isEarthy ? "bg-white border-tan-200" : "bg-[#DFD2D5] border-[#8090B0]"
                   } border`}
                 >
                   <div className="grid grid-cols-2 gap-2">
@@ -437,10 +434,10 @@ export default function Community() {
                           selectedCategory === category
                             ? isEarthy
                               ? "bg-rust-500 text-white"
-                              : "bg-slate-blue text-white"
+                              : "bg-[#c7b4e2] text-white"
                             : isEarthy
                             ? "text-brown-700 hover:bg-cream-100"
-                            : "text-charcoal-grey hover:bg-pale-lavender"
+                            : "text-gray-900 hover:bg-[#ABAAC0]"
                         }`}
                       >
                         {category}
@@ -456,13 +453,13 @@ export default function Community() {
               {/* Create Post Form */}
               {isCreatingPost && (
                 <div
-                  className={`rounded-lg shadow-lg p-6 mb-6 bg-white ${
-                    isEarthy ? "border-tan-200" : "border-cool-grey"
+                  className={`rounded-lg shadow-lg p-6 mb-6 ${
+                    isEarthy ? "bg-white border-tan-200" : "bg-[#DFD2D5] border-[#8090B0]"
                   } border`}
                 >
                   <h2
                     className={`text-xl font-bold mb-4 ${
-                      isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                      isEarthy ? "text-brown-800" : "text-gray-900"
                     }`}
                   >
                     Create a New Post
@@ -471,7 +468,7 @@ export default function Community() {
                     <div>
                       <label
                         className={`block text-sm font-medium mb-2 ${
-                          isEarthy ? "text-brown-700" : "text-charcoal-grey"
+                          isEarthy ? "text-brown-700" : "text-gray-700"
                         }`}
                       >
                         Category
@@ -482,7 +479,7 @@ export default function Community() {
                         className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 ${
                           isEarthy
                             ? "border-tan-300 focus:ring-rust-500"
-                            : "border-cool-grey focus:ring-slate-blue"
+                            : "bg-white text-gray-900 border-[#8090B0] focus:ring-[#c7b4e2]"
                         }`}
                       >
                         {categories.filter((c) => c !== "All").map((category) => (
@@ -495,7 +492,7 @@ export default function Community() {
                     <div>
                       <label
                         className={`block text-sm font-medium mb-2 ${
-                          isEarthy ? "text-brown-700" : "text-charcoal-grey"
+                          isEarthy ? "text-brown-700" : "text-gray-700"
                         }`}
                       >
                         Title
@@ -508,7 +505,7 @@ export default function Community() {
                         className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 ${
                           isEarthy
                             ? "border-tan-300 focus:ring-rust-500"
-                            : "border-cool-grey focus:ring-slate-blue"
+                            : "bg-white text-gray-900 border-[#8090B0] focus:ring-[#c7b4e2]"
                         }`}
                         required
                       />
@@ -516,7 +513,7 @@ export default function Community() {
                     <div>
                       <label
                         className={`block text-sm font-medium mb-2 ${
-                          isEarthy ? "text-brown-700" : "text-charcoal-grey"
+                          isEarthy ? "text-brown-700" : "text-gray-700"
                         }`}
                       >
                         Content
@@ -529,7 +526,7 @@ export default function Community() {
                         className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 resize-none ${
                           isEarthy
                             ? "border-tan-300 focus:ring-rust-500"
-                            : "border-cool-grey focus:ring-slate-blue"
+                            : "bg-white text-gray-900 border-[#8090B0] focus:ring-[#c7b4e2]"
                         }`}
                         required
                       />
@@ -540,7 +537,7 @@ export default function Community() {
                         className={`flex-1 px-6 py-2 rounded-lg font-bold text-white transition ${
                           isEarthy
                             ? "bg-rust-500 hover:bg-rust-600"
-                            : "bg-slate-blue hover:bg-charcoal-grey"
+                            : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
                         }`}
                       >
                         Post
@@ -564,13 +561,13 @@ export default function Community() {
               {/* Posts List */}
               {filteredPosts.length === 0 ? (
                 <div
-                  className={`rounded-lg shadow-lg p-12 bg-white text-center ${
-                    isEarthy ? "border-tan-200" : "border-cool-grey"
+                  className={`rounded-lg shadow-lg p-12 text-center ${
+                    isEarthy ? "bg-white border-tan-200" : "bg-[#DFD2D5] border-[#8090B0]"
                   } border`}
                 >
                   <p
                     className={`text-lg ${
-                      isEarthy ? "text-brown-600" : "text-slate-blue"
+                      isEarthy ? "text-brown-600" : "text-gray-700"
                     }`}
                   >
                     No posts yet. Be the first to start a conversation!
@@ -581,15 +578,15 @@ export default function Community() {
                   {filteredPosts.map((post) => (
                     <div
                       key={post.id}
-                      className={`rounded-lg shadow-lg bg-white ${
-                        isEarthy ? "border-tan-200" : "border-cool-grey"
+                      className={`rounded-lg shadow-lg ${
+                        isEarthy ? "bg-white border-tan-200" : "bg-[#DFD2D5] border-[#8090B0]"
                       } border overflow-hidden`}
                     >
                       <div className="flex">
                         {/* Vote Section */}
                         <div
                           className={`flex flex-col items-center p-4 ${
-                            isEarthy ? "bg-cream-50" : "bg-gray-50"
+                            isEarthy ? "bg-cream-50" : "bg-[#ABAAC0]"
                           }`}
                         >
                           <button
@@ -600,10 +597,10 @@ export default function Community() {
                               post.upvotes?.includes(user.uid)
                                 ? isEarthy
                                   ? "text-rust-600"
-                                  : "text-slate-blue"
+                                  : "text-[#c7b4e2]"
                                 : isEarthy
                                 ? "text-brown-400 hover:text-rust-500"
-                                : "text-gray-400 hover:text-slate-blue"
+                                : "text-gray-400 hover:text-[#c7b4e2]"
                             }`}
                           >
                             <svg
@@ -616,7 +613,7 @@ export default function Community() {
                           </button>
                           <span
                             className={`text-lg font-bold my-1 ${
-                              isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                              isEarthy ? "text-brown-800" : "text-gray-900"
                             }`}
                           >
                             {getVoteCount(post.upvotes, post.downvotes)}
@@ -629,10 +626,10 @@ export default function Community() {
                               post.downvotes?.includes(user.uid)
                                 ? isEarthy
                                   ? "text-rust-600"
-                                  : "text-slate-blue"
+                                  : "text-[#c7b4e2]"
                                 : isEarthy
                                 ? "text-brown-400 hover:text-rust-500"
-                                : "text-gray-400 hover:text-slate-blue"
+                                : "text-gray-400 hover:text-[#c7b4e2]"
                             }`}
                           >
                             <svg
@@ -654,7 +651,7 @@ export default function Community() {
                                 className={`px-2 py-1 text-xs font-semibold rounded ${
                                   isEarthy
                                     ? "bg-tan-200 text-brown-800"
-                                    : "bg-blue-100 text-slate-blue"
+                                    : "bg-[#c7b4e2] text-gray-900"
                                 }`}
                               >
                                 {post.category}
@@ -687,7 +684,7 @@ export default function Community() {
                           {/* Post Title & Content */}
                           <h3
                             className={`text-xl font-bold mb-2 ${
-                              isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                              isEarthy ? "text-brown-800" : "text-gray-900"
                             }`}
                           >
                             {post.title}
@@ -711,7 +708,7 @@ export default function Community() {
                               className={`flex items-center space-x-1 text-sm font-medium transition ${
                                 isEarthy
                                   ? "text-brown-600 hover:text-rust-500"
-                                  : "text-gray-600 hover:text-slate-blue"
+                                  : "text-gray-600 hover:text-[#c7b4e2]"
                               }`}
                             >
                               <svg
@@ -751,7 +748,7 @@ export default function Community() {
                                   className={`w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 resize-none ${
                                     isEarthy
                                       ? "border-tan-300 focus:ring-rust-500"
-                                      : "border-cool-grey focus:ring-slate-blue"
+                                      : "bg-white text-gray-900 border-[#8090B0] focus:ring-[#c7b4e2]"
                                   }`}
                                 />
                                 <button
@@ -759,7 +756,7 @@ export default function Community() {
                                   className={`mt-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition ${
                                     isEarthy
                                       ? "bg-rust-500 hover:bg-rust-600"
-                                      : "bg-slate-blue hover:bg-charcoal-grey"
+                                      : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
                                   }`}
                                 >
                                   Comment
@@ -772,7 +769,7 @@ export default function Community() {
                                   <div
                                     key={comment.id}
                                     className={`rounded-lg ${
-                                      isEarthy ? "bg-cream-50" : "bg-gray-50"
+                                      isEarthy ? "bg-cream-50" : "bg-[#ABAAC0]"
                                     }`}
                                   >
                                     <div className="flex">
@@ -791,10 +788,10 @@ export default function Community() {
                                             comment.upvotes?.includes(user.uid)
                                               ? isEarthy
                                                 ? "text-rust-600"
-                                                : "text-slate-blue"
+                                                : "text-[#c7b4e2]"
                                               : isEarthy
                                               ? "text-brown-400 hover:text-rust-500"
-                                              : "text-gray-400 hover:text-slate-blue"
+                                              : "text-gray-400 hover:text-[#c7b4e2]"
                                           }`}
                                         >
                                           <svg
@@ -807,7 +804,7 @@ export default function Community() {
                                         </button>
                                         <span
                                           className={`text-sm font-semibold my-0.5 ${
-                                            isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                                            isEarthy ? "text-brown-800" : "text-gray-900"
                                           }`}
                                         >
                                           {getVoteCount(
@@ -828,10 +825,10 @@ export default function Community() {
                                             comment.downvotes?.includes(user.uid)
                                               ? isEarthy
                                                 ? "text-rust-600"
-                                                : "text-slate-blue"
+                                                : "text-[#c7b4e2]"
                                               : isEarthy
                                               ? "text-brown-400 hover:text-rust-500"
-                                              : "text-gray-400 hover:text-slate-blue"
+                                              : "text-gray-400 hover:text-[#c7b4e2]"
                                           }`}
                                         >
                                           <svg
@@ -849,7 +846,7 @@ export default function Community() {
                                         <div className="flex items-start space-x-3">
                                           <div
                                             className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 ${
-                                              isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                                              isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
                                             }`}
                                           >
                                             {comment.authorName.charAt(0).toUpperCase()}
@@ -860,7 +857,7 @@ export default function Community() {
                                                 className={`text-sm font-semibold ${
                                                   isEarthy
                                                     ? "text-brown-800"
-                                                    : "text-charcoal-grey"
+                                                    : "text-gray-900"
                                                 }`}
                                               >
                                                 {comment.authorName}
@@ -869,7 +866,7 @@ export default function Community() {
                                                 className={`text-xs ${
                                                   isEarthy
                                                     ? "text-brown-600"
-                                                    : "text-gray-500"
+                                                    : "text-gray-600"
                                                 }`}
                                               >
                                                 {timeAgo(comment.createdAt)}

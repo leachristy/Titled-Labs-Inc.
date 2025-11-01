@@ -58,23 +58,29 @@ export default function DirectMessages() {
     <>
     <UntiltNavBar />
     <div className={`min-h-screen  ${
-            isEarthy ? "bg-cream-100" : "bg-pale-lavender"
-          }`}
-          style={{
-            backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
-    }}>
+            isEarthy ? "bg-cream-100" : "bg-[#373E4F]"
+          }`}>
     <div className="max-w-2xl mx-auto p-6 mt-20">
-      <h2 className="text-xl font-bold mb-4">Direct Messages</h2>
+      <h2 className={`text-xl font-bold mb-4 ${
+        isEarthy ? "text-brown-800" : "text-white"
+      }`}>Direct Messages</h2>
       <div className="flex flex-col gap-2">
-        {conversations.length === 0 && <p className="text-gray-400">No conversations yet.</p>}
+        {conversations.length === 0 && <p className={`${
+          isEarthy ? "text-gray-400" : "text-purple-200"
+        }`}>No conversations yet.</p>}
         {conversations.map((convo) => (
           <Link
             key={convo.otherId}
             to={`/chat/${convo.otherId}`}
-            className="p-3 border rounded hover:bg-gray-100 flex justify-between"
+            className={`p-3 border rounded flex justify-between ${
+              isEarthy 
+                ? "border-tan-300 hover:bg-cream-50 text-brown-800" 
+            }`}
           >
             <span>{convo.otherName}</span>
-            <span className="text-gray-500 text-sm">{convo.lastMessage}</span>
+            <span className={`text-sm ${
+              isEarthy ? "text-gray-500" : "text-gray-600"
+            }`}>{convo.lastMessage}</span>
           </Link>
         ))}
       </div>

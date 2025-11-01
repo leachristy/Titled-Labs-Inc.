@@ -170,7 +170,7 @@ export default function Home() {
       <Testimonial />
       {/* Who We Serve Section */}
       <div
-        className={`py-20 ${isEarthy ? "bg-cream-100" : "bg-pale-lavender"}`}
+        className={`py-20 ${isEarthy ? "bg-cream-100" : "bg-[#ABAAC0]"}`}
         style={{
           backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
         }}
@@ -179,7 +179,7 @@ export default function Home() {
           <div className="mb-16 text-center">
             <h2
               className={`text-3xl sm:text-4xl font-semibold mb-4 ${
-                isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                isEarthy ? "text-brown-800" : "text-[#373E4F]"
               }`}
               style={{ color: isEarthy ? undefined : "var(--charcoal-grey)" }}
             >
@@ -187,7 +187,7 @@ export default function Home() {
             </h2>
             <p
               className={`text-base max-w-2xl mx-auto ${
-                isEarthy ? "text-brown-700" : "text-slate-blue"
+                isEarthy ? "text-brown-700" : "text-[#373E4F]"
               }`}
               style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
             >
@@ -207,7 +207,7 @@ export default function Home() {
               <div className="flex items-start gap-4 mb-6">
                 <div
                   className={`w-12 h-12 flex items-center justify-center flex-shrink-0 ${
-                    isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                    isEarthy ? "bg-rust-500" : "bg-[#646F89]"
                   }`}
                   style={{
                     backgroundColor: isEarthy ? undefined : "var(--slate-blue)",
@@ -230,7 +230,7 @@ export default function Home() {
                 <div>
                   <h3
                     className={`text-xl font-semibold mb-2 ${
-                      isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                      isEarthy ? "text-brown-800" : "text-[#373E4F]"
                     }`}
                     style={{
                       color: isEarthy ? undefined : "var(--charcoal-grey)",
@@ -240,7 +240,7 @@ export default function Home() {
                   </h3>
                   <p
                     className={`text-sm leading-relaxed ${
-                      isEarthy ? "text-brown-700" : "text-slate-blue"
+                      isEarthy ? "text-brown-700" : "text-[#373E4F]"
                     }`}
                     style={{
                       color: isEarthy ? undefined : "var(--slate-blue)",
@@ -255,7 +255,7 @@ export default function Home() {
                 <li className="flex items-start gap-3">
                   <div
                     className={`w-1.5 h-1.5 rounded-full mt-2 ${
-                      isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                      isEarthy ? "bg-rust-500" : "bg-[#646F89]"
                     }`}
                     style={{
                       backgroundColor: isEarthy
@@ -265,7 +265,7 @@ export default function Home() {
                   ></div>
                   <span
                     className={`text-sm ${
-                      isEarthy ? "text-brown-700" : "text-slate-blue"
+                      isEarthy ? "text-brown-700" : "text-[#373E4F]"
                     }`}
                     style={{
                       color: isEarthy ? undefined : "var(--slate-blue)",
@@ -277,7 +277,7 @@ export default function Home() {
                 <li className="flex items-start gap-3">
                   <div
                     className={`w-1.5 h-1.5 rounded-full mt-2 ${
-                      isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                      isEarthy ? "bg-rust-500" : "bg-[#646F89]"
                     }`}
                     style={{
                       backgroundColor: isEarthy
@@ -287,7 +287,7 @@ export default function Home() {
                   ></div>
                   <span
                     className={`text-sm ${
-                      isEarthy ? "text-brown-700" : "text-slate-blue"
+                      isEarthy ? "text-brown-700" : "text-[#373E4F]"
                     }`}
                     style={{
                       color: isEarthy ? undefined : "var(--slate-blue)",
@@ -299,7 +299,7 @@ export default function Home() {
                 <li className="flex items-start gap-3">
                   <div
                     className={`w-1.5 h-1.5 rounded-full mt-2 ${
-                      isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                      isEarthy ? "bg-rust-500" : "bg-[#646F89]"
                     }`}
                     style={{
                       backgroundColor: isEarthy
@@ -309,7 +309,7 @@ export default function Home() {
                   ></div>
                   <span
                     className={`text-sm ${
-                      isEarthy ? "text-brown-700" : "text-slate-blue"
+                      isEarthy ? "text-brown-700" : "text-[#373E4F]"
                     }`}
                     style={{
                       color: isEarthy ? undefined : "var(--slate-blue)",
@@ -324,7 +324,7 @@ export default function Home() {
                 className={`font-medium inline-flex items-center gap-2 group ${
                   isEarthy
                     ? "text-rust-500 hover:text-rust-600"
-                    : "text-slate-blue hover:text-charcoal-grey"
+                    : "text-[#373E4F] hover:text-[#373E4F]"
                 }`}
                 style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
               >
@@ -355,7 +355,7 @@ export default function Home() {
               <div className="flex items-start gap-4 mb-6">
                 <div
                   className={`w-12 h-12 flex items-center justify-center flex-shrink-0 ${
-                    isEarthy ? "bg-terracotta-400" : "bg-blue-grey"
+                    isEarthy ? "bg-terracotta-400" : "bg-[#8090B0]"
                   }`}
                   style={{
                     backgroundColor: isEarthy ? undefined : "var(--blue-grey)",
@@ -378,7 +378,7 @@ export default function Home() {
                 <div>
                   <h3
                     className={`text-xl font-semibold mb-2 ${
-                      isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                      isEarthy ? "text-brown-800" : "text-[#373E4F]"
                     }`}
                     style={{
                       color: isEarthy ? undefined : "var(--charcoal-grey)",
@@ -388,7 +388,7 @@ export default function Home() {
                   </h3>
                   <p
                     className={`text-sm leading-relaxed ${
-                      isEarthy ? "text-brown-700" : "text-slate-blue"
+                      isEarthy ? "text-brown-700" : "text-[#373E4F]"
                     }`}
                     style={{
                       color: isEarthy ? undefined : "var(--slate-blue)",
@@ -403,7 +403,7 @@ export default function Home() {
                 <li className="flex items-start gap-3">
                   <div
                     className={`w-1.5 h-1.5 rounded-full mt-2 ${
-                      isEarthy ? "bg-terracotta-400" : "bg-blue-grey"
+                      isEarthy ? "bg-terracotta-400" : "bg-[#8090B0]"
                     }`}
                     style={{
                       backgroundColor: isEarthy
@@ -413,7 +413,7 @@ export default function Home() {
                   ></div>
                   <span
                     className={`text-sm ${
-                      isEarthy ? "text-brown-700" : "text-slate-blue"
+                      isEarthy ? "text-brown-700" : "text-[#373E4F]"
                     }`}
                     style={{
                       color: isEarthy ? undefined : "var(--slate-blue)",
@@ -428,7 +428,7 @@ export default function Home() {
                 className={`font-medium inline-flex items-center gap-2 group ${
                   isEarthy
                     ? "text-terracotta-400 hover:text-terracotta-500"
-                    : "text-blue-grey hover:text-charcoal-grey"
+                    : "text-blue-grey hover:text-[#373E4F]"
                 }`}
                 style={{ color: isEarthy ? undefined : "var(--blue-grey)" }}
               >
@@ -458,7 +458,7 @@ export default function Home() {
         className={`py-20 border-t ${
           isEarthy
             ? "bg-cream-100 border-tan-200"
-            : "bg-pale-lavender border-cool-grey"
+            : "bg-[#ABAAC0] border-[#8090B0]"
         }`}
         style={{
           backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
@@ -469,7 +469,7 @@ export default function Home() {
           <div className="mb-12 text-center">
             <h2
               className={`text-3xl font-semibold mb-4 ${
-                isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                isEarthy ? "text-brown-800" : "text-[#373E4F]"
               }`}
               style={{ color: isEarthy ? undefined : "var(--charcoal-grey)" }}
             >
@@ -477,7 +477,7 @@ export default function Home() {
             </h2>
             <p
               className={`text-base ${
-                isEarthy ? "text-brown-700" : "text-slate-blue"
+                isEarthy ? "text-brown-700" : "text-[#373E4F]"
               }`}
               style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
             >
@@ -494,7 +494,7 @@ export default function Home() {
               style={{ borderColor: isEarthy ? undefined : "var(--cool-grey)" }}
             >
               <div
-                className={`h-48 ${isEarthy ? "bg-rust-400" : "bg-slate-blue"}`}
+                className={`h-48 ${isEarthy ? "bg-rust-400" : "bg-[#646F89]"}`}
                 style={{
                   backgroundColor: isEarthy ? undefined : "var(--slate-blue)",
                 }}
@@ -504,7 +504,7 @@ export default function Home() {
                   className={`inline-block px-3 py-1 text-xs font-semibold tracking-wider mb-3 ${
                     isEarthy
                       ? "bg-cream-200 text-brown-800"
-                      : "bg-pale-lavender text-charcoal-grey"
+                      : "bg-[#ABAAC0] text-[#373E4F]"
                   }`}
                   style={{
                     backgroundColor: isEarthy
@@ -519,7 +519,7 @@ export default function Home() {
                   className={`text-lg font-semibold mb-2 transition-colors ${
                     isEarthy
                       ? "text-brown-800 group-hover:text-rust-500"
-                      : "text-charcoal-grey group-hover:text-slate-blue"
+                      : "text-[#373E4F] group-hover:text-[#373E4F]"
                   }`}
                   style={{
                     color: isEarthy ? undefined : "var(--charcoal-grey)",
@@ -529,7 +529,7 @@ export default function Home() {
                 </h3>
                 <p
                   className={`text-sm leading-relaxed ${
-                    isEarthy ? "text-brown-600" : "text-slate-blue"
+                    isEarthy ? "text-brown-600" : "text-[#373E4F]"
                   }`}
                   style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
                 >
@@ -548,7 +548,7 @@ export default function Home() {
             >
               <div
                 className={`h-48 ${
-                  isEarthy ? "bg-terracotta-400" : "bg-blue-grey"
+                  isEarthy ? "bg-terracotta-400" : "bg-[#8090B0]"
                 }`}
                 style={{
                   backgroundColor: isEarthy ? undefined : "var(--blue-grey)",
@@ -559,7 +559,7 @@ export default function Home() {
                   className={`inline-block px-3 py-1 text-xs font-semibold tracking-wider mb-3 ${
                     isEarthy
                       ? "bg-cream-200 text-brown-800"
-                      : "bg-pale-lavender text-charcoal-grey"
+                      : "bg-[#ABAAC0] text-[#373E4F]"
                   }`}
                   style={{
                     backgroundColor: isEarthy
@@ -574,7 +574,7 @@ export default function Home() {
                   className={`text-lg font-semibold mb-2 transition-colors ${
                     isEarthy
                       ? "text-brown-800 group-hover:text-terracotta-400"
-                      : "text-charcoal-grey group-hover:text-blue-grey"
+                      : "text-[#373E4F] group-hover:text-blue-grey"
                   }`}
                   style={{
                     color: isEarthy ? undefined : "var(--charcoal-grey)",
@@ -584,7 +584,7 @@ export default function Home() {
                 </h3>
                 <p
                   className={`text-sm leading-relaxed ${
-                    isEarthy ? "text-brown-600" : "text-slate-blue"
+                    isEarthy ? "text-brown-600" : "text-[#373E4F]"
                   }`}
                   style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
                 >
@@ -601,7 +601,7 @@ export default function Home() {
               style={{ borderColor: isEarthy ? undefined : "var(--cool-grey)" }}
             >
               <div
-                className={`h-48 ${isEarthy ? "bg-tan-300" : "bg-cool-grey"}`}
+                className={`h-48 ${isEarthy ? "bg-tan-300" : "bg-[#ABAAC0]"}`}
                 style={{
                   backgroundColor: isEarthy ? undefined : "var(--cool-grey)",
                 }}
@@ -611,7 +611,7 @@ export default function Home() {
                   className={`inline-block px-3 py-1 text-xs font-semibold tracking-wider mb-3 ${
                     isEarthy
                       ? "bg-cream-200 text-brown-800"
-                      : "bg-pale-lavender text-charcoal-grey"
+                      : "bg-[#ABAAC0] text-[#373E4F]"
                   }`}
                   style={{
                     backgroundColor: isEarthy
@@ -626,7 +626,7 @@ export default function Home() {
                   className={`text-lg font-semibold mb-2 transition-colors ${
                     isEarthy
                       ? "text-brown-800 group-hover:text-tan-400"
-                      : "text-charcoal-grey group-hover:text-cool-grey"
+                      : "text-[#373E4F] group-hover:text-cool-grey"
                   }`}
                   style={{
                     color: isEarthy ? undefined : "var(--charcoal-grey)",
@@ -636,7 +636,7 @@ export default function Home() {
                 </h3>
                 <p
                   className={`text-sm leading-relaxed ${
-                    isEarthy ? "text-brown-600" : "text-slate-blue"
+                    isEarthy ? "text-brown-600" : "text-[#373E4F]"
                   }`}
                   style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
                 >
@@ -652,7 +652,7 @@ export default function Home() {
               className={`font-medium inline-flex items-center gap-2 group ${
                 isEarthy
                   ? "text-rust-500 hover:text-rust-600"
-                  : "text-slate-blue hover:text-charcoal-grey"
+                  : "text-[#373E4F] hover:text-[#373E4F]"
               }`}
               style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
             >

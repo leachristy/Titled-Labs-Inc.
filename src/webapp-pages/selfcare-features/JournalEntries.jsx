@@ -97,7 +97,7 @@ export default function JournalEntries() {
   return (
     <>
       <UntiltNavBar />
-      <div className={`min-h-screen mt-15 px-6 py-10 ${isEarthy ? "bg-cream-100" : "bg-pale-lavender"}`}>
+      <div className={`min-h-screen mt-15 px-6 py-10 ${isEarthy ? "bg-cream-100" : "bg-[#373E4F]"}`}>
         <div className="max-w-5xl mx-auto">
           {/* Back Button */}
           <button
@@ -105,17 +105,17 @@ export default function JournalEntries() {
             className={`mb-6 px-4 py-2 rounded-lg flex items-center gap-2 font-medium shadow-sm ${
               isEarthy
                 ? "bg-tan-300 hover:bg-tan-400 text-brown-900"
-                : "bg-indigo-200 hover:bg-indigo-300 text-indigo-900"
+                : "bg-[#c7b4e2] hover:bg-[#b49fd3] text-gray-900"
             } transition`}
           >
             ← Back to Self-Care
           </button>
           {/* Header */}
           <div className="mb-8 text-center">
-            <h1 className={`text-4xl font-bold ${isEarthy ? "text-brown-800" : "text-charcoal-grey"}`}>
+            <h1 className={`text-4xl font-bold ${isEarthy ? "text-brown-800" : "text-gray-900"}`}>
               My Journal
             </h1>
-            <p className={`mt-2 ${isEarthy ? "text-brown-600" : "text-slate-600"}`}>
+            <p className={`mt-2 ${isEarthy ? "text-brown-600" : "text-gray-600"}`}>
               Reflect, release, and write freely. Choose a prompt or start your own entry.
             </p>
           </div>
@@ -127,7 +127,7 @@ export default function JournalEntries() {
               className={`px-4 py-2 rounded-lg font-semibold ${
                 isEarthy
                   ? "bg-rust-500 hover:bg-rust-600"
-                  : "bg-slate-blue hover:bg-charcoal-grey"
+                  : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
               } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`}
             >
               ✏️ Choose a Prompt
@@ -137,7 +137,7 @@ export default function JournalEntries() {
               className={`px-4 py-2 rounded-lg font-semibold ${
                 isEarthy
                   ? "bg-terracotta-400 hover:bg-terracotta-500"
-                  : "bg-blue-grey hover:bg-slate-blue"
+                  : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
               } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`}
             >
               ➕ New Entry
@@ -153,8 +153,8 @@ export default function JournalEntries() {
                 <div
                   key={entry.id}
                   className={`p-5 rounded-xl shadow-md ${
-                    isEarthy ? "bg-cream-50" : "bg-white"
-                  } border ${isEarthy ? "border-tan-300" : "border-slate-200"}`}
+                    isEarthy ? "bg-cream-100" : "bg-cream-100"
+                  } border ${isEarthy ? "border-tan-300" : "border-[#c7b4e2]"}`}
                 >
                   <div className="flex justify-between items-start">
                     {editingEntry === entry.id ? (
@@ -162,12 +162,12 @@ export default function JournalEntries() {
                         value={editText}
                         onChange={(e) => setEditText(e.target.value)}
                         className={`w-full border rounded-lg p-2 ${
-                          isEarthy ? "border-tan-400 bg-cream-100" : "border-slate-300"
+                          isEarthy ? "border-tan-400 bg-cream-100" : "border-[#c7b4e2]"
                         }`}
                         rows={4}
                       />
                     ) : (
-                      <p className={`${isEarthy ? "text-brown-800" : "text-slate-800"}`}>
+                      <p className={`${isEarthy ? "text-brown-800" : "text-gray-700"}`}>
                         {entry.text}
                       </p>
                     )}
@@ -203,7 +203,7 @@ export default function JournalEntries() {
                               setEditingEntry(entry.id);
                               setEditText(entry.text);
                             }}
-                            className="text-blue-600 hover:underline"
+                            className="text-[#c7b4e2] hover:underline"
                           >
                             Edit
                           </button>
@@ -228,7 +228,7 @@ export default function JournalEntries() {
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
             <div
               className={`p-6 rounded-xl shadow-lg max-w-lg w-full ${
-                isEarthy ? "bg-cream-50 border-tan-300" : "bg-white border-slate-200"
+                isEarthy ? "bg-cream-100 border-tan-300" : "bg-cream-100 border-[#c7b4e2]"
               }`}
               onClick={(e) => e.stopPropagation()}
             >
@@ -251,7 +251,7 @@ export default function JournalEntries() {
                   className={`px-4 py-2 rounded-lg ${
                     isEarthy
                     ? "bg-rust-500 hover:bg-rust-600"
-                    : "bg-slate-blue hover:bg-charcoal-grey"
+                    : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
                 } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform`}
                 >
                   Add
@@ -272,7 +272,7 @@ export default function JournalEntries() {
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
             <div
               className={`p-6 rounded-xl shadow-lg max-w-2xl w-full overflow-y-auto max-h-[80vh] ${
-                isEarthy ? "bg-cream-50 border-tan-300" : "bg-white border-slate-200"
+                isEarthy ? "bg-cream-100 border-tan-300" : "bg-cream-100 border-[#c7b4e2]"
               }`}
               onClick={(e) => e.stopPropagation()}
             >
@@ -288,7 +288,7 @@ export default function JournalEntries() {
                     className={`p-3 rounded-lg text-left ${
                       isEarthy
                       ? "bg-tan-500 hover:bg-tan-600"
-                      : "bg-cool-grey hover:bg-slate-blue"
+                      : "bg-cool-grey hover:bg-[#b49fd3]"
                   } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`}
                   >
                     {prompt}

@@ -10,10 +10,10 @@ export default function FeatureCard({ icon, title, description, color = "primary
     tertiary: "bg-tan-300",
     accent: "bg-brown-600"
   } : {
-    primary: "bg-slate-blue",
-    secondary: "bg-blue-grey",
-    tertiary: "bg-cool-grey",
-    accent: "bg-charcoal-grey"
+    primary: "bg-[#646F89]",
+    secondary: "bg-[#8090B0]",
+    tertiary: "bg-[#ABAAC0]",
+    accent: "bg-[#373E4F]"
   };
 
   return (

@@ -45,7 +45,7 @@ export default function UntiltNavBar() {
       className={`${
         isEarthy
           ? "bg-cream-100 border-tan-200"
-          : "bg-pale-lavender border-cool-grey"
+          : "bg-[#646F89] border-[#8090B0]"
       } shadow-md fixed top-0 w-full z-50 border-b opacity-90 hover:opacity-100 transition-opacity duration-200`}
     >
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -60,7 +60,7 @@ export default function UntiltNavBar() {
               />
               <span
                 className={`text-xl font-bold ${
-                  isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                  isEarthy ? "text-brown-800" : "text-white"
                 }`}
               >
                 Untilt
@@ -84,12 +84,12 @@ export default function UntiltNavBar() {
                       `px-3 py-2 rounded-md text-sm font-medium transition flex items-center gap-1 ${
                         isActive
                           ? `${
-                              isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                              isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
                             } text-white`
                           : `${
                               isEarthy
                                 ? "text-brown-700 hover:text-rust-500"
-                                : "text-charcoal-grey hover:text-slate-blue"
+                                : "text-purple-200 hover:text-[#c7b4e2]"
                             }`
                       }`
                     }
@@ -121,7 +121,7 @@ export default function UntiltNavBar() {
                     } ${
                       isEarthy
                         ? "bg-cream-50 border-2 border-tan-300"
-                        : "bg-white border-2 border-cool-grey"
+                        : "bg-[#8090B0] border-2 border-[#ABAAC0]"
                     }`}
                   >
                     {link.subLinks.map((subLink) => (
@@ -132,13 +132,13 @@ export default function UntiltNavBar() {
                           `block px-4 py-3 text-sm font-medium transition ${
                             isActive
                               ? `${
-                                  isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                                  isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
                                 } text-white`
-                              : `${
-                                  isEarthy
-                                    ? "text-brown-700 hover:bg-tan-100 hover:text-rust-500"
-                                    : "text-charcoal-grey hover:bg-pale-lavender hover:text-slate-blue"
-                                }`
+                                : `${
+                                    isEarthy
+                                      ? "text-brown-700 hover:bg-tan-100 hover:text-rust-500"
+                                      : "text-white hover:bg-[#646F89] hover:text-[#DFD2D5]"
+                                  }`
                           }`
                         }
                       >
@@ -155,12 +155,12 @@ export default function UntiltNavBar() {
                     `px-3 py-2 rounded-md text-sm font-medium transition ${
                       isActive
                         ? `${
-                            isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                            isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
                           } text-white`
-                        : `${
+                          : `${
                             isEarthy
                               ? "text-brown-700 hover:text-rust-500"
-                              : "text-charcoal-grey hover:text-slate-blue"
+                              : "text-purple-200 hover:text-[#c7b4e2]"
                           }`
                     }`
                   }
@@ -176,7 +176,7 @@ export default function UntiltNavBar() {
             <NavLink
             to={"/profile"}
               className={`${
-                isEarthy ? "text-brown-700" : "text-charcoal-grey"
+                isEarthy ? "text-brown-700" : "text-purple-200"
               } px-3 py-2 rounded-md text-sm font-medium`}
             >
               {profile?.firstName || "Unknown"}
@@ -186,7 +186,7 @@ export default function UntiltNavBar() {
               className={`${
                 isEarthy
                   ? "bg-rust-500 hover:bg-rust-600"
-                  : "bg-slate-blue hover:bg-charcoal-grey"
+                  : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
               } text-white px-4 py-2 rounded-md text-sm font-medium transition-colors`}
             >
               Sign Out
@@ -200,7 +200,7 @@ export default function UntiltNavBar() {
               className={`p-2 rounded-md ${
                 isEarthy
                   ? "text-brown-700 hover:text-rust-500"
-                  : "text-charcoal-grey hover:text-slate-blue"
+                  : "text-purple-200 hover:text-[#c7b4e2]"
               } focus:outline-none`}
               aria-label="Toggle menu"
             >
@@ -238,7 +238,7 @@ export default function UntiltNavBar() {
         >
           <div
             className={`py-2 space-y-1 ${
-              isEarthy ? "bg-cream-50" : "bg-white"
+              isEarthy ? "bg-cream-50" : "bg-[#8090B0]"
             } rounded-lg mx-2 mb-2`}
           >
             {links.map((link) => (
@@ -253,12 +253,12 @@ export default function UntiltNavBar() {
                         `flex-1 px-4 py-3 rounded-md text-base font-medium transition ${
                           isActive
                             ? `${
-                                isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                                isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
                               } text-white`
                             : `${
                                 isEarthy
                                   ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
-                                  : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
+                                  : "text-purple-200 hover:text-[#c7b4e2] hover:bg-[#2d1b4e]"
                               }`
                         }`
                       }
@@ -270,7 +270,7 @@ export default function UntiltNavBar() {
                       className={`px-3 py-3 ${
                         isEarthy
                           ? "text-brown-700 hover:text-rust-500"
-                          : "text-charcoal-grey hover:text-slate-blue"
+                          : "text-purple-200 hover:text-[#c7b4e2]"
                       }`}
                     >
                       <svg
@@ -310,12 +310,12 @@ export default function UntiltNavBar() {
                             `block px-4 py-2 rounded-md text-sm font-medium transition ${
                               isActive
                                 ? `${
-                                    isEarthy ? "bg-rust-400" : "bg-slate-blue"
+                                    isEarthy ? "bg-rust-400" : "bg-[#c7b4e2]"
                                   } text-white`
                                 : `${
                                     isEarthy
                                       ? "text-brown-600 hover:text-rust-500 hover:bg-cream-200"
-                                      : "text-slate-blue hover:text-charcoal-grey hover:bg-pale-lavender"
+                                      : "text-white hover:text-[#DFD2D5] hover:bg-[#646F89]"
                                   }`
                             }`
                           }
@@ -335,12 +335,12 @@ export default function UntiltNavBar() {
                     `block px-4 py-3 rounded-md text-base font-medium transition ${
                       isActive
                         ? `${
-                            isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                            isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
                           } text-white`
                         : `${
                             isEarthy
                               ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
-                              : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
+                              : "text-white hover:text-[#DFD2D5] hover:bg-[#646F89]"
                           }`
                     }`
                   }
@@ -358,12 +358,12 @@ export default function UntiltNavBar() {
                 `block w-full text-center px-4 py-3 rounded-md text-base font-medium transition ${
                   isActive
                     ? `${
-                        isEarthy ? "bg-rust-500" : "bg-slate-blue"
+                        isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
                       } text-white`
                     : `${
                         isEarthy
                           ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
-                          : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
+                          : "text-white hover:text-[#DFD2D5] hover:bg-[#646F89]"
                       }`
                 }`
               }
@@ -382,7 +382,7 @@ export default function UntiltNavBar() {
               className={`block w-full text-center px-4 py-2 rounded-md text-base font-medium ${
                 isEarthy
                   ? "bg-rust-500 hover:bg-rust-600"
-                  : "bg-slate-blue hover:bg-charcoal-grey"
+                  : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
               } text-white mt-2`}
             >
               Sign Out

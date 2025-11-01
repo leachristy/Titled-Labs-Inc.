@@ -14,7 +14,7 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
     className={`group relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer ${
       isEarthy
         ? "bg-gradient-to-br from-cream-100 to-tan-50 border-2 border-tan-300"
-        : "bg-gradient-to-br from-white to-pale-lavender border-2 border-cool-grey"
+        : "bg-[#DFD2D5] border-2 border-[#8090B0]"
     }`}
     onClick={onClick}
   >
@@ -39,14 +39,14 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
           className={`mb-3 text-2xl font-bold transition-colors text-center ${
             isEarthy
               ? "text-brown-800 group-hover:text-rust-600"
-              : "text-charcoal-grey group-hover:text-slate-blue"
+              : "text-gray-900 group-hover:text-[#c7b4e2]"
           }`}
         >
           {title}
         </h2>
         <p
           className={`mb-4 text-sm leading-relaxed text-center ${
-            isEarthy ? "text-brown-600" : "text-slate-blue"
+            isEarthy ? "text-brown-600" : "text-gray-700"
           }`}
         >
           {description}
@@ -59,7 +59,7 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
           className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 ${
             isEarthy
               ? "bg-rust-500 hover:bg-rust-600 text-white"
-              : "bg-slate-blue hover:bg-charcoal-grey text-white"
+              : "bg-[#c7b4e2] hover:bg-[#b49fd3] text-gray-900"
           } shadow-md hover:shadow-lg transform hover:scale-105`}
         >
           Explore →
@@ -69,7 +69,7 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
       {/* Hover effect overlay */}
       <div
         className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl transition-opacity duration-300 opacity-0 group-hover:opacity-20 ${
-          isEarthy ? "bg-rust-400" : "bg-slate-blue"
+          isEarthy ? "bg-rust-400" : "bg-[#c7b4e2]"
         }`}
         style={{ transform: "translate(50%, -50%)" }}
       ></div>
@@ -119,24 +119,21 @@ export const SelfCare = () => {
 
       <div
         className={`min-h-screen px-4 pt-24 pb-12 ${
-          isEarthy ? "bg-cream-100" : "bg-pale-lavender"
+          isEarthy ? "bg-cream-100" : "bg-[#373E4F]"
         }`}
-        style={{
-          backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
-        }}
       >
         {/* Header Section */}
         <div className="max-w-7xl mx-auto mb-12 text-center">
           <h1
             className={`text-5xl font-bold mb-4 ${
-              isEarthy ? "text-brown-800" : "text-charcoal-grey"
+              isEarthy ? "text-brown-800" : "text-white"
             }`}
           >
             Your Self-Care Toolkit
           </h1>
           <p
             className={`text-lg max-w-2xl mx-auto ${
-              isEarthy ? "text-brown-600" : "text-slate-blue"
+              isEarthy ? "text-brown-600" : "text-purple-200"
             }`}
           >
             Discover personalized tools and resources to support your mental wellness journey. 

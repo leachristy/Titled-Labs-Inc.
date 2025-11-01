@@ -18,7 +18,7 @@ export default function NavBar() {
   return (
     <nav
       className={`${
-        isEarthy ? "bg-cream-100 border-tan-200" : "bg-pale-lavender border-cool-grey"
+        isEarthy ? "bg-cream-100 border-tan-200" : "bg-[#DFD2D5] border-[#8090B0]"
       } shadow-md fixed top-0 w-full z-50 border-b opacity-90`}
     >
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -27,7 +27,7 @@ export default function NavBar() {
           <NavLink to="/">
             <div className="flex items-center space-x-3">
               <img src={logoImage} alt="Logo" className="object-contain w-12 h-10" />
-              <span className={`text-xl font-bold ${isEarthy ? "text-brown-800" : "text-charcoal-grey"}`}>
+              <span className={`text-xl font-bold ${isEarthy ? "text-brown-800" : "text-[#373E4F]"}`}>
                 Tilted Lab Inc.
               </span>
             </div>
@@ -42,11 +42,11 @@ export default function NavBar() {
                 className={({ isActive }) =>
                   `px-3 py-2 rounded-md text-sm font-medium transition ${
                     isActive
-                      ? `${isEarthy ? "bg-rust-500" : "bg-slate-blue"} text-white`
+                      ? `${isEarthy ? "bg-rust-500" : "bg-[#646F89]"} text-white`
                       : `${
                           isEarthy
                             ? "text-brown-700 hover:text-rust-500"
-                            : "text-charcoal-grey hover:text-slate-blue"
+                            : "text-[#373E4F] hover:text-[#646F89]"
                         }`
                   }`
                 }
@@ -59,7 +59,7 @@ export default function NavBar() {
             <NavLink
               to="/login"
               className={`${
-                isEarthy ? "text-brown-700 hover:text-rust-500" : "text-charcoal-grey hover:text-slate-blue"
+                isEarthy ? "text-brown-700 hover:text-rust-500" : "text-[#373E4F] hover:text-[#646F89]"
               } px-3 py-2 rounded-md text-sm font-medium transition-colors`}
             >
               Login
@@ -67,7 +67,7 @@ export default function NavBar() {
             <NavLink
               to="/signup"
               className={`${
-                isEarthy ? "bg-rust-500 hover:bg-rust-600" : "bg-slate-blue hover:bg-charcoal-grey"
+                isEarthy ? "bg-rust-500 hover:bg-rust-600" : "bg-[#646F89] hover:bg-[#373E4F]"
               } text-white px-4 py-2 rounded-md text-sm font-medium transition-colors`}
             >
               Sign Up
@@ -79,7 +79,7 @@ export default function NavBar() {
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className={`p-2 rounded-md ${
-                isEarthy ? "text-brown-700 hover:text-rust-500" : "text-charcoal-grey hover:text-slate-blue"
+                isEarthy ? "text-brown-700 hover:text-rust-500" : "text-[#373E4F] hover:text-[#646F89]"
               } focus:outline-none`}
               aria-label="Toggle menu"
             >
@@ -100,7 +100,7 @@ export default function NavBar() {
             isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className={`py-2 space-y-1 ${isEarthy ? "bg-cream-50" : "bg-white"} rounded-lg mx-2 mb-2`}>
+          <div className={`py-2 space-y-1 ${isEarthy ? "bg-cream-50" : "bg-[#ABAAC0]"} rounded-lg mx-2 mb-2`}>
             {links.map(link => (
               <NavLink
                 key={link.path}
@@ -109,11 +109,11 @@ export default function NavBar() {
                 className={({ isActive }) =>
                   `block px-4 py-3 rounded-md text-base font-medium transition ${
                     isActive
-                      ? `${isEarthy ? "bg-rust-500" : "bg-slate-blue"} text-white`
+                      ? `${isEarthy ? "bg-rust-500" : "bg-[#646F89]"} text-white`
                       : `${
                           isEarthy
                             ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
-                            : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
+                            : "text-white hover:text-[#DFD2D5] hover:bg-[#646F89]"
                         }`
                   }`
                 }
@@ -129,7 +129,7 @@ export default function NavBar() {
               className={`block w-full text-center px-4 py-2 rounded-md text-base font-medium ${
                 isEarthy
                   ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
-                  : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
+                  : "text-white hover:text-[#DFD2D5] hover:bg-[#646F89]"
               } mb-2`}
             >
               Login
@@ -138,7 +138,7 @@ export default function NavBar() {
               to="/signup"
               onClick={() => setIsMenuOpen(false)}
               className={`block w-full text-center px-4 py-2 rounded-md text-base font-medium ${
-                isEarthy ? "bg-rust-500 hover:bg-rust-600" : "bg-slate-blue hover:bg-charcoal-grey"
+                isEarthy ? "bg-rust-500 hover:bg-rust-600" : "bg-[#646F89] hover:bg-[#373E4F]"
               } text-white`}
             >
               Sign Up
