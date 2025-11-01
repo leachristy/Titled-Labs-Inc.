@@ -30,6 +30,7 @@ export default function UntiltNavBar() {
     },
     { name: "AI Chat", path: "/aichat" },
     { name: "Community", path: "/community" },
+    { name: "Direct Messages", path: "/messages" },
   ];
 
   const handleSignOut = async () => {

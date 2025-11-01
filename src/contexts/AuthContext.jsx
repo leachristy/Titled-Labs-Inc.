@@ -23,6 +23,7 @@ const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState({});
   const [profile, setProfile] = useState(null); // Firestore user document
+  const [loading, setLoading] = useState(true); // Add loading state
 
   // sign in function
   const googleSignIn = async () => {
@@ -130,11 +131,14 @@ export const AuthContextProvider = ({ children }) => {
       setUser(currentUser);
       if (!currentUser) {
         setProfile(null);
+        setLoading(false);
         return;
       }
-      return onSnapshot(doc(db, "users", currentUser.uid), (snap) =>
-        setProfile(snap.data() || null)
-      );
+      const unsubProfile = onSnapshot(doc(db, "users", currentUser.uid), (snap) => {
+        setProfile(snap.data() || null);
+        setLoading(false);
+      });
+      return unsubProfile;
     });
     return () => unsubAuth();
   }, []);
@@ -150,6 +154,7 @@ export const AuthContextProvider = ({ children }) => {
         logOut,
         user,
         profile,
+        loading,
       }}
     >
       {/* ensures all child components render normally, but now have access to these values via the context. */}

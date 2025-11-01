@@ -22,14 +22,13 @@ export default function CTASection({ onNavigate }) {
               NO CREDIT CARD REQUIRED
             </span>
           </div>
-          <h2 className="mb-4 text-4xl font-bold text-white">Start for free</h2>
+          <h2 className="mb-4 text-4xl font-bold text-white">Ready to begin your wellness journey?</h2>
           <p
             className={`max-w-2xl mx-auto mb-8 text-lg ${
               isEarthy ? "text-cream-100" : "text-pale-lavender"
             }`}
           >
-            Try Tilted free for 30 days. Experience the complete platform and
-            see how we can support your mental wellness journey.
+            Join Untilt today to access self-care tools, supportive communities, AI assistance, and personalized wellness tracking—all in one secure platform.
           </p>
           <div className="flex flex-col justify-center gap-4 mb-8 sm:flex-row">
             <button
@@ -40,13 +39,13 @@ export default function CTASection({ onNavigate }) {
                   : "text-slate-blue hover:bg-pale-lavender"
               } font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200`}
             >
-              Start free trial
+              Get started free
             </button>
             <button
               onClick={() => onNavigate("/contact")}
               className="px-8 py-3 bg-transparent text-white font-semibold rounded-lg border-2 border-white hover:bg-white/10 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
             >
-              Schedule demo
+              Learn more
             </button>
           </div>
           <p
@@ -54,7 +53,7 @@ export default function CTASection({ onNavigate }) {
               isEarthy ? "text-cream-200" : "text-pale-lavender"
             }`}
           >
-            Join 225,000+ users who trust Tilted for their mental wellness
+            Begin your wellness journey today—no credit card required
           </p>
         </div>
       </div>
