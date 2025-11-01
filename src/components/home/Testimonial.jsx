@@ -5,7 +5,7 @@ export default function Testimonial() {
   const isEarthy = currentTheme === 'earthy';
 
   return (
-    <section className={`py-20 ${isEarthy ? 'bg-gradient-to-br from-rust-500 to-terracotta-500' : 'bg-slate-blue'}`}>
+    <section className={`py-20 ${isEarthy ? 'bg-gradient-to-br from-rust-500 to-terracotta-500' : 'bg-[#8090B0]'}`}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
@@ -16,7 +16,7 @@ export default function Testimonial() {
         <div className="bg-white rounded-2xl shadow-2xl p-8 sm:p-12 mb-12">
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="flex-shrink-0">
-              <div className={`w-16 h-16 ${isEarthy ? 'bg-rust-500' : 'bg-slate-blue'} rounded-full flex items-center justify-center`}>
+              <div className={`w-16 h-16 ${isEarthy ? 'bg-rust-500' : 'bg-[#646F89]'} rounded-full flex items-center justify-center`}>
                 <span className="text-2xl font-bold text-white">JD</span>
               </div>
             </div>

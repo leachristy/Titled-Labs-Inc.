@@ -9,7 +9,7 @@ export default function StatsBar() {
       value: "96%", 
       label: "agree Tilted is intuitive to set up", 
       earthyColor: "text-rust-600",
-      coolColor: "text-slate-blue"
+      coolColor: "text-[#646F89]"
     },
     { 
       value: "6+", 
@@ -27,12 +27,12 @@ export default function StatsBar() {
       value: "50M+", 
       label: "sessions completed", 
       earthyColor: "text-brown-600",
-      coolColor: "text-charcoal-grey"
+      coolColor: "text-[#373E4F]"
     }
   ];
 
   return (
-    <section className={`py-16 bg-white border-y ${isEarthy ? "border-tan-200" : "border-cool-grey"}`}>
+    <section className={`py-16 bg-white border-y ${isEarthy ? "border-tan-200" : "border-[#8090B0]"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
@@ -40,7 +40,7 @@ export default function StatsBar() {
               <div className={`text-4xl sm:text-5xl font-bold ${isEarthy ? stat.earthyColor : stat.coolColor} mb-2`}>
                 {stat.value}
               </div>
-              <div className={`text-sm ${isEarthy ? "text-brown-700" : "text-charcoal-grey"}`}>
+              <div className={`text-sm ${isEarthy ? "text-brown-700" : "text-[#373E4F]"}`}>
                 {stat.label}
               </div>
             </div>

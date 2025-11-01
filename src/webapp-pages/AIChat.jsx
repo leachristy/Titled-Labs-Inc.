@@ -6,6 +6,7 @@ export default function AIChat() {
   const isEarthy = currentTheme === "earthy";
 
   return (
+<<<<<<< Updated upstream
     <>
       <title>Untilt - AI Chat</title>
       <UntiltNavBar />
@@ -13,15 +14,131 @@ export default function AIChat() {
       <div
         className={`min-h-screen px-4 pt-24 ${
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"
+=======
+    <div
+      className={`min-h-screen pt-28 px-4 transition-colors duration-300 ${
+        isEarthy
+          ? "bg-[#f4efe9] text-stone-800"
+          : isDark
+          ? "bg-[#1e1e1e] text-gray-100"
+          : "bg-[#373E4F] text-white"
+      }`}
+    >
+      <div
+        className={`max-w-3xl mx-auto rounded-3xl shadow-lg p-6 transition-colors duration-300 ${
+          isEarthy
+            ? "bg-[#fdfbf7]"
+            : isDark
+            ? "bg-[#2a2a2a]"
+            : "bg-[#DFD2D5] backdrop-blur-sm"
+>>>>>>> Stashed changes
         }`}
         style={{
           backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
         }}
       >
+<<<<<<< Updated upstream
         <div className="max-w-4xl mx-auto">
           <h1
             className={`mb-6 text-3xl font-bold text-center ${
               isEarthy ? "text-brown-800" : "text-charcoal-grey"
+=======
+        <Link
+          to="/dashboard"
+          className={`inline-block mb-6 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors duration-300 ${
+            isEarthy
+              ? "bg-[#e3a765] hover:bg-[#d3934d] text-stone-800"
+              : isDark
+              ? "bg-[#444] hover:bg-[#555] text-gray-100"
+              : "bg-[#c7b4e2] hover:bg-[#b49fd3] text-gray-900"
+          }`}
+        >
+          ← Back to Dashboard
+        </Link>
+
+
+
+        <h1 className={`text-3xl font-bold text-center mb-1 ${
+          isEarthy ? "text-brown-800" : isDark ? "text-white" : "text-gray-900"
+        }`}>AI Self-Care Chat</h1>
+        <p
+          className={`text-center mb-6 ${
+            isEarthy
+              ? "text-gray-600"
+              : isDark
+              ? "text-gray-400"
+              : "text-gray-600"
+          }`}
+        >
+          Welcome, <span className="font-semibold">{displayName}</span>
+        </p>
+
+        {/* Chat window */}
+        <div
+          className={`h-[480px] overflow-y-auto rounded-2xl p-4 shadow-inner transition-colors duration-300 ${
+            isEarthy
+              ? "bg-[#f8f6f1]"
+              : isDark
+              ? "bg-[#333333]"
+              : "bg-white"
+          }`}
+        >
+          {messages.length === 0 ? (
+            <p
+              className={`text-center italic mt-32 ${
+                isEarthy
+                  ? "text-gray-400"
+                  : isDark
+                  ? "text-gray-500"
+                  : "text-gray-400"
+              }`}
+            >
+              Start your self-care conversation
+            </p>
+          ) : (
+            messages.map(renderMessage)
+          )}
+          {loading && (
+            <p
+              className={`text-center italic mt-2 ${
+                isEarthy
+                  ? "text-gray-400"
+                  : isDark
+                  ? "text-gray-500"
+                  : "text-gray-400"
+              }`}
+            >
+              Thinking...
+            </p>
+          )}
+        </div>
+
+        {/* Input area */}
+        <div className="flex mt-4 items-center">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            placeholder="Type your message..."
+            className={`flex-1 p-3 rounded-l-2xl border text-sm focus:outline-none transition-colors duration-300 ${
+              isEarthy
+                ? "border-[#d4c7b8] bg-[#f9f8f6] focus:border-[#a1866f]"
+                : isDark
+                ? "border-gray-600 bg-[#222222] text-gray-100 focus:border-[#7b6ca8]"
+                : "border-[#c7b4e2] bg-white text-gray-900 focus:border-[#c7b4e2]"
+            }`}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={loading}
+            className={`px-6 py-3 rounded-r-2xl font-semibold text-sm shadow-sm transition-colors duration-300 ${
+              isEarthy
+                ? "bg-[#e3a765] hover:bg-[#d3934d] text-white"
+                : isDark
+                ? "bg-[#7b6ca8] hover:bg-[#675799] text-white"
+                : "bg-[#c7b4e2] hover:bg-[#b49fd3] text-gray-900"
+>>>>>>> Stashed changes
             }`}
             style={{ color: isEarthy ? undefined : "var(--charcoal-grey)" }}
           >

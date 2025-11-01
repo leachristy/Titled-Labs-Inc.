@@ -15,7 +15,7 @@ export default function DetailedFeature({
   return (
     <div className={`flex flex-col ${reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 items-center mb-20`}>
       <div className="flex-1">
-        <div className={`inline-block px-3 py-1 ${isEarthy ? 'bg-rust-100 text-rust-600' : 'bg-pale-lavender text-slate-blue'} text-xs font-semibold tracking-wider rounded-full mb-4`}>
+        <div className={`inline-block px-3 py-1 ${isEarthy ? 'bg-rust-100 text-rust-600' : 'bg-[#ABAAC0] text-[#373E4F]'} text-xs font-semibold tracking-wider rounded-full mb-4`}>
           {badge}
         </div>
         <h3 className={`text-3xl font-bold ${isEarthy ? 'text-brown-800' : 'text-charcoal-grey'} mb-4`}>{title}</h3>

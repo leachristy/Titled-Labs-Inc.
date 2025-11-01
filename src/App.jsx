@@ -19,7 +19,9 @@ import Dashboard from "./webapp-pages/Dashboard";
 import AIChat from "./webapp-pages/AIChat";
 import Community from "./webapp-pages/Community";
 import { AuthContextProvider } from "./contexts/AuthContext";
+import { MessengerProvider } from "./contexts/MessengerContext";
 import Protected from "./components/Protected";
+import MessengerWidget from "./components/MessengerWidget";
 import { SelfCare } from "./webapp-pages/SelfCare";
 import JournalEntries from "./webapp-pages/selfcare-features/JournalEntries";
 import Goals from "./webapp-pages/selfcare-features/Goal";
@@ -35,7 +37,9 @@ export default function App() {
       <div className="min-h-screen">
         <ThemeToggle />
         <AuthContextProvider>
-          <Routes>
+          <MessengerProvider>
+            <MessengerWidget />
+            <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<UnifiedHome />} />
             <Route path="/home" element={<UnifiedHome />} />
@@ -126,6 +130,7 @@ export default function App() {
               }
             />
           </Routes>
+          </MessengerProvider>
         </AuthContextProvider>
       </div>
     </ThemeProvider>

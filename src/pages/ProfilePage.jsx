@@ -90,7 +90,7 @@ export default function ProfilePage() {
           className={`px-4 py-2 rounded font-semibold transition ${
             isEarthy
               ? "bg-rust-500 hover:bg-rust-600 text-white"
-              : "bg-slate-blue hover:bg-charcoal-grey text-white"
+              : "bg-[#c7b4e2] hover:bg-[#b49fd3] text-white"
           }`}
         >
           ← Back to Dashboard
@@ -101,7 +101,7 @@ export default function ProfilePage() {
       {message && (
         <div
           className={`w-full max-w-lg text-center py-3 px-4 rounded mb-6 ${
-            isEarthy ? "bg-tan-400 text-white" : "bg-slate-blue text-white"
+            isEarthy ? "bg-tan-400 text-white" : "bg-[#c7b4e2] text-white"
           }`}
         >
           {message}
@@ -132,7 +132,7 @@ export default function ProfilePage() {
             {/* Email */}
             <p
               className={`text-sm mb-3 ${
-                isEarthy ? "text-brown-600" : "text-slate-blue"
+                isEarthy ? "text-brown-600" : "text-[#c7b4e2]"
               }`}
             >
               {profile.email}
@@ -148,7 +148,7 @@ export default function ProfilePage() {
                 className={`px-5 py-2 rounded font-semibold transition ${
                   isEarthy
                     ? "bg-rust-500 hover:bg-rust-600 text-white"
-                    : "bg-slate-blue hover:bg-charcoal-grey text-white"
+                    : "bg-[#c7b4e2] hover:bg-[#b49fd3] text-white"
                 }`}
               >
                 Edit Profile
@@ -158,7 +158,7 @@ export default function ProfilePage() {
                 className={`px-5 py-2 rounded font-semibold transition ${
                   isEarthy
                     ? "bg-brown-700 hover:bg-rust-500 text-white"
-                    : "bg-charcoal-grey hover:bg-slate-blue text-white"
+                    : "bg-charcoal-grey hover:bg-[#c7b4e2] text-white"
                 }`}
               >
                 Delete Account

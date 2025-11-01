@@ -7,7 +7,7 @@ export default function HeroSection({ onNavigate }) {
   const isEarthy = currentTheme === "earthy";
 
   return (
-    <section className={`relative py-20 overflow-hidden ${isEarthy ? "bg-terracotta-200" : "bg-pale-lavender"}`}>
+    <section className={`relative py-20 overflow-hidden ${isEarthy ? "bg-terracotta-200" : "bg-[#DFD2D5]"}`}>
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzBoLTZhMSAxIDAgMCAxIDAtMmg2YTEgMSAwIDAgMSAwIDJ6bS0xMiAwSDhhMSAxIDAgMCAxIDAtMmgxNmExIDEgMCAwIDEgMCAyek0zNiAxOGgtNmExIDEgMCAwIDEgMC0yaDZhMSAxIDAgMCAxIDAgem0tMTIgMEg4YTEgMSAwIDAgMSAwLTJoMTZhMSAxIDAgMCAxIDAgek0zNiA0Mmg2YTEgMSAwIDAgMSAwIDJoLTZhMSAxIDAgMCAxIDAtMnptLTEyIDBoMTZhMSAxIDAgMCAxIDAgMkg4YTEgMSAwIDAgMSAwLTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30"></div>
 
       <div className="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -64,15 +64,24 @@ export default function HeroSection({ onNavigate }) {
             isEarthy ? "text-brown-700" : "text-charcoal-grey"
           }`}>
             <div className="flex items-center gap-2">
+<<<<<<< Updated upstream
               <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-slate-blue"}`}></div>
               <span>HIPAA-compliant</span>
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-slate-blue"}`}></div>
               <span>30-day free trial</span>
+=======
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#646F89]"}`}></div>
+              <span>Secure & Private</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-slate-blue"}`}></div>
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#646F89]"}`}></div>
+              <span>24/7 AI Support</span>
+>>>>>>> Stashed changes
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#646F89]"}`}></div>
               <span>No credit card required</span>
             </div>
           </div>
