@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ export default function AIChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
 
   const handleBack = () => {
     navigate("/dashboard");

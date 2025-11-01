@@ -12,7 +12,11 @@ export default function DirectMessages() {
   const isEarthy = currentTheme === "earthy";
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      // Clear conversations when user signs out
+      setConversations([]);
+      return;
+    }
 
     const q = query(
       collection(db, "messages"),
