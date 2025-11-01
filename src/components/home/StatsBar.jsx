@@ -6,26 +6,26 @@ export default function StatsBar() {
 
   const stats = [
     { 
-      value: "96%", 
-      label: "agree Tilted is intuitive to set up", 
+      value: "24/7", 
+      label: "AI support available anytime", 
       earthyColor: "text-rust-600",
       coolColor: "text-slate-blue"
     },
     { 
-      value: "6+", 
-      label: "hours saved per week on admin tasks", 
+      value: "4+", 
+      label: "self-care tools to explore", 
       earthyColor: "text-terracotta-500",
       coolColor: "text-blue-grey"
     },
     { 
-      value: "14+", 
-      label: "hours saved per month on billing", 
+      value: "100%", 
+      label: "private and secure platform", 
       earthyColor: "text-tan-400",
       coolColor: "text-cool-grey"
     },
     { 
-      value: "50M+", 
-      label: "sessions completed", 
+      value: "1000+", 
+      label: "community members connected", 
       earthyColor: "text-brown-600",
       coolColor: "text-charcoal-grey"
     }
