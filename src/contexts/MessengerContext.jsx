@@ -51,6 +51,16 @@ export const MessengerProvider = ({ children }) => {
     return () => unsubscribe();
   }, [user]);
 
+  // Clear all messenger state when user signs out
+  useEffect(() => {
+    if (!user) {
+      setIsMessengerOpen(false);
+      setOpenChats([]);
+      setConversations({});
+      setAllUsers([]);
+    }
+  }, [user]);
+
   // Open a chat window
   const openChat = (userId, userName, userAvatar) => {
     setOpenChats((prev) => {
