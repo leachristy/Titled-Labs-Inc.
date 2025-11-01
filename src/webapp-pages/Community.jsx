@@ -14,8 +14,11 @@ import {
   arrayUnion,
   arrayRemove,
   deleteDoc,
+  runTransaction,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../src/firebase";
+import { Link } from "react-router-dom";
 
 export default function Community() {
   const { currentTheme } = useTheme();
@@ -144,12 +147,30 @@ export default function Community() {
     };
 
     try {
+      // First, get the current document
+      const postDoc = await getDoc(postRef);
+      
+      if (!postDoc.exists()) {
+        console.error("Post does not exist!");
+        alert("Post not found. Please refresh the page.");
+        return;
+      }
+
+      const currentComments = postDoc.data().comments || [];
+      const updatedComments = [...currentComments, newComment];
+      
+      // Update with the new comments array
       await updateDoc(postRef, {
-        comments: arrayUnion(newComment),
+        comments: updatedComments,
       });
+      
       setCommentText({ ...commentText, [postId]: "" });
+      console.log("Comment added successfully!");
     } catch (error) {
       console.error("Error adding comment:", error);
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
+      alert(`Failed to add comment: ${error.message}`);
     }
   };
 
@@ -640,7 +661,14 @@ export default function Community() {
                                   isEarthy ? "text-brown-600" : "text-gray-600"
                                 }`}
                               >
-                                Posted by {post.authorName} • {timeAgo(post.createdAt)}
+                                Posted by {" "}
+                                <Link
+                                  to={`/profile/${post.authorId}`}
+                                  className="font-semibold hover:underline"
+                                  >
+                                    {post.authorName}
+                                </Link>{" "} 
+                                • {timeAgo(post.createdAt)}
                               </span>
                             </div>
                             {user.uid === post.authorId && (

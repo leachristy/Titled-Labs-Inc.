@@ -38,9 +38,7 @@ export default function HeroSection({ onNavigate }) {
           <p className={`max-w-3xl mx-auto mb-10 text-lg leading-relaxed sm:text-xl ${
             isEarthy ? "text-brown-700" : "text-charcoal-grey"
           }`}>
-            Our platform helps you save time and focus on what matters most—your
-            well-being. Connect with licensed therapists, join supportive
-            communities, and access AI-powered resources.
+            Access self-care tools, join supportive communities, get AI-powered guidance, and track your progress—all in one secure, easy-to-use platform designed for your mental wellness.
           </p>
 
           {/* CTA Buttons */}
@@ -49,10 +47,10 @@ export default function HeroSection({ onNavigate }) {
               onClick={() => onNavigate("/signup")}
               className={`px-8 py-3 ${isEarthy ? "btn-primary" : "btn-primary-new"}`}
             >
-              Start free trial
+              Get started free
             </button>
             <button
-              onClick={() => onNavigate("/contact")}
+              onClick={() => onNavigate("/about")}
               className={`px-8 py-3 ${isEarthy ? "btn-secondary" : "btn-secondary-new"}`}
             >
               Learn more
@@ -64,21 +62,12 @@ export default function HeroSection({ onNavigate }) {
             isEarthy ? "text-brown-700" : "text-charcoal-grey"
           }`}>
             <div className="flex items-center gap-2">
-<<<<<<< Updated upstream
               <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-slate-blue"}`}></div>
-              <span>HIPAA-compliant</span>
+              <span>Secure & Private</span>
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-slate-blue"}`}></div>
               <span>30-day free trial</span>
-=======
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#646F89]"}`}></div>
-              <span>Secure & Private</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#646F89]"}`}></div>
-              <span>24/7 AI Support</span>
->>>>>>> Stashed changes
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#646F89]"}`}></div>

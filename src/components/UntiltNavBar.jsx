@@ -3,7 +3,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
 import logoImage from "../assets/Thong.png";
-import DirectChat from "./DirectChat";
 
 export default function UntiltNavBar() {
   const { user, logOut, profile } = UserAuth();
@@ -12,7 +11,6 @@ export default function UntiltNavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSelfCareOpen, setIsSelfCareOpen] = useState(false);
   const [isSelfCareOpenMobile, setIsSelfCareOpenMobile] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const navigate = useNavigate();
 
   const links = [
@@ -30,6 +28,7 @@ export default function UntiltNavBar() {
     },
     { name: "AI Chat", path: "/aichat" },
     { name: "Community", path: "/community" },
+    { name: "Direct Messages", path: "/messages" },
   ];
 
   const handleSignOut = async () => {
@@ -174,19 +173,6 @@ export default function UntiltNavBar() {
 
           {/* Desktop User Display */}
           <div className="hidden lg:flex items-center ml-6 space-x-3">
-            <button
-              onClick={() => setIsChatOpen(!isChatOpen)}
-              className={`relative p-2 rounded-full transition ${
-                isEarthy
-                  ? "hover:bg-rust-100 text-brown-700 hover:text-rust-500"
-                  : "hover:bg-pale-lavender text-charcoal-grey hover:text-slate-blue"
-              }`}
-              title="Messages"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-            </button>
             <NavLink
             to={"/profile"}
               className={`${
@@ -364,21 +350,6 @@ export default function UntiltNavBar() {
               )
             ))}
 
-            {/* Mobile Messages Button */}
-            <button
-              onClick={() => {
-                setIsChatOpen(!isChatOpen);
-                setIsMenuOpen(false);
-              }}
-              className={`block w-full text-center px-4 py-3 rounded-md text-base font-medium transition ${
-                isEarthy
-                  ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
-                  : "text-charcoal-grey hover:text-slate-blue hover:bg-pale-lavender"
-              }`}
-            >
-              💬 Messages
-            </button>
-
             {/* Mobile User Display */}
             <NavLink
               to="/profile"
@@ -419,9 +390,6 @@ export default function UntiltNavBar() {
           </div>
         </div>
       </div>
-
-      {/* Direct Chat Component - Always render when user is logged in */}
-      {user && <DirectChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />}
     </nav>
   );
 }

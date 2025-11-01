@@ -105,6 +105,17 @@ export default function GuidedVideos() {
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"
         }`}
       >
+        {/* Back Button */}
+        <button
+            onClick={() => navigate("/selfcare")}
+            className={`mb-6 px-4 py-2 rounded-lg flex items-center gap-2 font-medium shadow-sm ${
+              isEarthy
+                ? "bg-tan-300 hover:bg-tan-400 text-brown-900"
+                : "bg-indigo-200 hover:bg-indigo-300 text-indigo-900"
+            } transition`}
+          >
+            ← Back to Self-Care
+          </button>
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h1

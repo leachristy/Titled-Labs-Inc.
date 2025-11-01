@@ -75,7 +75,6 @@ export default function DirectMessages() {
             className={`p-3 border rounded flex justify-between ${
               isEarthy 
                 ? "border-tan-300 hover:bg-cream-50 text-brown-800" 
-                : "bg-cream-100 border-[#c7b4e2] hover:bg-cream-200 text-gray-900"
             }`}
           >
             <span>{convo.otherName}</span>
