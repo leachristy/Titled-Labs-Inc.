@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { collection, orderBy, query } from "firebase/firestore";
+import { collection, query } from "firebase/firestore";
 import { useTheme } from "../contexts/ThemeContext";
 import { db } from "../src/firebase";
-import UntiltNavBar from "../components/UntiltNavBar";
+import NavBar from "../components/NavBar";
 
-export default function Dashboard() {
+export default function Users() {
   const [visible, setVisible] = useState(false);
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
-  const usersQuery = query(collection(db, "users"), orderBy("first_name"));
+  const usersQuery = query(collection(db, "users"));
 
   const [usersQuerySnapshot, usersLoading, usersError] = useCollection(
     visible ? usersQuery : null,
@@ -20,13 +20,19 @@ export default function Dashboard() {
   );
 
   const users =
-    usersQuerySnapshot?.docs.map((doc) => ({ id: doc.id, ...doc.data() })) ??
-    [];
+    usersQuerySnapshot?.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((user) => user.firstName || user.lastName) // Only show users with names
+      .sort((a, b) => {
+        const nameA = (a.firstName || "").toLowerCase();
+        const nameB = (b.firstName || "").toLowerCase();
+        return nameA.localeCompare(nameB);
+      }) ?? [];
 
   return (
     <>
-      <title>Untilt - Dashboard</title>
-      <UntiltNavBar />
+      <title>Users - Tilted | Mental Wellness</title>
+      <NavBar />
       {/* push content down from fixed navbar */}
       <div
         className={`min-h-screen pt-32 ${
@@ -85,31 +91,17 @@ export default function Dashboard() {
                 {users.map((user) => (
                   <div
                     key={user.id}
-                    className="text-left card"
-                    style={{
-                      borderColor: isEarthy ? undefined : "var(--cool-grey)",
-                    }}
+                    className={`text-center card p-4 rounded-lg shadow-md border-2 ${
+                      isEarthy ? "bg-white border-tan-300" : "bg-white border-[#8090B0]"
+                    }`}
                   >
                     <h3
                       className={`text-lg font-bold ${
-                        isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                        isEarthy ? "text-brown-800" : "text-gray-900"
                       }`}
-                      style={{
-                        color: isEarthy ? undefined : "var(--charcoal-grey)",
-                      }}
                     >
-                      {user.first_name} {user.last_name}
+                      {user.firstName || user.lastName || "Anonymous"}
                     </h3>
-                    <p
-                      className={`text-sm ${
-                        isEarthy ? "text-brown-600" : "text-slate-blue"
-                      }`}
-                      style={{
-                        color: isEarthy ? undefined : "var(--slate-blue)",
-                      }}
-                    >
-                      ID: {user.ID ?? user.id}
-                    </p>
                   </div>
                 ))}
               </div>

@@ -600,7 +600,7 @@ export default function Community() {
                                   : "text-[#c7b4e2]"
                                 : isEarthy
                                 ? "text-brown-400 hover:text-rust-500"
-                                : "text-gray-400 hover:text-[#c7b4e2]"
+                                : "text-white hover:text-[#c7b4e2]"
                             }`}
                           >
                             <svg
@@ -629,7 +629,7 @@ export default function Community() {
                                   : "text-[#c7b4e2]"
                                 : isEarthy
                                 ? "text-brown-400 hover:text-rust-500"
-                                : "text-gray-400 hover:text-[#c7b4e2]"
+                                : "text-white hover:text-[#c7b4e2]"
                             }`}
                           >
                             <svg
@@ -791,7 +791,7 @@ export default function Community() {
                                                 : "text-[#c7b4e2]"
                                               : isEarthy
                                               ? "text-brown-400 hover:text-rust-500"
-                                              : "text-gray-400 hover:text-[#c7b4e2]"
+                                              : "text-white hover:text-[#c7b4e2]"
                                           }`}
                                         >
                                           <svg
@@ -828,7 +828,7 @@ export default function Community() {
                                                 : "text-[#c7b4e2]"
                                               : isEarthy
                                               ? "text-brown-400 hover:text-rust-500"
-                                              : "text-gray-400 hover:text-[#c7b4e2]"
+                                              : "text-white hover:text-[#c7b4e2]"
                                           }`}
                                         >
                                           <svg

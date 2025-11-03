@@ -32,9 +32,16 @@ export const MessengerProvider = ({ children }) => {
   const [conversations, setConversations] = useState({}); // { userId: messages[] }
   const [allUsers, setAllUsers] = useState([]);
 
-  // Fetch all users for search
+  // Fetch all users for search and clear state on sign out
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      // Clear all messenger state when user signs out
+      setIsMessengerOpen(false);
+      setOpenChats([]);
+      setConversations({});
+      setAllUsers([]);
+      return;
+    }
 
     const usersRef = collection(db, "users");
     const unsubscribe = onSnapshot(usersRef, (snapshot) => {

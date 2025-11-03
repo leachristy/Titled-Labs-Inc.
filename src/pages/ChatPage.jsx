@@ -29,6 +29,15 @@ export const ChatPage = () => {
   const scrollToBottom = () =>
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
+  // Clear messages when user signs out
+  useEffect(() => {
+    if (!currentUser) {
+      setMessages([]);
+      setNewMessage("");
+      setRecipient(null);
+    }
+  }, [currentUser]);
+
   // Fetch recipient user info
   useEffect(() => {
     const fetchRecipient = async () => {
