@@ -16,6 +16,31 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
 
   const messages = conversations[userId] || [];
 
+  // Group consecutive messages from same sender
+  const groupMessages = (messages) => {
+    const grouped = [];
+    let currentGroup = null;
+
+    messages.forEach((msg) => {
+      if (!currentGroup || currentGroup.senderId !== msg.senderId) {
+        if (currentGroup) grouped.push(currentGroup);
+        currentGroup = {
+          senderId: msg.senderId,
+          senderName: msg.senderName,
+          senderAvatar: msg.senderAvatar,
+          messages: [msg],
+        };
+      } else {
+        currentGroup.messages.push(msg);
+      }
+    });
+
+    if (currentGroup) grouped.push(currentGroup);
+    return grouped;
+  };
+
+  const groupedMessages = groupMessages(messages);
+
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {
     if (!isMinimized) {
@@ -40,26 +65,25 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
   // Each chat window is 320px wide + 20px gap
   const rightPosition = 350 + (index * 340); // Start 350px from right (left of messenger), then stack left
 
+  // Don't show chat window if user is not logged in
+  if (!user) return null;
+
   return (
     <div
-      className={`fixed bottom-6 w-80 rounded-lg shadow-2xl z-40 transition-all ${
-        isEarthy ? "bg-amber-50" : "bg-purple-50"
-      }`}
+      className="fixed bottom-6 w-80 rounded-lg shadow-2xl z-40 transition-all bg-white"
       style={{ right: `${rightPosition}px`, height: isMinimized ? "56px" : "400px" }}
     >
       {/* Header */}
       <div
         className={`p-3 rounded-t-lg flex items-center justify-between cursor-pointer ${
-          isEarthy
-            ? "bg-amber-700"
-            : "bg-[#c7b4e2]"
+          isEarthy ? "bg-amber-700" : "bg-[#c7b4e2]"
         }`}
         onClick={() => setIsMinimized(!isMinimized)}
       >
         <div className="flex items-center gap-2">
           {/* Avatar */}
           <div
-            className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center overflow-hidden cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center overflow-hidden cursor-pointer border-2 border-white"
             onClick={(e) => {
               e.stopPropagation();
               handleProfileClick();
@@ -79,7 +103,7 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
           </div>
 
           {/* Name */}
-          <span className="text-white font-medium text-sm">{userName}</span>
+          <span className="text-white font-semibold text-sm">{userName}</span>
         </div>
 
         <div className="flex items-center gap-1">
@@ -138,44 +162,102 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
         <>
           {/* Messages Area */}
           <div
-            className={`overflow-y-auto p-3 space-y-2 ${
-              isEarthy ? "bg-amber-50" : "bg-purple-50"
-            }`}
+            className="overflow-y-auto p-3 space-y-3 bg-white dark:bg-gray-50"
             style={{ height: "290px" }}
           >
             {messages.length === 0 ? (
-              <div className={`flex items-center justify-center h-full text-sm ${
-                isEarthy ? "text-amber-600" : "text-purple-600"
-              }`}>
+              <div className="flex items-center justify-center h-full text-sm text-gray-400">
                 Start a conversation!
               </div>
             ) : (
-              messages.map((msg) => {
-                const isSender = msg.senderId === user?.uid;
+              groupedMessages.map((group, groupIndex) => {
+                const isCurrentUser = group.senderId === user?.uid;
+                
                 return (
                   <div
-                    key={msg.id}
-                    className={`flex ${isSender ? "justify-end" : "justify-start"}`}
+                    key={groupIndex}
+                    className={`flex gap-2 ${
+                      isCurrentUser ? "flex-row-reverse" : "flex-row"
+                    }`}
                   >
+                    {/* Avatar (only for other user) */}
+                    {!isCurrentUser && (
+                      <div className="shrink-0 self-end">
+                        <img
+                          src={
+                            group.senderAvatar ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              group.senderName || "User"
+                            )}&background=random`
+                          }
+                          alt={group.senderName}
+                          className="w-7 h-7 rounded-full"
+                        />
+                      </div>
+                    )}
+
+                    {/* Message Group */}
                     <div
-                      className={`max-w-[70%] px-3 py-2 rounded-lg ${
-                        isSender
-                          ? isEarthy
-                            ? "bg-amber-700 text-white"
-                            : "bg-[#c7b4e2] text-gray-900"
-                          : isEarthy
-                          ? "bg-amber-200 text-amber-900"
-                          : "bg-purple-200 text-gray-900"
-                      }`}
+                      className={`flex flex-col ${
+                        isCurrentUser ? "items-end" : "items-start"
+                      } max-w-[75%]`}
                     >
-                      <p className="text-sm">{msg.text}</p>
-                      <p className="text-xs opacity-70 mt-1">
-                        {msg.createdAt?.toDate?.()?.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
+                      {/* Messages */}
+                      {group.messages.map((msg, msgIndex) => {
+                        const isFirst = msgIndex === 0;
+                        const isLast = msgIndex === group.messages.length - 1;
+
+                        return (
+                          <div
+                            key={msg.id}
+                            className={`px-3 py-2 ${
+                              msgIndex > 0 ? "mt-0.5" : ""
+                            } ${
+                              isCurrentUser
+                                ? isEarthy
+                                  ? "bg-amber-700 text-white"
+                                  : "bg-linear-to-r from-blue-500 to-blue-600 text-white"
+                                : "bg-gray-200 text-gray-900"
+                            } ${
+                              isCurrentUser
+                                ? isFirst && isLast
+                                  ? "rounded-2xl"
+                                  : isFirst
+                                  ? "rounded-2xl rounded-br-md"
+                                  : isLast
+                                  ? "rounded-2xl rounded-tr-md"
+                                  : "rounded-l-2xl rounded-r-md"
+                                : isFirst && isLast
+                                ? "rounded-2xl"
+                                : isFirst
+                                ? "rounded-2xl rounded-bl-md"
+                                : isLast
+                                ? "rounded-2xl rounded-tl-md"
+                                : "rounded-r-2xl rounded-l-md"
+                            } shadow-sm`}
+                          >
+                            <p className="text-sm wrap-break-word">{msg.text}</p>
+                          </div>
+                        );
+                      })}
+
+                      {/* Timestamp (only on last message of group) */}
+                      {group.messages[group.messages.length - 1].createdAt && (
+                        <span className="text-xs text-gray-500 mt-1 px-2">
+                          {group.messages[group.messages.length - 1].createdAt
+                            .toDate()
+                            .toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                        </span>
+                      )}
                     </div>
+
+                    {/* Spacer for current user messages */}
+                    {isCurrentUser && (
+                      <div className="w-7 shrink-0"></div>
+                    )}
                   </div>
                 );
               })
@@ -184,31 +266,39 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
           </div>
 
           {/* Input Area */}
-          <form onSubmit={handleSend} className={`p-3 border-t ${
-            isEarthy ? "border-amber-300 bg-white" : "border-purple-300 bg-white"
-          }`}>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type a message..."
-                className={`flex-1 px-3 py-2 border rounded-lg outline-none text-sm ${
-                  isEarthy
-                    ? "border-amber-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                    : "border-purple-300 focus:border-[#c7b4e2] focus:ring-1 focus:ring-[#c7b4e2]"
-                }`}
-              />
+          <form onSubmit={handleSend} className="p-3 border-t border-gray-200 bg-white">
+            <div className="flex items-center gap-2">
+              {/* Message Input */}
+              <div className="flex-1 bg-gray-100 rounded-full px-4 py-2">
+                <input
+                  type="text"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Aa"
+                  className="w-full bg-transparent border-none outline-none text-gray-900 placeholder-gray-500 text-sm"
+                />
+              </div>
+
+              {/* Send Button */}
               <button
                 type="submit"
                 disabled={!message.trim()}
-                className={`px-4 py-2 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isEarthy
-                    ? "bg-amber-700 hover:bg-amber-800 disabled:hover:bg-amber-700 text-white"
-                    : "bg-[#c7b4e2] hover:bg-[#b49fd3] disabled:hover:bg-[#c7b4e2] text-gray-900"
+                className={`p-2 rounded-full transition-all ${
+                  message.trim()
+                    ? isEarthy
+                      ? "bg-amber-700 text-white hover:bg-amber-800"
+                      : "bg-blue-500 text-white hover:bg-blue-600"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
-                Send
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                </svg>
               </button>
             </div>
           </form>
