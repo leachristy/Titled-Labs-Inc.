@@ -1,8 +1,8 @@
 import leaImage from '../assets/lea.png';
-import carolImage from '../assets/carol.png';
-import thongImage from '../assets/thong.png';
+import carolImage from '../assets/Carol.png';
+import thongImage from '../assets/Thong.png';
 import kainoahImage from '../assets/kai.png';
-import hungImage from '../assets/hung.png';
+import hungImage from '../assets/Hung.png';
 
 export const team = [
   {

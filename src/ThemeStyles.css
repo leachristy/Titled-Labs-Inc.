@@ -30,6 +30,17 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: transparent;
+}
+
+/* Earthy theme - moon icon color (purple) */
+.theme-earthy .theme-toggle {
+  color: #b45309;
+}
+
+/* Cool theme - sun icon color (amber/orange) */
+.theme-cool .theme-toggle {
+  color: #b49fd3;
 }
 
 .theme-toggle:hover {
