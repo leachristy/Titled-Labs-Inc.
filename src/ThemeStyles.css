@@ -35,12 +35,12 @@
 
 /* Earthy theme - moon icon color (purple) */
 .theme-earthy .theme-toggle {
-  color: #b45309;
+  color: rust-600;
 }
 
 /* Cool theme - sun icon color (amber/orange) */
 .theme-cool .theme-toggle {
-  color: #b49fd3;
+  color: #ffffff;
 }
 
 .theme-toggle:hover {
