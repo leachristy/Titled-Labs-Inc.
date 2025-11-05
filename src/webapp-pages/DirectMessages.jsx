@@ -12,51 +12,48 @@ export default function DirectMessages() {
   const isEarthy = currentTheme === "earthy";
 
   useEffect(() => {
-    if (!currentUser) {
-      // Clear conversations when user signs out
-      setConversations([]);
-      return;
-    }
-
-    const q = query(
-      collection(db, "messages"),
-      where("participants", "array-contains", currentUser.uid),
-      orderBy("createdAt", "desc")
-    );
-
-    const unsubscribe = onSnapshot(q, async (snapshot) => {
-      const convoMap = {};
-
-      // Build a map of conversations keyed by other user's UID
-      for (let docSnap of snapshot.docs) {
-        const msg = docSnap.data();
-        const otherId = msg.participants.find((id) => id !== currentUser.uid);
-
-        // Only update if this is the latest message
-        if (!convoMap[otherId] || convoMap[otherId].createdAt < msg.createdAt?.toMillis()) {
-          // Fetch other user's name
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      if (!user) {
+        setConversations([]);
+        return;
+      }
+  
+      const q = query(
+        collection(db, "messages"),
+        where("participants", "array-contains", user.uid),
+        orderBy("createdAt", "desc")
+      );
+  
+      const unsubscribeMessages = onSnapshot(q, async (snapshot) => {
+        const convoMap = {};
+        for (let docSnap of snapshot.docs) {
+          const msg = docSnap.data();
+          const otherId = msg.participants.find((id) => id !== user.uid);
+  
           const userDoc = await getDoc(doc(db, "users", otherId));
-          const otherName = userDoc.exists() ? userDoc.data().firstName + " " + userDoc.data().lastName : otherId;
-
+          const otherName = userDoc.exists()
+            ? userDoc.data().firstName + " " + userDoc.data().lastName
+            : otherId;
+  
           convoMap[otherId] = {
             lastMessage: msg.content,
             createdAt: msg.createdAt?.toDate(),
             otherId,
-            otherName
+            otherName,
           };
         }
-      }
-
-      const convoArray = Object.values(convoMap).sort(
-        (a, b) => b.createdAt - a.createdAt
-      );
-      setConversations(convoArray);
+  
+        setConversations(
+          Object.values(convoMap).sort((a, b) => b.createdAt - a.createdAt)
+        );
+      });
+  
+      return () => unsubscribeMessages();
     });
-
-    return () => unsubscribe();
-  }, [currentUser]);
-
-  if (!currentUser) return <p>Please log in to view your messages.</p>;
+  
+    return () => unsubscribeAuth();
+  }, []);
+  
 
   return (
     <>
