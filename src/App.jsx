@@ -7,8 +7,6 @@ import { Routes, Route } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./src/firebase";
 
-import Home from "./pages/Home";
-import Home2 from "./pages/Home2";
 import UnifiedHome from "./pages/UnifiedHome";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -46,8 +44,6 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<UnifiedHome />} />
             <Route path="/home" element={<UnifiedHome />} />
-            <Route path="/home-earthy" element={<Home />} />
-            <Route path="/home-cool" element={<Home2 />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/about" element={<About />} />
             <Route path="/users" element={<Users />} />

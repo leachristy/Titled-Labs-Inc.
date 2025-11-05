@@ -40,6 +40,9 @@ export default function GlobalChatWindow({ onClose }) {
     }
   };
 
+  // Don't show if user is not logged in
+  if (!user) return null;
+
   return (
     <div className={`fixed ${isMobile ? "inset-0" : "inset-0"} bg-black/50 flex items-center justify-center z-100`}>
       <div

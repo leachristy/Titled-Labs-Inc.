@@ -62,6 +62,9 @@ export default function RoomChatWindow({ room, onClose }) {
     }
   };
 
+  // Don't show if user is not logged in
+  if (!user) return null;
+
   const isCreator = room.createdBy === user?.uid;
 
   return (

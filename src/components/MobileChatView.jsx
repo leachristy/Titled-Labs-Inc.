@@ -54,6 +54,9 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
     }
   };
 
+  // Don't show if user is not logged in
+  if (!user) return null;
+
   return (
     <div className="fixed inset-0 bg-white dark:bg-gray-900 z-100 flex flex-col">
       {/* Header */}
