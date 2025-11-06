@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useMessenger } from "../contexts/MessengerContext";
-import { useTheme } from "../contexts/ThemeContext";
-import { UserAuth } from "../contexts/AuthContext";
+import { useMessenger } from "../../contexts/MessengerContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import { UserAuth } from "../../contexts/AuthContext";
 
 const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
   const { conversations, sendMessage } = useMessenger();
@@ -61,7 +61,7 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
     <div className="fixed inset-0 bg-white dark:bg-gray-900 z-100 flex flex-col">
       {/* Header */}
       <div className={`text-white p-4 flex items-center gap-3 shadow-lg ${
-        isEarthy ? "bg-amber-700" : "bg-[#c7b4e2]"
+        isEarthy ? "bg-amber-700" : "bg-light-lavender"
       }`}>
         <button
           onClick={onClose}

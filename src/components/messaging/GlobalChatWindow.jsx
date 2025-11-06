@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMessenger } from "../contexts/MessengerContext";
-import { useTheme } from "../contexts/ThemeContext";
+import { useMessenger } from "../../contexts/MessengerContext";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export default function GlobalChatWindow({ onClose }) {
   const { globalMessages, sendGlobalMessage, user, clearGlobalMessages } = useMessenger();
@@ -56,7 +56,7 @@ export default function GlobalChatWindow({ onClose }) {
         <div
           className={`p-4 flex items-center justify-between ${
             isMobile ? "" : "rounded-t-lg"
-          } ${isEarthy ? "bg-amber-700" : "bg-[#c7b4e2]"}`}
+          } ${isEarthy ? "bg-amber-700" : "bg-light-lavender"}`}
         >
           <div className="flex items-center gap-3">
             <button

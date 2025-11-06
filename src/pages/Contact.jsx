@@ -1,7 +1,7 @@
-﻿import NavBar from "../components/NavBar";
+import NavBar from "../components/navigation/NavBar";
 import { useTheme } from "../contexts/ThemeContext";
-import ContactForm from "../components/ContactForm";
-import ContactInfo from "../components/ContactInfo";
+import ContactForm from "../components/forms/ContactForm";
+import ContactInfo from "../components/cards/ContactInfo";
 import { contactInfo, contactFormFields } from "../data/contact";
 
 export default function Contact() {

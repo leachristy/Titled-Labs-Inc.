@@ -1,5 +1,5 @@
 import React from "react";
-import { useTheme } from "../contexts/ThemeContext";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const CustomButton = ({ isEarthy = false, onClick, children, className = "" }) => {
     const baseClasses = "px-6 py-2 text-white transition rounded-lg";

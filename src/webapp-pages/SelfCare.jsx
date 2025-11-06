@@ -1,5 +1,5 @@
 import React from "react";
-import UntiltNavBar from "../components/UntiltNavBar";
+import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 
@@ -13,8 +13,8 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
   <div
     className={`group relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer ${
       isEarthy
-        ? "bg-gradient-to-br from-cream-100 to-tan-50 border-2 border-tan-300"
-        : "bg-[#DFD2D5] border-2 border-[#8090B0]"
+        ? "bg-linear-to-br from-cream-100 to-tan-50 border-2 border-tan-300"
+        : "bg-pale-lavender border-2 border-blue-grey"
     }`}
     onClick={onClick}
   >
@@ -39,7 +39,7 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
           className={`mb-3 text-2xl font-bold transition-colors text-center ${
             isEarthy
               ? "text-brown-800 group-hover:text-rust-600"
-              : "text-gray-900 group-hover:text-[#c7b4e2]"
+              : "text-gray-900 group-hover:text-light-lavender"
           }`}
         >
           {title}
@@ -59,7 +59,7 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
           className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 ${
             isEarthy
               ? "bg-rust-500 hover:bg-rust-600 text-white"
-              : "bg-[#c7b4e2] hover:bg-[#b49fd3] text-gray-900"
+              : "bg-light-lavender hover:bg-medium-lavender text-gray-900"
           } shadow-md hover:shadow-lg transform hover:scale-105`}
         >
           Explore →
@@ -69,7 +69,7 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
       {/* Hover effect overlay */}
       <div
         className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl transition-opacity duration-300 opacity-0 group-hover:opacity-20 ${
-          isEarthy ? "bg-rust-400" : "bg-[#c7b4e2]"
+          isEarthy ? "bg-rust-400" : "bg-light-lavender"
         }`}
         style={{ transform: "translate(50%, -50%)" }}
       ></div>
@@ -119,7 +119,7 @@ export const SelfCare = () => {
 
       <div
         className={`min-h-screen px-4 pt-24 pb-12 ${
-          isEarthy ? "bg-cream-100" : "bg-[#373E4F]"
+          isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
         }`}
       >
         {/* Header Section */}

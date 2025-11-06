@@ -47,7 +47,7 @@ export default function ServiceCard({ service, onNavigate }) {
     >
       <div className="flex items-start gap-4 mb-6">
         <div
-          className={`w-12 h-12 ${getIconColor(service.color)} flex items-center justify-center flex-shrink-0`}
+          className={`w-12 h-12 ${getIconColor(service.color)} flex items-center justify-center shrink-0`}
         >
           <svg
             className="text-white w-7 h-7"

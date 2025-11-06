@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useMessenger } from "../contexts/MessengerContext";
-import { useTheme } from "../contexts/ThemeContext";
+import { useMessenger } from "../../contexts/MessengerContext";
+import { useTheme } from "../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import MobileChatView from "./MobileChatView";
 import GlobalChatWindow from "./GlobalChatWindow";
@@ -100,7 +100,7 @@ export default function MessengerPopup() {
       >
         {/* Header */}
         <div className={`p-4 rounded-t-lg ${
-          isEarthy ? "bg-amber-700" : "bg-[#c7b4e2]"
+          isEarthy ? "bg-amber-700" : "bg-light-lavender"
         }`}>
           <div className="flex items-center justify-between">
             <h3 className="text-white font-semibold text-lg">Messages</h3>
@@ -239,7 +239,7 @@ export default function MessengerPopup() {
                 className={`w-full py-3 rounded-lg font-medium transition mb-3 ${
                   isEarthy
                     ? "bg-amber-700 hover:bg-amber-800 text-white"
-                    : "bg-[#c7b4e2] hover:bg-purple-400 text-white"
+                    : "bg-light-lavender hover:bg-purple-400 text-white"
                 }`}
               >
                 + Create Room
@@ -285,7 +285,7 @@ export default function MessengerPopup() {
                             className={`text-xs px-3 py-1 rounded font-medium ${
                               isEarthy
                                 ? "bg-amber-700 hover:bg-amber-800 text-white"
-                                : "bg-[#c7b4e2] hover:bg-purple-400 text-white"
+                                : "bg-light-lavender hover:bg-purple-400 text-white"
                             }`}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -379,7 +379,7 @@ export default function MessengerPopup() {
                 className={`flex-1 py-2 rounded-lg text-white transition ${
                   isEarthy
                     ? "bg-amber-700 hover:bg-amber-800"
-                    : "bg-[#c7b4e2] hover:bg-purple-400"
+                    : "bg-light-lavender hover:bg-purple-400"
                 }`}
               >
                 Create

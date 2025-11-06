@@ -1,6 +1,6 @@
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
-import UntiltNavBar from "../components/UntiltNavBar";
+import UntiltNavBar from "../components/navigation/UntiltNavBar";
 
 export default function Dashboard() {
   const { user, profile, loading } = UserAuth();

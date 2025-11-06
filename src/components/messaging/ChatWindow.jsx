@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { useMessenger } from "../contexts/MessengerContext";
-import { useTheme } from "../contexts/ThemeContext";
+import { useMessenger } from "../../contexts/MessengerContext";
+import { useTheme } from "../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import { UserAuth } from "../contexts/AuthContext";
+import { UserAuth } from "../../contexts/AuthContext";
 
 export default function ChatWindow({ userId, userName, userAvatar, index }) {
   const { closeChat, minimizeChat, conversations, sendMessage } = useMessenger();
@@ -76,7 +76,7 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
       {/* Header */}
       <div
         className={`p-3 rounded-t-lg flex items-center justify-between cursor-pointer ${
-          isEarthy ? "bg-amber-700" : "bg-[#c7b4e2]"
+          isEarthy ? "bg-amber-700" : "bg-light-lavender"
         }`}
         onClick={() => setIsMinimized(!isMinimized)}
       >

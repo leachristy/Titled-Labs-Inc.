@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import UntiltNavBar from "../../components/UntiltNavBar";
+import UntiltNavBar from "../../components/navigation/UntiltNavBar";
 import { useTheme } from "../../contexts/ThemeContext";
 import { db, auth } from "../../src/firebase";
 import { useNavigate } from "react-router-dom";

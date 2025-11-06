@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { collection, query, where, orderBy, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../src/firebase";
 import { Link } from "react-router-dom";
-import UntiltNavBar from "../components/UntiltNavBar";
+import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 
 export default function DirectMessages() {
@@ -59,7 +59,7 @@ export default function DirectMessages() {
     <>
     <UntiltNavBar />
     <div className={`min-h-screen  ${
-            isEarthy ? "bg-cream-100" : "bg-[#373E4F]"
+            isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
           }`}>
     <div className="max-w-2xl mx-auto p-6 mt-20">
       <h2 className={`text-xl font-bold mb-4 ${
@@ -76,7 +76,7 @@ export default function DirectMessages() {
             className={`p-3 border rounded flex justify-between ${
               isEarthy 
                 ? "border-tan-300 hover:bg-cream-50 text-brown-800" 
-                : "bg-[#DFD2D5] border-[#8090B0] hover:bg-[#ABAAC0] text-gray-900"
+                : "bg-pale-lavender border-blue-grey hover:bg-cool-grey text-gray-900"
             }`}
           >
             <span>{convo.otherName}</span>

@@ -7,7 +7,7 @@ export default function HeroSection({ onNavigate }) {
   const isEarthy = currentTheme === "earthy";
 
   return (
-    <section className={`relative py-20 overflow-hidden ${isEarthy ? "bg-terracotta-200" : "bg-[#DFD2D5]"}`}>
+    <section className={`relative py-20 overflow-hidden ${isEarthy ? "bg-terracotta-200" : "bg-charcoal-grey"}`}>
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzBoLTZhMSAxIDAgMCAxIDAtMmg2YTEgMSAwIDAgMSAwIDJ6bS0xMiAwSDhhMSAxIDAgMCAxIDAtMmgxNmExIDEgMCAwIDEgMCAyek0zNiAxOGgtNmExIDEgMCAwIDEgMC0yaDZhMSAxIDAgMCAxIDAgem0tMTIgMEg4YTEgMSAwIDAgMSAwLTJoMTZhMSAxIDAgMCAxIDAgek0zNiA0Mmg2YTEgMSAwIDAgMSAwIDJoLTZhMSAxIDAgMCAxIDAtMnptLTEyIDBoMTZhMSAxIDAgMCAxIDAgMkg4YTEgMSAwIDAgMSAwLTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30"></div>
 
       <div className="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -29,7 +29,7 @@ export default function HeroSection({ onNavigate }) {
           }`}>
             Everything you need to manage
             <br />
-            <span className={isEarthy ? "text-rust-600" : "text-[#c7b4e2]"}>
+            <span className={isEarthy ? "text-rust-600" : "text-light-lavender"}>
               your mental wellness journey
             </span>
           </h1>
@@ -62,15 +62,15 @@ export default function HeroSection({ onNavigate }) {
             isEarthy ? "text-brown-700" : "text-charcoal-grey"
           }`}>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"}`}></div>
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-light-lavender"}`}></div>
               <span>Secure & Private</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"}`}></div>
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-light-lavender"}`}></div>
               <span>30-day free trial</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"}`}></div>
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-light-lavender"}`}></div>
               <span>No credit card required</span>
             </div>
           </div>

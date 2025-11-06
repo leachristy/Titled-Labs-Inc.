@@ -116,7 +116,7 @@
   }
 
   .mock-chat-avatar {
-    @apply w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0;
+    @apply w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm shrink-0;
   }
 
   .mock-chat-bubble {
@@ -129,7 +129,7 @@
   }
 
   .mock-group-avatar {
-    @apply w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0;
+    @apply w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold shrink-0;
   }
 
   .mock-group-title {
