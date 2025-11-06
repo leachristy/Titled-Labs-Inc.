@@ -1,3 +1,22 @@
+/**
+ * Login Page Component
+ * 
+ * User authentication page with multiple sign-in options:
+ * - Email/Password authentication
+ * - Google OAuth sign-in
+ * - Social login buttons (Twitter placeholder)
+ * 
+ * Features:
+ * - Form validation and error handling
+ * - Loading states during authentication
+ * - "Remember me" checkbox
+ * - Password reset link
+ * - Sign-up redirect for new users
+ * - Crisis hotline information
+ * - Auto-redirect to dashboard on successful login
+ * - Theme-aware styling
+ */
+
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
@@ -5,10 +24,15 @@ import { UserAuth } from "../contexts/AuthContext.jsx";
 import NavBar from "../components/navigation/NavBar";
 
 export default function Login() {
+  // Get authentication functions and state from AuthContext
   const { googleSignIn, doSignInWithEmailAndPassword, user } = UserAuth();
   const navigate = useNavigate();
+  
+  // Get current theme state
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  
+  // Form state management
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -16,6 +40,10 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /**
+   * Handle form input changes
+   * Updates formData state as user types
+   */
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,26 +51,43 @@ export default function Login() {
     });
   };
 
+  /**
+   * Handle form submission for email/password login
+   * 
+   * Process:
+   * 1. Prevent default form submission
+   * 2. Set loading state and clear errors
+   * 3. Call Firebase authentication with credentials
+   * 4. On success: Navigate to dashboard
+   * 5. On failure: Display error message
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Simulate login process
     try {
+      // Authenticate user with email and password
       await doSignInWithEmailAndPassword(formData.email, formData.password);
 
-      // On success, redirect to home
+      // On success, redirect to dashboard
       navigate("/dashboard");
     } catch (error) {
+      // On failure, show error message to user
       setError("Invalid email or password. Please try again.");
       console.log(error);
     } finally {
+      // Always clear loading state
       setIsLoading(false);
     }
   };
 
-  // handle google signin with popup/redirect
+  /**
+   * Handle Google Sign-In
+   * 
+   * Opens Google OAuth popup for authentication
+   * On success, user is automatically redirected by useEffect below
+   */
   const handleGoogleSignIn = async () => {
     try {
       await googleSignIn();
@@ -51,7 +96,13 @@ export default function Login() {
     }
   };
 
-  // -> link to dashboard when signin sucessfully
+  /**
+   * Auto-redirect Effect
+   * 
+   * Monitors user authentication state
+   * If user successfully logs in, automatically redirect to dashboard
+   * This handles post-login navigation for both email/password and Google sign-in
+   */
   useEffect(() => {
     if (user != null) {
       navigate("/dashboard");
@@ -60,8 +111,13 @@ export default function Login() {
 
   return (
     <>
+      {/* Page title for browser tab */}
       <title>Login - Tilted | Mental Wellness</title>
+      
+      {/* Navigation bar */}
       <NavBar />
+      
+      {/* Main login container with theme-aware styling */}
       <div
         className={`mt-10 min-h-screen ${
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"
