@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext.jsx";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/navigation/NavBar";
 
 export default function SignUp() {
   const { googleSignIn, doCreateUserWithEmailAndPassword, user } = UserAuth();

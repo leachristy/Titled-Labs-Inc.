@@ -1,7 +1,7 @@
 import MessengerButton from "./MessengerButton";
 import MessengerPopup from "./MessengerPopup";
 import ChatWindow from "./ChatWindow";
-import { useMessenger } from "../contexts/MessengerContext";
+import { useMessenger } from "../../contexts/MessengerContext";
 
 export default function MessengerWidget() {
   const { openChats } = useMessenger();

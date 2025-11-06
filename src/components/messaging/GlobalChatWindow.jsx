@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMessenger } from "../contexts/MessengerContext";
-import { useTheme } from "../contexts/ThemeContext";
+import { useMessenger } from "../../contexts/MessengerContext";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export default function GlobalChatWindow({ onClose }) {
   const { globalMessages, sendGlobalMessage, user, clearGlobalMessages } = useMessenger();
@@ -10,15 +10,20 @@ export default function GlobalChatWindow({ onClose }) {
   const isEarthy = currentTheme === "earthy";
   const [message, setMessage] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isTablet, setIsTablet] = useState(
+    window.innerWidth >= 768 && window.innerWidth <= 1024
+  );
   const [showMenu, setShowMenu] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width <= 1024);
     };
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    window.addEventListener("resize", checkDevice);
+    return () => window.removeEventListener("resize", checkDevice);
   }, []);
 
   useEffect(() => {
@@ -40,12 +45,17 @@ export default function GlobalChatWindow({ onClose }) {
     }
   };
 
+  // Don't show if user is not logged in
+  if (!user) return null;
+
   return (
     <div className={`fixed ${isMobile ? "inset-0" : "inset-0"} bg-black/50 flex items-center justify-center z-100`}>
       <div
         className={`bg-white flex flex-col ${
           isMobile
             ? "w-full h-full"
+            : isTablet
+            ? "w-[700px] h-[750px] rounded-lg shadow-2xl"
             : "w-[600px] h-[700px] rounded-lg shadow-2xl"
         }`}
       >
@@ -53,7 +63,7 @@ export default function GlobalChatWindow({ onClose }) {
         <div
           className={`p-4 flex items-center justify-between ${
             isMobile ? "" : "rounded-t-lg"
-          } ${isEarthy ? "bg-amber-700" : "bg-[#c7b4e2]"}`}
+          } ${isEarthy ? "bg-amber-700" : "bg-light-lavender"}`}
         >
           <div className="flex items-center gap-3">
             <button

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { db } from "../src/firebase";
+import { db } from "../../src/firebase";
 import { doc, updateDoc } from "firebase/firestore";
-import { useTheme } from "../contexts/ThemeContext";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export default function EditProfile({ userId, profile, onSave, onCancel }) {
   const { currentTheme } = useTheme();

@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../../../src/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import UntiltNavBar from "../../../components/UntiltNavBar";
+import UntiltNavBar from "../../../components/navigation/UntiltNavBar";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 

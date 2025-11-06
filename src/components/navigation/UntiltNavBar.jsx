@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useTheme } from "../contexts/ThemeContext";
-import { UserAuth } from "../contexts/AuthContext";
-import logoImage from "../assets/Thong.png";
+import { useTheme } from "../../contexts/ThemeContext";
+import { UserAuth } from "../../contexts/AuthContext";
+import logoImage from "../../assets/logoName.png";
 
 export default function UntiltNavBar() {
   const { user, logOut, profile } = UserAuth();

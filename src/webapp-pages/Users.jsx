@@ -3,7 +3,7 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, query } from "firebase/firestore";
 import { useTheme } from "../contexts/ThemeContext";
 import { db } from "../src/firebase";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/navigation/NavBar";
 
 export default function Users() {
   const [visible, setVisible] = useState(false);
@@ -92,7 +92,7 @@ export default function Users() {
                   <div
                     key={user.id}
                     className={`text-center card p-4 rounded-lg shadow-md border-2 ${
-                      isEarthy ? "bg-white border-tan-300" : "bg-white border-[#8090B0]"
+                      isEarthy ? "bg-white border-tan-300" : "bg-white border-blue-grey"
                     }`}
                   >
                     <h3

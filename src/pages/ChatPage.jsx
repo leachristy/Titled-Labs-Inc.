@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "../src/firebase";
-import UntiltNavBar from "../components/UntiltNavBar";
+import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 
 export const ChatPage = () => {
@@ -129,7 +129,7 @@ export const ChatPage = () => {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`p-2 rounded-lg break-words whitespace-pre-wrap inline-block max-w-[70%] ${
+                className={`p-2 rounded-lg wrap-break-word whitespace-pre-wrap inline-block max-w-[70%] ${
                   msg.senderId === currentUser.uid
                     ? "bg-blue-500 text-white self-end"
                     : "bg-gray-300 text-black self-start"

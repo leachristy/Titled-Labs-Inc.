@@ -5,13 +5,13 @@ export default function CTASection({ onNavigate }) {
   const isEarthy = currentTheme === "earthy";
 
   return (
-    <section className={`py-20 ${isEarthy ? "bg-rust-500" : "bg-[#646F89]"}`}>
+    <section className={`py-20 ${isEarthy ? "bg-rust-500" : "bg-medium-lavender"}`}>
       <div className="max-w-4xl px-4 mx-auto text-center sm:px-6 lg:px-8">
         <div className="p-12 border bg-white/10 backdrop-blur-sm rounded-2xl border-white/20">
           <div className="flex items-center justify-center gap-2 mb-6">
             <div
               className={`w-2 h-2 ${
-                isEarthy ? "bg-cream-100" : "bg-[#DFD2D5]"
+                isEarthy ? "bg-cream-100" : "bg-pale-lavender"
               } rounded-full animate-pulse`}
             ></div>
             <span
@@ -36,7 +36,7 @@ export default function CTASection({ onNavigate }) {
               className={`px-8 py-3 bg-white ${
                 isEarthy
                   ? "text-rust-500 hover:bg-cream-50"
-                  : "text-[#646F89] hover:bg-[#DFD2D5]"
+                  : "text-medium-lavender hover:bg-pale-lavender"
               } font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200`}
             >
               Get started free

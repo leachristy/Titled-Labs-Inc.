@@ -238,7 +238,7 @@ body {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
-  
+
   .logo-image {
     width: 8rem;
     height: 8rem;
@@ -250,7 +250,7 @@ body {
   .mobile-menu {
     display: block;
   }
-  
+
   .desktop-menu {
     display: none;
   }
@@ -260,7 +260,7 @@ body {
   .mobile-menu {
     display: none;
   }
-  
+
   .desktop-menu {
     display: flex;
   }

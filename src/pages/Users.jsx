@@ -3,7 +3,7 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, query } from "firebase/firestore";
 import { useTheme } from "../contexts/ThemeContext";
 import { db } from "../src/firebase";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/navigation/NavBar";
 
 export default function Users() {
   const [visible, setVisible] = useState(false);
@@ -49,19 +49,19 @@ export default function Users() {
               className={`${
                 isEarthy
                   ? "btn-primary"
-                  : "font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 text-white"
+                  : "font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 text-gray-900"
               }`}
               style={{
-                backgroundColor: isEarthy ? undefined : "var(--slate-blue)",
-                color: "white",
+                backgroundColor: isEarthy ? undefined : "var(--light-lavender)",
+                color: isEarthy ? undefined : "var(--charcoal-grey)",
               }}
               onMouseEnter={(e) =>
                 !isEarthy &&
-                (e.target.style.backgroundColor = "var(--charcoal-grey)")
+                (e.target.style.backgroundColor = "var(--medium-lavender)")
               }
               onMouseLeave={(e) =>
                 !isEarthy &&
-                (e.target.style.backgroundColor = "var(--slate-blue)")
+                (e.target.style.backgroundColor = "var(--light-lavender)")
               }
             >
               {visible ? "Hide Users" : "Show Users"}
@@ -70,8 +70,8 @@ export default function Users() {
 
           {usersLoading && (
             <p
-              className={`${isEarthy ? "text-brown-600" : "text-slate-blue"}`}
-              style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
+              className={`${isEarthy ? "text-brown-600" : "text-light-lavender"}`}
+              style={{ color: isEarthy ? undefined : "var(--light-lavender)" }}
             >
               Loading…
             </p>
@@ -79,9 +79,9 @@ export default function Users() {
           {usersError ? (
             <p
               className={`font-medium ${
-                isEarthy ? "text-rust-600" : "text-slate-blue"
+                isEarthy ? "text-rust-600" : "text-light-lavender"
               }`}
-              style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
+              style={{ color: isEarthy ? undefined : "var(--light-lavender)" }}
             >
               {usersError.message}
             </p>
@@ -92,7 +92,7 @@ export default function Users() {
                   <div
                     key={user.id}
                     className={`text-center card p-4 rounded-lg shadow-md border-2 ${
-                      isEarthy ? "bg-white border-tan-300" : "bg-white border-[#8090B0]"
+                      isEarthy ? "bg-white border-tan-300" : "bg-white border-blue-grey"
                     }`}
                   >
                     <h3

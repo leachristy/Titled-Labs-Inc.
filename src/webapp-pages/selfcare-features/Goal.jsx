@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import UntiltNavBar from "../../components/UntiltNavBar";
+import UntiltNavBar from "../../components/navigation/UntiltNavBar";
 import { useTheme } from "../../contexts/ThemeContext";
 import { goalStyles, getRelativeFontSize, getTextScaleLabel } from "../app-styles/Goal.styles";
 import { db, auth } from "../../src/firebase";

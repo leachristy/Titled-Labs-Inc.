@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useMessenger } from "../contexts/MessengerContext";
-import { useTheme } from "../contexts/ThemeContext";
-import { UserAuth } from "../contexts/AuthContext";
+import { useMessenger } from "../../contexts/MessengerContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import { UserAuth } from "../../contexts/AuthContext";
 
 const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
   const { conversations, sendMessage } = useMessenger();
@@ -54,11 +54,14 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
     }
   };
 
+  // Don't show if user is not logged in
+  if (!user) return null;
+
   return (
     <div className="fixed inset-0 bg-white dark:bg-gray-900 z-100 flex flex-col">
       {/* Header */}
       <div className={`text-white p-4 flex items-center gap-3 shadow-lg ${
-        isEarthy ? "bg-amber-700" : "bg-[#c7b4e2]"
+        isEarthy ? "bg-amber-700" : "bg-light-lavender"
       }`}>
         <button
           onClick={onClose}
@@ -137,7 +140,7 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
                 <div
                   className={`flex flex-col ${
                     isCurrentUser ? "items-end" : "items-start"
-                  } max-w-[75%]`}
+                  } max-w-[80%] md:max-w-[70%]`}
                 >
                   {/* Messages */}
                   {group.messages.map((msg, msgIndex) => {

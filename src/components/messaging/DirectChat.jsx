@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useTheme } from "../contexts/ThemeContext";
-import { UserAuth } from "../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import { UserAuth } from "../../contexts/AuthContext";
 import {
   collection,
   query,
@@ -13,7 +13,7 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "../src/firebase";
+import { db } from "../../src/firebase";
 
 export default function DirectChat({ isOpen, onClose }) {
   const { currentTheme } = useTheme();

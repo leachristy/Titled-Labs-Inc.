@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { collection, query, where, orderBy, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../src/firebase";
 import { Link } from "react-router-dom";
-import UntiltNavBar from "../components/UntiltNavBar";
+import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 
 export default function DirectMessages() {

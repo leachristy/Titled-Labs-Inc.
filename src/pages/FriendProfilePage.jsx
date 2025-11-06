@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../src/firebase";
 import { useNavigate } from "react-router-dom";
-import UntiltNavBar from '../components/UntiltNavBar';
+import UntiltNavBar from '../components/navigation/UntiltNavBar';
 import { useTheme } from "../contexts/ThemeContext";
 
 export const FriendProfilePage = () => {
