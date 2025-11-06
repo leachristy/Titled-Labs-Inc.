@@ -30,6 +30,7 @@ import ProfilePage from "./pages/ProfilePage"
 import { FriendProfilePage } from "./pages/FriendProfilePage";
 import { ChatPage } from "./pages/ChatPage";
 import DirectMessages from "./webapp-pages/DirectMessages";
+import Resources from "./webapp-pages/selfcare-features/Resources";
 
 
 export default function App() {
@@ -142,6 +143,14 @@ export default function App() {
               element={
                 <Protected>
                   <ProfilePage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/resources"
+              element={
+                <Protected>
+                  <Resources />
                 </Protected>
               }
             />

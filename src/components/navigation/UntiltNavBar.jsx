@@ -24,6 +24,7 @@ export default function UntiltNavBar() {
         { name: "Guided Videos", path: "/guide-videos" },
         { name: "Journal Entries", path: "/journal" },
         { name: "Goals", path: "/goals" },
+        { name: "Resources", path: "/resources" },
       ]
     },
     { name: "AI Chat", path: "/aichat" },
