@@ -30,6 +30,9 @@ export default function MessengerPopup() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isTablet, setIsTablet] = useState(
+    window.innerWidth >= 768 && window.innerWidth <= 1024
+  );
   const [mobileChat, setMobileChat] = useState(null);
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const [roomName, setRoomName] = useState("");
@@ -38,11 +41,13 @@ export default function MessengerPopup() {
   const [activeRoom, setActiveRoom] = useState(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width <= 1024);
     };
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    window.addEventListener("resize", checkDevice);
+    return () => window.removeEventListener("resize", checkDevice);
   }, []);
 
   // Don't show messenger if user is not logged in
@@ -93,10 +98,12 @@ export default function MessengerPopup() {
     <>
       {/* Messenger Popup */}
       <div
-        className={`fixed bottom-24 right-6 w-80 rounded-lg shadow-2xl ${
+        className={`fixed bottom-24 right-6 ${
+          isTablet ? "w-96" : "w-80"
+        } rounded-lg shadow-2xl ${
           isMobile ? "z-100" : "z-50"
         } bg-white`}
-        style={{ maxHeight: "550px" }}
+        style={{ maxHeight: isTablet ? "600px" : "550px" }}
       >
         {/* Header */}
         <div className={`p-4 rounded-t-lg ${
@@ -168,7 +175,7 @@ export default function MessengerPopup() {
         </div>
 
         {/* Content Area */}
-        <div className="overflow-y-auto bg-white" style={{ maxHeight: "380px" }}>
+        <div className="overflow-y-auto bg-white" style={{ maxHeight: isTablet ? "430px" : "380px" }}>
           {/* Chats View */}
           {activeView === "chats" && (
             <>

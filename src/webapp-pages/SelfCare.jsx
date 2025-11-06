@@ -1,14 +1,39 @@
+/**
+ * SelfCare Component
+ * 
+ * Main self-care dashboard page that displays four key mental wellness features:
+ * - Breathing Exercises: Guided breathing techniques for stress reduction
+ * - Guided Videos: Professional meditation and mindfulness content
+ * - Journal Entries: Private journaling space for emotional expression
+ * - Goals: Interactive goal tracking and achievement visualization
+ * 
+ * Features responsive grid layout and theme-aware styling (earthy/cool themes)
+ */
+
 import React from "react";
 import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 
-// Import icon images
+// Import icon images for self-care features
 import breathingIcon from "../assets/breathing.png";
 import videoIcon from "../assets/video.png";
 import journalIcon from "../assets/journal.png";
-import goals from "../assets/goals.png"; // Using logo as placeholder for goals until goals.png is added
+import goals from "../assets/goals.png";
 
+/**
+ * SelfCareCard Component
+ * 
+ * Reusable card component for displaying individual self-care features
+ * Includes hover effects, theme-aware styling, and click navigation
+ * 
+ * @param {string} title - Card title
+ * @param {string} description - Feature description text
+ * @param {string} iconSrc - Path to feature icon image
+ * @param {string} iconAlt - Alt text for icon
+ * @param {function} onClick - Navigation handler when card is clicked
+ * @param {boolean} isEarthy - Theme flag (true = earthy, false = cool)
+ */
 const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy }) => (
   <div
     className={`group relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer ${
@@ -77,11 +102,22 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
   </div>
 );
 
+/**
+ * Main SelfCare Page Component
+ * 
+ * Renders the self-care dashboard with all available features
+ * Manages theme state and navigation to individual feature pages
+ */
 export const SelfCare = () => {
+  // Get current theme from ThemeContext
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  
+  // React Router navigation hook
   const navigate = useNavigate();
 
+  // Configuration array for all self-care features
+  // Each feature defines its display content and navigation path
   const selfCareFeatures = [
     {
       title: "Breathing Exercises",

@@ -10,17 +10,22 @@ export default function RoomChatWindow({ room, onClose }) {
   const isEarthy = currentTheme === "earthy";
   const [message, setMessage] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isTablet, setIsTablet] = useState(
+    window.innerWidth >= 768 && window.innerWidth <= 1024
+  );
   const [showMenu, setShowMenu] = useState(false);
   const messagesEndRef = useRef(null);
 
   const messages = roomMessages[room.id] || [];
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width <= 1024);
     };
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    window.addEventListener("resize", checkDevice);
+    return () => window.removeEventListener("resize", checkDevice);
   }, []);
 
   useEffect(() => {
@@ -73,6 +78,8 @@ export default function RoomChatWindow({ room, onClose }) {
         className={`bg-white flex flex-col ${
           isMobile
             ? "w-full h-full"
+            : isTablet
+            ? "w-[700px] h-[750px] rounded-lg shadow-2xl"
             : "w-[600px] h-[700px] rounded-lg shadow-2xl"
         }`}
       >

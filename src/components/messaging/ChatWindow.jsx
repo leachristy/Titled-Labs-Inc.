@@ -12,9 +12,22 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isTablet, setIsTablet] = useState(
+    window.innerWidth >= 768 && window.innerWidth <= 1024
+  );
   const messagesEndRef = useRef(null);
 
   const messages = conversations[userId] || [];
+
+  // Check for tablet on resize
+  useEffect(() => {
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      setIsTablet(width >= 768 && width <= 1024);
+    };
+    window.addEventListener("resize", checkDevice);
+    return () => window.removeEventListener("resize", checkDevice);
+  }, []);
 
   // Group consecutive messages from same sender
   const groupMessages = (messages) => {
@@ -61,17 +74,24 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
   };
 
   // Position calculation (stacked to the left, starting from right of screen minus messenger width)
-  // Messenger popup is 320px wide (w-80 = 320px) + 24px right margin = 344px from right
-  // Each chat window is 320px wide + 20px gap
-  const rightPosition = 350 + (index * 340); // Start 350px from right (left of messenger), then stack left
+  // Messenger popup is 320px (w-80) or 384px (w-96 on tablet) + 24px right margin
+  // Each chat window is 320px or 360px (tablet) wide + 20px gap
+  const messengerWidth = isTablet ? 384 : 320;
+  const chatWidth = isTablet ? 360 : 320;
+  const rightPosition = (messengerWidth + 30) + (index * (chatWidth + 20));
 
   // Don't show chat window if user is not logged in
   if (!user) return null;
 
   return (
     <div
-      className="fixed bottom-6 w-80 rounded-lg shadow-2xl z-40 transition-all bg-white"
-      style={{ right: `${rightPosition}px`, height: isMinimized ? "56px" : "400px" }}
+      className={`fixed bottom-6 ${
+        isTablet ? "w-[360px]" : "w-80"
+      } rounded-lg shadow-2xl z-40 transition-all bg-white`}
+      style={{ 
+        right: `${rightPosition}px`, 
+        height: isMinimized ? "56px" : isTablet ? "480px" : "400px" 
+      }}
     >
       {/* Header */}
       <div

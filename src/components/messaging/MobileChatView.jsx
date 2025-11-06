@@ -140,7 +140,7 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
                 <div
                   className={`flex flex-col ${
                     isCurrentUser ? "items-end" : "items-start"
-                  } max-w-[75%]`}
+                  } max-w-[80%] md:max-w-[70%]`}
                 >
                   {/* Messages */}
                   {group.messages.map((msg, msgIndex) => {
