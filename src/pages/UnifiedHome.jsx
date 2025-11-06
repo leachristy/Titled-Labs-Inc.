@@ -54,13 +54,13 @@ export default function UnifiedHome() {
 
       <Testimonial />
 
-      <div className={`py-20 ${isEarthy ? "bg-cream-100" : "bg-pale-lavender"}`}>
+      <div className={`py-20 ${isEarthy ? "bg-cream-100" : "bg-charcoal-grey"}`}>
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
-            <h2 className={`text-3xl sm:text-4xl font-semibold ${isEarthy ? "text-brown-800" : "text-charcoal-grey"} mb-4`}>
+            <h2 className={`text-3xl sm:text-4xl font-semibold ${isEarthy ? "text-brown-800" : "text-white"} mb-4`}>
               Who we are for
             </h2>
-            <p className={`text-base ${isEarthy ? "text-brown-700" : "text-charcoal-grey"} max-w-2xl mx-auto`}>
+            <p className={`text-base ${isEarthy ? "text-brown-700" : "text-gray-300"} max-w-2xl mx-auto`}>
               Tilted supports individuals at every stage of their mental wellness journey.
             </p>
           </div>
@@ -79,13 +79,13 @@ export default function UnifiedHome() {
 
       <CTASection onNavigate={handleNavigation} />
 
-      <div className={`py-20 ${isEarthy ? "bg-cream-100 border-t border-tan-200" : "bg-pale-lavender border-t border-cool-grey"}`}>
+      <div className={`py-20 ${isEarthy ? "bg-cream-100 border-t border-tan-200" : "bg-charcoal-grey border-t border-cool-grey"}`}>
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <h2 className={`text-3xl font-semibold ${isEarthy ? "text-brown-800" : "text-charcoal-grey"} mb-4`}>
+            <h2 className={`text-3xl font-semibold ${isEarthy ? "text-brown-800" : "text-white"} mb-4`}>
               More from Tilted
             </h2>
-            <p className={`text-base ${isEarthy ? "text-brown-700" : "text-charcoal-grey"}`}>
+            <p className={`text-base ${isEarthy ? "text-brown-700" : "text-gray-300"}`}>
               Explore resources designed to support your mental wellness journey
             </p>
           </div>

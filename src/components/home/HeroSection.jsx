@@ -25,7 +25,7 @@ export default function HeroSection({ onNavigate }) {
 
           {/* Main Heading */}
           <h1 className={`mb-6 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl ${
-            isEarthy ? "text-brown-800" : "text-charcoal-grey"
+            isEarthy ? "text-brown-800" : "text-white"
           }`}>
             Everything you need to manage
             <br />
@@ -36,7 +36,7 @@ export default function HeroSection({ onNavigate }) {
 
           {/* Subheading */}
           <p className={`max-w-3xl mx-auto mb-10 text-lg leading-relaxed sm:text-xl ${
-            isEarthy ? "text-brown-700" : "text-charcoal-grey"
+            isEarthy ? "text-brown-700" : "text-gray-300"
           }`}>
             Access self-care tools, join supportive communities, get AI-powered guidance, and track your progress—all in one secure, easy-to-use platform designed for your mental wellness.
           </p>
@@ -59,7 +59,7 @@ export default function HeroSection({ onNavigate }) {
 
           {/* Trust Indicators */}
           <div className={`flex flex-wrap items-center justify-center gap-6 text-sm ${
-            isEarthy ? "text-brown-700" : "text-charcoal-grey"
+            isEarthy ? "text-brown-700" : "text-gray-300"
           }`}>
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-light-lavender"}`}></div>
