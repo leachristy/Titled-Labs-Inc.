@@ -303,7 +303,7 @@ export default function Community() {
     <>
       <title>Untilt - Community</title>
       <UntiltNavBar />
-      <div
+      <div  
         className={`min-h-screen pt-20 pb-12 ${
           isEarthy ? "bg-cream-100" : "bg-[#373E4F]"
         }`}

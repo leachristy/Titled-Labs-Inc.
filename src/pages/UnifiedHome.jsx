@@ -97,7 +97,7 @@ export default function UnifiedHome() {
           </div>
 
           <div className="mt-10 text-center">
-            <button className={`${isEarthy ? "text-rust-500 hover:text-rust-600" : "text-slate-blue hover:text-charcoal-grey"} font-medium inline-flex items-center gap-2 group`}>
+            <button className={`${isEarthy ? "text-rust-500 hover:text-rust-600" : "text-[#c7b4e2] hover:text-[#b49fd3]"} font-medium inline-flex items-center gap-2 group`}>
               View all resources
               <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

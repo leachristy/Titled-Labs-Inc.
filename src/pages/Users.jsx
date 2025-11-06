@@ -49,19 +49,19 @@ export default function Users() {
               className={`${
                 isEarthy
                   ? "btn-primary"
-                  : "font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 text-white"
+                  : "font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 text-gray-900"
               }`}
               style={{
-                backgroundColor: isEarthy ? undefined : "var(--slate-blue)",
-                color: "white",
+                backgroundColor: isEarthy ? undefined : "var(--light-lavender)",
+                color: isEarthy ? undefined : "var(--charcoal-grey)",
               }}
               onMouseEnter={(e) =>
                 !isEarthy &&
-                (e.target.style.backgroundColor = "var(--charcoal-grey)")
+                (e.target.style.backgroundColor = "var(--medium-lavender)")
               }
               onMouseLeave={(e) =>
                 !isEarthy &&
-                (e.target.style.backgroundColor = "var(--slate-blue)")
+                (e.target.style.backgroundColor = "var(--light-lavender)")
               }
             >
               {visible ? "Hide Users" : "Show Users"}
@@ -70,8 +70,8 @@ export default function Users() {
 
           {usersLoading && (
             <p
-              className={`${isEarthy ? "text-brown-600" : "text-slate-blue"}`}
-              style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
+              className={`${isEarthy ? "text-brown-600" : "text-[#c7b4e2]"}`}
+              style={{ color: isEarthy ? undefined : "var(--light-lavender)" }}
             >
               Loading…
             </p>
@@ -79,9 +79,9 @@ export default function Users() {
           {usersError ? (
             <p
               className={`font-medium ${
-                isEarthy ? "text-rust-600" : "text-slate-blue"
+                isEarthy ? "text-rust-600" : "text-[#c7b4e2]"
               }`}
-              style={{ color: isEarthy ? undefined : "var(--slate-blue)" }}
+              style={{ color: isEarthy ? undefined : "var(--light-lavender)" }}
             >
               {usersError.message}
             </p>

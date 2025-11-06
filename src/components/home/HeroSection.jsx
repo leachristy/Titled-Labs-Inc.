@@ -29,7 +29,7 @@ export default function HeroSection({ onNavigate }) {
           }`}>
             Everything you need to manage
             <br />
-            <span className={isEarthy ? "text-rust-600" : "text-slate-blue"}>
+            <span className={isEarthy ? "text-rust-600" : "text-[#c7b4e2]"}>
               your mental wellness journey
             </span>
           </h1>
@@ -62,15 +62,15 @@ export default function HeroSection({ onNavigate }) {
             isEarthy ? "text-brown-700" : "text-charcoal-grey"
           }`}>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-slate-blue"}`}></div>
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"}`}></div>
               <span>Secure & Private</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-slate-blue"}`}></div>
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"}`}></div>
               <span>30-day free trial</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#646F89]"}`}></div>
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"}`}></div>
               <span>No credit card required</span>
             </div>
           </div>

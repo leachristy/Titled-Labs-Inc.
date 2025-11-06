@@ -156,46 +156,7 @@ export const SelfCare = () => {
               />
             ))}
           </div>
-        </div>
-        
-
-        {/* Bottom CTA Section
-        <div className="max-w-4xl mx-auto mt-16 text-center">
-          <div
-            className={`p-8 rounded-2xl shadow-lg ${
-              isEarthy
-                ? "bg-gradient-to-r from-terracotta-200 to-tan-200 border-2 border-tan-400"
-                : "bg-gradient-to-r from-pale-lavender to-white border-2 border-cool-grey"
-            }`}
-          >
-            <h3
-              className={`text-2xl font-bold mb-3 ${
-                isEarthy ? "text-brown-800" : "text-charcoal-grey"
-              }`}
-            >
-              Need Additional Support?
-            </h3>
-            <p
-              className={`mb-6 ${
-                isEarthy ? "text-brown-700" : "text-slate-blue"
-              }`}
-            >
-              Connect with licensed therapists, join supportive communities, or explore AI-powered resources.
-            </p>
-            <button
-              onClick={() => navigate("/dashboard")}
-              className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
-                isEarthy
-                  ? "bg-rust-500 hover:bg-rust-600 text-white"
-                  : "bg-slate-blue hover:bg-charcoal-grey text-white"
-              }`}
-            >
-              Explore More Resources
-            </button>
-          </div>
-        </div> 
-        */}
-            
+        </div>        
       </div>
     </>
   );
