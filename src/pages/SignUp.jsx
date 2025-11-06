@@ -1,3 +1,23 @@
+/**
+ * Sign Up Page Component
+ * 
+ * User registration page with multiple authentication options:
+ * - Email/Password registration with first/last name
+ * - Google OAuth sign-up
+ * - Social login placeholders (Twitter)
+ * 
+ * Features:
+ * - Complete form validation (password match, terms agreement)
+ * - Loading states during registration
+ * - Error handling and display
+ * - Auto-redirect to dashboard on successful registration
+ * - Account benefits information
+ * - Crisis hotline access
+ * - Theme-aware styling
+ * - Password requirements display
+ * - Terms of Service and Privacy Policy agreement
+ */
+
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
@@ -5,10 +25,15 @@ import { UserAuth } from "../contexts/AuthContext.jsx";
 import NavBar from "../components/navigation/NavBar";
 
 export default function SignUp() {
+  // Get authentication functions and state from AuthContext
   const { googleSignIn, doCreateUserWithEmailAndPassword, user } = UserAuth();
   const navigate = useNavigate();
+  
+  // Get current theme state
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  
+  // Form state management
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -20,6 +45,11 @@ export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /**
+   * Handle form input changes
+   * Updates formData state as user types
+   * Handles both text inputs and checkbox inputs
+   */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -28,18 +58,36 @@ export default function SignUp() {
     });
   };
 
+  /**
+   * Handle form submission for sign-up
+   * 
+   * Validation:
+   * 1. Password match check
+   * 2. Terms agreement check
+   * 
+   * Process:
+   * 1. Prevent default form submission
+   * 2. Set loading state and clear errors
+   * 3. Validate passwords match
+   * 4. Validate terms agreement
+   * 5. Create Firebase auth account with email/password
+   * 6. Create Firestore profile document with first/last name
+   * 7. On success: Navigate to login page
+   * 8. On failure: Display error message
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Validation
+    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
+    // Validate terms agreement
     if (!formData.agreeToTerms) {
       setError("Please agree to the Terms of Service and Privacy Policy");
       setIsLoading(false);
@@ -47,7 +95,7 @@ export default function SignUp() {
     }
 
     try {
-      // Add your Firebase auth logic here
+      // Create Firebase auth account and Firestore profile
       await doCreateUserWithEmailAndPassword(
         formData.firstName,
         formData.lastName,
@@ -55,17 +103,24 @@ export default function SignUp() {
         formData.password
       );
 
-      // On success, redirect to home or dashboard
+      // On success, redirect to login page
       navigate("/login");
     } catch (error) {
+      // On failure, show error message to user
       setError("An error occurred during signup. Please try again.");
       console.error(error);
     } finally {
+      // Always clear loading state
       setIsLoading(false);
     }
   };
 
-  // handle google signin with popup/redirect
+  /**
+   * Handle Google Sign-Up
+   * 
+   * Opens Google OAuth popup for authentication
+   * On success, user is automatically redirected by useEffect below
+   */
   const handleGoogleSignIn = async () => {
     try {
       await googleSignIn();
@@ -74,7 +129,13 @@ export default function SignUp() {
     }
   };
 
-  // -> link to dashboard when signin sucessfully
+  /**
+   * Auto-redirect Effect
+   * 
+   * Monitors user authentication state
+   * If user successfully signs up, automatically redirect to dashboard
+   * This handles post-signup navigation for both email/password and Google sign-up
+   */
   useEffect(() => {
     if (user != null) {
       navigate("/dashboard");
@@ -83,8 +144,13 @@ export default function SignUp() {
 
   return (
     <>
+      {/* Page title for browser tab */}
       <title>Sign Up - Tilted | Mental Wellness</title>
+      
+      {/* Navigation bar */}
       <NavBar />
+      
+      {/* Main sign-up container with theme-aware styling */}
       <div
         className={`mt-10 min-h-screen ${
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"
