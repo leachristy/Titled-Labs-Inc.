@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
@@ -29,6 +30,7 @@ export default function Community() {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
   const { user, profile } = UserAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [posts, setPosts] = useState([]);
   const [newPostTitle, setNewPostTitle] = useState("");
@@ -81,6 +83,28 @@ export default function Community() {
 
     return () => unsubscribe();
   }, []);
+
+  // Handle navigation to specific post via URL parameter
+  useEffect(() => {
+    const postId = searchParams.get('postId');
+    if (postId && posts.length > 0 && !isLoading) {
+      const postExists = posts.find(p => p.id === postId);
+      if (postExists) {
+        // Expand the target post
+        setExpandedPost(postId);
+        
+        // Scroll to the post after a short delay to ensure rendering
+        setTimeout(() => {
+          const element = document.getElementById(`post-${postId}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          // Clear URL parameter after navigation
+          setSearchParams({});
+        }, 300);
+      }
+    }
+  }, [searchParams, posts, isLoading, setSearchParams]);
 
   // Create new post
   const handleCreatePost = async (e) => {

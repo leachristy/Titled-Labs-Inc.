@@ -244,134 +244,316 @@ export const FriendProfilePage = () => {
     }
   };
 
-  if (!profile) return <p>Loading profile...</p>;
+  if (!profile) {
+    return (
+      <>
+        <UntiltNavBar />
+        <div
+          className={`min-h-screen pt-20 pb-12 ${
+            isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
+          }`}
+        >
+          <div
+            className={`max-w-4xl mx-auto p-6 rounded-lg shadow-lg text-center ${
+              isEarthy
+                ? "bg-white border-tan-200"
+                : "bg-pale-lavender border-blue-grey"
+            } border`}
+          >
+            <div className="flex flex-col items-center justify-center">
+              <svg
+                className={`animate-spin h-12 w-12 mb-4 ${
+                  isEarthy ? "text-rust-500" : "text-light-lavender"
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              <p
+                className={`text-lg ${
+                  isEarthy ? "text-brown-600" : "text-gray-300"
+                }`}
+              >
+                Loading profile...
+              </p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <UntiltNavBar />
       <div
-        className={`min-h-screen ${
-          isEarthy ? "bg-cream-100" : "bg-pale-lavender"
+        className={`min-h-screen pt-20 pb-12 ${
+          isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
         }`}
-        style={{
-          backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
-        }}
       >
-        <div className="max-w-4xl p-6 mx-auto mt-20">
+        <div className="max-w-4xl p-6 mx-auto">
           {/* Profile Header */}
-          <div className="flex items-center mb-6 space-x-4">
-            <div className="flex items-center justify-center w-16 h-16 text-xl font-bold text-white bg-gray-400 rounded-full">
-              {profile.firstName?.charAt(0)?.toUpperCase() || "U"}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">
-                {profile.firstName} {profile.lastName}
-              </h1>
-              <p className="text-sm text-gray-500">
-                {profile.bio || "No bio yet"}
-              </p>
+          <div
+            className={`rounded-lg shadow-lg p-6 mb-6 ${
+              isEarthy
+                ? "bg-white border-tan-200"
+                : "bg-pale-lavender border-blue-grey"
+            } border`}
+          >
+            <div className="flex items-center space-x-6">
+              <div
+                className={`flex items-center justify-center w-20 h-20 text-2xl font-bold rounded-full shrink-0 ${
+                  isEarthy
+                    ? "bg-rust-200 text-rust-700"
+                    : "bg-light-lavender text-white"
+                }`}
+              >
+                {profile.firstName?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+              <div className="flex-1">
+                <h1
+                  className={`text-3xl font-bold mb-2 ${
+                    isEarthy ? "text-brown-800" : "text-gray-900"
+                  }`}
+                >
+                  {profile.firstName} {profile.lastName}
+                </h1>
+                <p
+                  className={`text-sm ${
+                    isEarthy ? "text-brown-500" : "text-gray-600"
+                  }`}
+                >
+                  {profile.bio || "No bio yet"}
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Error message for friend actions */}
           {friendError && (
-            <p className="mb-4 text-sm text-red-600">{friendError}</p>
+            <div
+              className={`mb-4 p-4 rounded-lg ${
+                isEarthy
+                  ? "bg-red-50 text-red-800 border border-red-200"
+                  : "bg-red-900/20 text-red-200 border border-red-700"
+              }`}
+            >
+              {friendError}
+            </div>
           )}
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-4 mb-6">
-            {/* Chat button */}
-            <button
-              onClick={() => navigate(`/chat/${uid}`)}
-              className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
-            >
-              Send Message
-            </button>
-
-            {/* Friend logic according to your rules */}
-            {friendStatus === "loading" && (
+          <div
+            className={`rounded-lg shadow-lg p-6 mb-6 ${
+              isEarthy
+                ? "bg-white border-tan-200"
+                : "bg-pale-lavender border-blue-grey"
+            } border`}
+          >
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Chat button */}
               <button
-                className="px-4 py-2 text-gray-700 bg-gray-300 rounded cursor-default"
-                disabled
+                onClick={() => navigate(`/chat/${uid}`)}
+                className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
+                  isEarthy
+                    ? "bg-rust-500 hover:bg-rust-600 text-white"
+                    : "bg-light-lavender hover:bg-medium-lavender text-white"
+                }`}
               >
-                Checking...
+                Send Message
               </button>
-            )}
 
-            {/* Viewing yourself -> go back to /profile */}
-            {friendStatus === "self" && (
-              <button
-                onClick={() => navigate("/profile")}
-                className="px-4 py-2 text-white bg-gray-500 rounded hover:bg-gray-600"
-              >
-                Go to your profile
-              </button>
-            )}
-
-            {/* Already friends */}
-            {friendStatus === "friends" && (
-              <button
-                onClick={handleUnfriend}
-                className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
-              >
-                Unfriend
-              </button>
-            )}
-
-            {/* You sent a request */}
-            {friendStatus === "pendingSent" && (
-              <button
-                className="px-4 py-2 text-white bg-yellow-500 rounded cursor-default"
-                disabled
-              >
-                Friend Request Sent
-              </button>
-            )}
-
-            {/* They sent a request to you */}
-            {friendStatus === "pendingReceived" && (
-              <>
+              {/* Friend logic according to your rules */}
+              {friendStatus === "loading" && (
                 <button
-                  onClick={handleAcceptFriend}
-                  className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
+                  className={`px-6 py-2.5 rounded-lg font-medium cursor-default ${
+                    isEarthy
+                      ? "bg-tan-200 text-brown-600"
+                      : "bg-gray-200 text-gray-600"
+                  }`}
+                  disabled
                 >
-                  Accept Friend Request
+                  Checking...
                 </button>
-                <button
-                  onClick={handleDeclineFriend}
-                  className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
-                >
-                  Decline
-                </button>
-              </>
-            )}
+              )}
 
-            {/* No relationship yet */}
-            {friendStatus === "none" && (
-              <button
-                onClick={handleAddFriend}
-                className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
-              >
-                Add Friend
-              </button>
-            )}
+              {/* Viewing yourself -> go back to /profile */}
+              {friendStatus === "self" && (
+                <button
+                  onClick={() => navigate("/profile")}
+                  className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
+                    isEarthy
+                      ? "bg-tan-200 hover:bg-tan-300 text-brown-800"
+                      : "bg-gray-200 hover:bg-gray-300 text-charcoal-grey"
+                  }`}
+                >
+                  Go to your profile
+                </button>
+              )}
+
+              {/* Already friends */}
+              {friendStatus === "friends" && (
+                <button
+                  onClick={handleUnfriend}
+                  className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
+                    isEarthy
+                      ? "bg-red-600 hover:bg-red-700 text-white"
+                      : "bg-red-500 hover:bg-red-600 text-white"
+                  }`}
+                >
+                  Unfriend
+                </button>
+              )}
+
+              {/* You sent a request */}
+              {friendStatus === "pendingSent" && (
+                <button
+                  className={`px-6 py-2.5 rounded-lg font-medium cursor-default ${
+                    isEarthy
+                      ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
+                      : "bg-yellow-900/20 text-yellow-200 border border-yellow-700"
+                  }`}
+                  disabled
+                >
+                  Friend Request Sent
+                </button>
+              )}
+
+              {/* They sent a request to you */}
+              {friendStatus === "pendingReceived" && (
+                <>
+                  <button
+                    onClick={handleAcceptFriend}
+                    className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
+                      isEarthy
+                        ? "bg-green-600 hover:bg-green-700 text-white"
+                        : "bg-green-500 hover:bg-green-600 text-white"
+                    }`}
+                  >
+                    Accept Friend Request
+                  </button>
+                  <button
+                    onClick={handleDeclineFriend}
+                    className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
+                      isEarthy
+                        ? "bg-tan-200 hover:bg-tan-300 text-brown-800"
+                        : "bg-gray-200 hover:bg-gray-300 text-charcoal-grey"
+                    }`}
+                  >
+                    Decline
+                  </button>
+                </>
+              )}
+
+              {/* No relationship yet */}
+              {friendStatus === "none" && (
+                <button
+                  onClick={handleAddFriend}
+                  className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
+                    isEarthy
+                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      : "bg-green-500 hover:bg-green-600 text-white"
+                  }`}
+                >
+                  Add Friend
+                </button>
+              )}
+            </div>
           </div>
 
           {/* User Posts */}
-          <h2 className="mb-4 text-xl font-bold">
-            Posts by {profile.firstName}
-          </h2>
-          <div className="space-y-4">
-            {userPosts.length === 0 && <p>No posts yet.</p>}
-            {userPosts.map((post) => (
-              <div
-                key={post.id}
-                className="p-4 bg-white border rounded-lg shadow"
-              >
-                <h3 className="mb-2 text-lg font-bold">{post.title}</h3>
-                <p className="text-sm text-gray-700">{post.content}</p>
-              </div>
-            ))}
+          <div
+            className={`rounded-lg shadow-lg p-6 ${
+              isEarthy
+                ? "bg-white border-tan-200"
+                : "bg-pale-lavender border-blue-grey"
+            } border`}
+          >
+            <h2
+              className={`text-2xl font-bold mb-4 ${
+                isEarthy ? "text-brown-800" : "text-gray-900"
+              }`}
+            >
+              Posts by {profile.firstName} ({userPosts.length})
+            </h2>
+            <div className="space-y-4">
+              {userPosts.length === 0 && (
+                <p
+                  className={`text-center py-8 ${
+                    isEarthy ? "text-brown-600" : "text-gray-600"
+                  }`}
+                >
+                  No posts yet.
+                </p>
+              )}
+              {userPosts.map((post) => (
+                <div
+                  key={post.id}
+                  onClick={() => navigate(`/community?postId=${post.id}`)}
+                  className={`p-5 rounded-lg border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer ${
+                    isEarthy
+                      ? "bg-cream-50 border-tan-200"
+                      : "bg-cream-50 border-blue-grey"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span
+                      className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                        isEarthy
+                          ? "bg-rust-100 text-rust-700"
+                          : "bg-light-lavender text-white"
+                      }`}
+                    >
+                      {post.category}
+                    </span>
+                    <span
+                      className={`text-xs ${
+                        isEarthy ? "text-brown-500" : "text-gray-500"
+                      }`}
+                    >
+                      {post.createdAt?.toDate?.().toLocaleDateString() || ""}
+                    </span>
+                  </div>
+                  <h3
+                    className={`text-lg font-bold mb-2 ${
+                      isEarthy ? "text-brown-900" : "text-gray-900"
+                    }`}
+                  >
+                    {post.title}
+                  </h3>
+                  <p
+                    className={`text-sm ${
+                      isEarthy ? "text-brown-700" : "text-gray-700"
+                    }`}
+                  >
+                    {post.content}
+                  </p>
+                  {post.comments && post.comments.length > 0 && (
+                    <div
+                      className={`mt-3 text-sm ${
+                        isEarthy ? "text-brown-500" : "text-gray-500"
+                      }`}
+                    >
+                      💬 {post.comments.length} comment
+                      {post.comments.length !== 1 ? "s" : ""}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

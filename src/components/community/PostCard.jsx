@@ -23,6 +23,7 @@ export default function PostCard({
 }) {
   return (
     <div
+      id={`post-${post.id}`}
       className={`rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 ${
         isEarthy
           ? "bg-white border-tan-200"
