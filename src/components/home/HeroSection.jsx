@@ -7,7 +7,7 @@ export default function HeroSection({ onNavigate }) {
   const isEarthy = currentTheme === "earthy";
 
   return (
-    <section className={`relative py-20 overflow-hidden ${isEarthy ? "bg-terracotta-200" : "bg-pale-lavender"}`}>
+    <section className={`relative py-20 overflow-hidden ${isEarthy ? "bg-terracotta-200" : "bg-charcoal-grey"}`}>
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzBoLTZhMSAxIDAgMCAxIDAtMmg2YTEgMSAwIDAgMSAwIDJ6bS0xMiAwSDhhMSAxIDAgMCAxIDAtMmgxNmExIDEgMCAwIDEgMCAyek0zNiAxOGgtNmExIDEgMCAwIDEgMC0yaDZhMSAxIDAgMCAxIDAgem0tMTIgMEg4YTEgMSAwIDAgMSAwLTJoMTZhMSAxIDAgMCAxIDAgek0zNiA0Mmg2YTEgMSAwIDAgMSAwIDJoLTZhMSAxIDAgMCAxIDAtMnptLTEyIDBoMTZhMSAxIDAgMCAxIDAgMkg4YTEgMSAwIDAgMSAwLTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30"></div>
 
       <div className="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -25,22 +25,20 @@ export default function HeroSection({ onNavigate }) {
 
           {/* Main Heading */}
           <h1 className={`mb-6 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl ${
-            isEarthy ? "text-brown-800" : "text-charcoal-grey"
+            isEarthy ? "text-brown-800" : "text-white"
           }`}>
             Everything you need to manage
             <br />
-            <span className={isEarthy ? "text-rust-600" : "text-slate-blue"}>
+            <span className={isEarthy ? "text-rust-600" : "text-light-lavender"}>
               your mental wellness journey
             </span>
           </h1>
 
           {/* Subheading */}
           <p className={`max-w-3xl mx-auto mb-10 text-lg leading-relaxed sm:text-xl ${
-            isEarthy ? "text-brown-700" : "text-charcoal-grey"
+            isEarthy ? "text-brown-700" : "text-gray-300"
           }`}>
-            Our platform helps you save time and focus on what matters most—your
-            well-being. Connect with licensed therapists, join supportive
-            communities, and access AI-powered resources.
+            Access self-care tools, join supportive communities, get AI-powered guidance, and track your progress—all in one secure, easy-to-use platform designed for your mental wellness.
           </p>
 
           {/* CTA Buttons */}
@@ -49,10 +47,10 @@ export default function HeroSection({ onNavigate }) {
               onClick={() => onNavigate("/signup")}
               className={`px-8 py-3 ${isEarthy ? "btn-primary" : "btn-primary-new"}`}
             >
-              Start free trial
+              Get started free
             </button>
             <button
-              onClick={() => onNavigate("/contact")}
+              onClick={() => onNavigate("/about")}
               className={`px-8 py-3 ${isEarthy ? "btn-secondary" : "btn-secondary-new"}`}
             >
               Learn more
@@ -61,18 +59,18 @@ export default function HeroSection({ onNavigate }) {
 
           {/* Trust Indicators */}
           <div className={`flex flex-wrap items-center justify-center gap-6 text-sm ${
-            isEarthy ? "text-brown-700" : "text-charcoal-grey"
+            isEarthy ? "text-brown-700" : "text-gray-300"
           }`}>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-slate-blue"}`}></div>
-              <span>HIPAA-compliant</span>
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-light-lavender"}`}></div>
+              <span>Secure & Private</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-slate-blue"}`}></div>
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-light-lavender"}`}></div>
               <span>30-day free trial</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-slate-blue"}`}></div>
+              <div className={`w-2 h-2 rounded-full ${isEarthy ? "bg-rust-500" : "bg-light-lavender"}`}></div>
               <span>No credit card required</span>
             </div>
           </div>

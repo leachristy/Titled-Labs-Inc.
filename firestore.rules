@@ -2,18 +2,60 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
+    // Allow public read access to users, but only authenticated users can write
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read and write goals
+    match /goals/{goalId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Community posts rules
+    match /communityPosts/{postId} {
+      // Anyone authenticated can read posts
+      allow read: if request.auth != null;
+      
+      // Anyone authenticated can create posts
+      allow create: if request.auth != null;
+      
+      // Only the author can delete their own posts
+      allow delete: if request.auth != null && request.auth.uid == resource.data.authorId;
+      
+      // Allow updates if user is the author OR if only updating comments/votes
+      allow update: if request.auth != null && (
+        request.auth.uid == resource.data.authorId ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comments', 'upvotes', 'downvotes'])
+      );
+    }
+    
+    // Journal entries
+    match /journalEntries/{entryId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Messenger conversations
+    match /conversations/{conversationId} {
+      // Allow read/write if user is part of the conversation
+      // conversationId format: userId1_userId2 (sorted)
+      allow read, write: if request.auth != null && 
+        conversationId.matches('.*' + request.auth.uid + '.*');
+      
+      match /messages/{messageId} {
+        allow read, write: if request.auth != null;
+      }
+    }
+    
+    // Messages collection for direct messages
+    match /messages/{messageId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // All other collections - require authentication
     match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2025, 10, 29);
+      allow read, write: if request.auth != null;
     }
   }
 }

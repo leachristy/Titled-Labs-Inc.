@@ -1,7 +1,7 @@
 import { useTheme } from "../contexts/ThemeContext";
-import TeamCard from "../components/TeamCard";
+import TeamCard from "../components/cards/TeamCard";
 import { team } from "../data/team";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/navigation/NavBar";
 
 export default function About() {
   const { currentTheme } = useTheme();

@@ -1,3 +1,22 @@
+/**
+ * Authentication Context for Firebase Authentication
+ * 
+ * Provides global authentication state and functions throughout the app
+ * Handles Google OAuth, email/password authentication, and user profile management
+ * Syncs with Firestore to maintain user profile data
+ * 
+ * Available functions:
+ * - googleSignIn(): Sign in with Google OAuth popup
+ * - doCreateUserWithEmailAndPassword(): Create new account with email/password
+ * - doSignInWithEmailAndPassword(): Sign in with existing email/password
+ * - logOut(): Sign out current user
+ * 
+ * Available state:
+ * - user: Firebase Auth user object
+ * - profile: Firestore user document (firstName, lastName, photoUrl, etc.)
+ * - loading: Boolean indicating if auth state is being loaded
+ */
+
 import { useContext, createContext, useState, useEffect } from "react";
 import {
   GoogleAuthProvider,
@@ -18,12 +37,20 @@ import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 // Create a React Context object that will hold the global authentication data: user info, login/logout functions
 const AuthContext = createContext();
 
-// degines a component that will wrap the entire app and give all children  access to the authentication state
-// {children}: or (prop.children) represents any components inside <AuthContextProvider>...</AuthContextProvider>
+/**
+ * AuthContextProvider Component
+ * 
+ * Wraps the entire app to provide authentication state and functions to all child components
+ * Listens for Firebase auth state changes and syncs with Firestore user profiles
+ * 
+ * @param {ReactNode} children - All components wrapped by this provider
+ */
 export const AuthContextProvider = ({ children }) => {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState({}); // Firebase Auth user object
   const [profile, setProfile] = useState(null); // Firestore user document
+  const [loading, setLoading] = useState(true); // Loading state for initial auth check
 
+<<<<<<< HEAD
   // Detect user online, offline logic:
   useEffect(() => {
     // only run when we know which user is logged in
@@ -77,20 +104,31 @@ export const AuthContextProvider = ({ children }) => {
   }, [user, user?.uid]);
 
   // sign in function
+=======
+  /**
+   * Google Sign-In Function
+   * 
+   * Opens Google OAuth popup, authenticates user, and creates/updates their Firestore profile
+   * Extracts first and last name from Google display name
+   * Stores user data in 'users' collection with Google profile information
+   */
+>>>>>>> 54c4048046e2e7a3653c22edaa8d5b1d3f92f638
   const googleSignIn = async () => {
     // create new instance of google provider
     const provider = new GoogleAuthProvider();
-    // call signinwithpopup function -> open Google Login Popup -> update to onStateChanged in Firebase via Google
+    
+    // Open Google Login Popup and authenticate user
     const { user } = await signInWithPopup(auth, provider);
-    // call signinwithRedirect -> facing some bugs right now,
-    // I will try to solve this later - Thong
+    
+    // Alternative: Redirect method (currently not used due to bugs)
     // signInWithRedirect(auth, provider);
 
-    // extract firstName and lastName from user google full name (user.displayName)
+    // Extract firstName and lastName from Google display name
+    // Splits "John Doe" into firstName="John", lastName="Doe"
     const [firstName = "", ...rest] = (user.displayName || "").split(" ");
     const lastName = rest.join(" ");
 
-    // create a block inside users table with collected info
+    // Create or update user document in Firestore 'users' collection
     await setDoc(doc(db, "users", user.uid), {
       firstName,
       lastName,
@@ -100,100 +138,133 @@ export const AuthContextProvider = ({ children }) => {
       createdAt: new Date(),
     });
 
-    // in-case user changed their name and photo in their google account
+    // Update Firebase Auth profile with Google display name and photo
+    // Ensures consistency if user changes their Google profile
     await updateProfile(user, {
       displayName: user.displayName,
       photoURL: user.photoURL,
     });
   };
 
-  // sign up with email and password
+  /**
+   * Email/Password Sign-Up Function
+   * 
+   * Creates a new Firebase Auth account and Firestore user profile
+   * 
+   * @param {string} firstName - User's first name
+   * @param {string} lastName - User's last name
+   * @param {string} email - User's email address
+   * @param {string} password - User's password (min 6 characters)
+   */
   const doCreateUserWithEmailAndPassword = async (
     firstName,
     lastName,
     email,
     password
   ) => {
+    // Create Firebase Auth account
     const { user } = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
 
-    // create a block inside users table with collected info
+    // Create user profile document in Firestore 'users' collection
     await setDoc(doc(db, "users", user.uid), {
       firstName,
       lastName,
       email,
-      photoUrl: null,
+      photoUrl: null, // No photo for email signups initially
       loginType: "email-password",
       createdAt: new Date(),
     });
   };
 
-  // sign in with email and password
+  /**
+   * Email/Password Sign-In Function
+   * 
+   * Signs in existing user with email and password credentials
+   * 
+   * @param {string} email - User's email address
+   * @param {string} password - User's password
+   * @returns {Promise} Firebase auth promise
+   */
   const doSignInWithEmailAndPassword = (email, password) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
   // ------------------------------------------------
-  // Extra functions for future implementation
+  // Additional functions for future implementation:
+  // 
+  // Password Reset:
   // const doPasswordReset = (email) => {
   //   return sendPasswordResetEmail(auth, email);
   // };
-
+  //
+  // Password Change:
   // const doPasswordChange = (password) => {
   //   return updatePassword(auth.user, password);
   // };
-
+  //
+  // Email Verification:
   // const doEmailVerification = () => {
   //   return sendEmailVerification(auth.user, {
   //     url: `${window.location.origin}/dashboard`,
   //   });
   // };
-  // update picture profile
-  //   await updateProfile(auth.currentUser, { photoURL: url });
+  //
+  // Update Profile Picture:
+  // await updateProfile(auth.currentUser, { photoURL: url });
   // await updateDoc(doc(db, "users", auth.currentUser.uid), {
   //   photoURL: url, updatedAt: serverTimestamp()
   // });
   // ------------------------------------------------
 
-  // logout function
+  /**
+   * Logout Function
+   * 
+   * Signs out the current user from Firebase Auth
+   * Auth state listener will automatically update user/profile to null
+   */
   const logOut = () => {
     signOut(auth);
   };
 
-  // --- Old ones -> simple auto set state for user/setUser
-  // useEffect(() => {
-  //   // get the currentUser from onAuthStateChanged
-  //   const unsubcribe = onAuthStateChanged(auth, (currentUser) => {
-  //     setUser(currentUser);
-  //     // For debugging purpose ...
-  //     // console.log("User", currentUser);
-  //   });
-  //   return () => {
-  //     unsubcribe();
-  //   };
-  // }, []);
-
-  // Updated => auto set state for user/setUser & access user profile in users table
+  /**
+   * Authentication State Listener
+   * 
+   * Monitors Firebase Auth state changes (login/logout)
+   * When user logs in, subscribes to their Firestore profile document
+   * Automatically updates user and profile state in real-time
+   * Cleans up listeners on component unmount or user logout
+   */
   useEffect(() => {
+    // Listen for Firebase Auth state changes
     const unsubAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      
+      // If no user logged in, clear profile and stop loading
       if (!currentUser) {
         setProfile(null);
+        setLoading(false);
         return;
       }
-      return onSnapshot(doc(db, "users", currentUser.uid), (snap) =>
-        setProfile(snap.data() || null)
-      );
+      
+      // Subscribe to user's Firestore profile document for real-time updates
+      const unsubProfile = onSnapshot(doc(db, "users", currentUser.uid), (snap) => {
+        setProfile(snap.data() || null);
+        setLoading(false);
+      });
+      
+      return unsubProfile;
     });
+    
+    // Cleanup: Unsubscribe from auth listener when component unmounts
     return () => unsubAuth();
   }, []);
 
   return (
-    // Return a Context Provider component
-    // Give value to the rest of the app
+    // Provide auth state and functions to all child components via Context
     <AuthContext.Provider
       value={{
         googleSignIn,
@@ -202,16 +273,25 @@ export const AuthContextProvider = ({ children }) => {
         logOut,
         user,
         profile,
+        loading,
       }}
     >
-      {/* ensures all child components render normally, but now have access to these values via the context. */}
+      {/* All child components can now access auth state and functions */}
       {children}
     </AuthContext.Provider>
   );
 };
 
-// create a custom Hook
+/**
+ * Custom Hook: useAuth (exported as UserAuth for backward compatibility)
+ * 
+ * Provides easy access to authentication context in any component
+ * 
+ * Usage example:
+ * const { user, profile, googleSignIn, logOut, loading } = UserAuth();
+ * 
+ * @returns {Object} Auth context value with user, profile, functions, and loading state
+ */
 export const UserAuth = () => {
   return useContext(AuthContext);
 };
-// Example use: const { user, googleSignIn, logOut } = UserAuth();

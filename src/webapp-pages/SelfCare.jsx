@@ -1,20 +1,45 @@
+/**
+ * SelfCare Component
+ * 
+ * Main self-care dashboard page that displays four key mental wellness features:
+ * - Breathing Exercises: Guided breathing techniques for stress reduction
+ * - Guided Videos: Professional meditation and mindfulness content
+ * - Journal Entries: Private journaling space for emotional expression
+ * - Goals: Interactive goal tracking and achievement visualization
+ * 
+ * Features responsive grid layout and theme-aware styling (earthy/cool themes)
+ */
+
 import React from "react";
-import UntiltNavBar from "../components/UntiltNavBar";
+import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 
-// Import icon images
+// Import icon images for self-care features
 import breathingIcon from "../assets/breathing.png";
 import videoIcon from "../assets/video.png";
 import journalIcon from "../assets/journal.png";
-import goals from "../assets/goals.png"; // Using logo as placeholder for goals until goals.png is added
+import goals from "../assets/goals.png";
 
+/**
+ * SelfCareCard Component
+ * 
+ * Reusable card component for displaying individual self-care features
+ * Includes hover effects, theme-aware styling, and click navigation
+ * 
+ * @param {string} title - Card title
+ * @param {string} description - Feature description text
+ * @param {string} iconSrc - Path to feature icon image
+ * @param {string} iconAlt - Alt text for icon
+ * @param {function} onClick - Navigation handler when card is clicked
+ * @param {boolean} isEarthy - Theme flag (true = earthy, false = cool)
+ */
 const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy }) => (
   <div
     className={`group relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer ${
       isEarthy
-        ? "bg-gradient-to-br from-cream-100 to-tan-50 border-2 border-tan-300"
-        : "bg-gradient-to-br from-white to-pale-lavender border-2 border-cool-grey"
+        ? "bg-linear-to-br from-cream-100 to-tan-50 border-2 border-tan-300"
+        : "bg-pale-lavender border-2 border-blue-grey"
     }`}
     onClick={onClick}
   >
@@ -39,14 +64,14 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
           className={`mb-3 text-2xl font-bold transition-colors text-center ${
             isEarthy
               ? "text-brown-800 group-hover:text-rust-600"
-              : "text-charcoal-grey group-hover:text-slate-blue"
+              : "text-gray-900 group-hover:text-light-lavender"
           }`}
         >
           {title}
         </h2>
         <p
           className={`mb-4 text-sm leading-relaxed text-center ${
-            isEarthy ? "text-brown-600" : "text-slate-blue"
+            isEarthy ? "text-brown-600" : "text-gray-700"
           }`}
         >
           {description}
@@ -59,7 +84,7 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
           className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 ${
             isEarthy
               ? "bg-rust-500 hover:bg-rust-600 text-white"
-              : "bg-slate-blue hover:bg-charcoal-grey text-white"
+              : "bg-light-lavender hover:bg-medium-lavender text-gray-900"
           } shadow-md hover:shadow-lg transform hover:scale-105`}
         >
           Explore →
@@ -69,7 +94,7 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
       {/* Hover effect overlay */}
       <div
         className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl transition-opacity duration-300 opacity-0 group-hover:opacity-20 ${
-          isEarthy ? "bg-rust-400" : "bg-slate-blue"
+          isEarthy ? "bg-rust-400" : "bg-light-lavender"
         }`}
         style={{ transform: "translate(50%, -50%)" }}
       ></div>
@@ -77,11 +102,22 @@ const SelfCareCard = ({ title, description, iconSrc, iconAlt, onClick, isEarthy 
   </div>
 );
 
+/**
+ * Main SelfCare Page Component
+ * 
+ * Renders the self-care dashboard with all available features
+ * Manages theme state and navigation to individual feature pages
+ */
 export const SelfCare = () => {
+  // Get current theme from ThemeContext
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  
+  // React Router navigation hook
   const navigate = useNavigate();
 
+  // Configuration array for all self-care features
+  // Each feature defines its display content and navigation path
   const selfCareFeatures = [
     {
       title: "Breathing Exercises",
@@ -119,24 +155,21 @@ export const SelfCare = () => {
 
       <div
         className={`min-h-screen px-4 pt-24 pb-12 ${
-          isEarthy ? "bg-cream-100" : "bg-pale-lavender"
+          isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
         }`}
-        style={{
-          backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
-        }}
       >
         {/* Header Section */}
         <div className="max-w-7xl mx-auto mb-12 text-center">
           <h1
             className={`text-5xl font-bold mb-4 ${
-              isEarthy ? "text-brown-800" : "text-charcoal-grey"
+              isEarthy ? "text-brown-800" : "text-white"
             }`}
           >
             Your Self-Care Toolkit
           </h1>
           <p
             className={`text-lg max-w-2xl mx-auto ${
-              isEarthy ? "text-brown-600" : "text-slate-blue"
+              isEarthy ? "text-brown-600" : "text-purple-200"
             }`}
           >
             Discover personalized tools and resources to support your mental wellness journey. 
@@ -159,46 +192,7 @@ export const SelfCare = () => {
               />
             ))}
           </div>
-        </div>
-        
-
-        {/* Bottom CTA Section
-        <div className="max-w-4xl mx-auto mt-16 text-center">
-          <div
-            className={`p-8 rounded-2xl shadow-lg ${
-              isEarthy
-                ? "bg-gradient-to-r from-terracotta-200 to-tan-200 border-2 border-tan-400"
-                : "bg-gradient-to-r from-pale-lavender to-white border-2 border-cool-grey"
-            }`}
-          >
-            <h3
-              className={`text-2xl font-bold mb-3 ${
-                isEarthy ? "text-brown-800" : "text-charcoal-grey"
-              }`}
-            >
-              Need Additional Support?
-            </h3>
-            <p
-              className={`mb-6 ${
-                isEarthy ? "text-brown-700" : "text-slate-blue"
-              }`}
-            >
-              Connect with licensed therapists, join supportive communities, or explore AI-powered resources.
-            </p>
-            <button
-              onClick={() => navigate("/dashboard")}
-              className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
-                isEarthy
-                  ? "bg-rust-500 hover:bg-rust-600 text-white"
-                  : "bg-slate-blue hover:bg-charcoal-grey text-white"
-              }`}
-            >
-              Explore More Resources
-            </button>
-          </div>
-        </div> 
-        */}
-            
+        </div>        
       </div>
     </>
   );

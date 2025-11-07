@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { db } from "../src/firebase";
+import { db } from "../../src/firebase";
 import { doc, updateDoc } from "firebase/firestore";
-import { useTheme } from "../contexts/ThemeContext";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export default function EditProfile({ userId, profile, onSave, onCancel }) {
   const { currentTheme } = useTheme();
@@ -77,7 +77,7 @@ export default function EditProfile({ userId, profile, onSave, onCancel }) {
         className={`border rounded px-3 py-2 opacity-75 cursor-not-allowed ${
           isEarthy
             ? "border-tan-200 bg-cream-200 text-brown-700"
-            : "border-cool-grey bg-blue-grey/10 text-charcoal-grey"
+            : "border-purple-200 bg-purple-50 text-gray-900"
         }`}
       />
 
@@ -87,7 +87,7 @@ export default function EditProfile({ userId, profile, onSave, onCancel }) {
           className={`px-5 py-2 rounded font-semibold transition ${
             isEarthy
               ? "bg-rust-500 hover:bg-rust-600 text-white"
-              : "bg-slate-blue hover:bg-charcoal-grey text-white"
+              : "bg-[#c7b4e2] hover:bg-[#b49fd3] text-gray-900"
           }`}
         >
           Save Changes

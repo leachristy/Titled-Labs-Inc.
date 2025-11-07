@@ -2,16 +2,19 @@
 
 /* Global transition for smooth theme switching */
 * {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Cool color palette variables */
 :root {
-  --pale-lavender: #DFD2D5;
-  --cool-grey: #ABAAC0;
-  --blue-grey: #8090B0;
-  --slate-blue: #646F89;
-  --charcoal-grey: #373E4F;
+  --pale-lavender: #dfd2d5;
+  --cool-grey: #abaac0;
+  --blue-grey: #8090b0;
+  --slate-blue: #646f89;
+  --charcoal-grey: #373e4f;
+  --light-lavender: #c7b4e2;
+  --medium-lavender: #b49fd3;
 }
 
 /* Theme toggle button */
@@ -30,6 +33,17 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: transparent;
+}
+
+/* Earthy theme - moon icon color (purple) */
+.theme-earthy .theme-toggle {
+  color: rust-600;
+}
+
+/* Cool theme - sun icon color (amber/orange) */
+.theme-cool .theme-toggle {
+  color: #ffffff;
 }
 
 .theme-toggle:hover {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import UntiltNavBar from "../../components/UntiltNavBar";
+import UntiltNavBar from "../../components/navigation/UntiltNavBar";
 
 export default function BreathingExercises() {
   const { currentTheme } = useTheme();

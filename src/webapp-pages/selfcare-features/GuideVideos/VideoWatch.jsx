@@ -17,7 +17,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import UntiltNavBar from "../../../components/UntiltNavBar";
+import UntiltNavBar from "../../../components/navigation/UntiltNavBar";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { UserAuth } from "../../../contexts/AuthContext";
 

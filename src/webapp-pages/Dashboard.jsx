@@ -1,9 +1,9 @@
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
-import UntiltNavBar from "../components/UntiltNavBar";
+import UntiltNavBar from "../components/navigation/UntiltNavBar";
 
 export default function Dashboard() {
-  const { user, profile } = UserAuth();
+  const { user, profile, loading } = UserAuth();
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
@@ -15,11 +15,8 @@ export default function Dashboard() {
       {/* push content down from fixed navbar */}
       <div
         className={`min-h-screen pt-32 ${
-          isEarthy ? "bg-cream-100" : "bg-pale-lavender"
+          isEarthy ? "bg-cream-100" : "bg-[#373E4F]"
         }`}
-        style={{
-          backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
-        }}
       >
         <div className="max-w-4xl px-4 mx-auto text-center">
           <div className="mb-8">
@@ -27,21 +24,19 @@ export default function Dashboard() {
               className={`rounded-lg shadow-md p-6 ${
                 isEarthy
                   ? "bg-cream-200 text-brown-800"
-                  : "bg-white text-slate-blue"
+                  : "bg-[#DFD2D5] text-gray-900"
               }`}
-              style={{
-                backgroundColor: isEarthy ? undefined : "var(--white)",
-                color: isEarthy ? undefined : "var(--slate-blue)",
-              }}
             >
               <p className="mb-2 text-2xl font-semibold">
                 Welcome{", "}
-                {[profile?.firstName, profile?.lastName]
-                  .filter(Boolean)
-                  .join(" ") || "Guest"}
+                {profile?.firstName
+                  ? `${profile.firstName}${profile.lastName ? " " + profile.lastName : ""}`
+                  : user?.displayName || "there"}
                 {"!"}
               </p>
-              <p className="text-lg opacity-80">New features on the way!</p>
+              <p className="text-lg opacity-80">
+                Explore your wellness tools and resources
+              </p>
             </div>
           </div>
         </div>

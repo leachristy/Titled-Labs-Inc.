@@ -3,13 +3,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import ThemeToggle from "../components/ThemeToggle";
+import ThemeToggle from "../components/ui/ThemeToggle";
 import { db, auth } from "../src/firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { deleteUser, signOut } from "firebase/auth";
-import EditProfile from "../components/EditProfile";
-import BadgeGallery from "../components/BadgeGallery";
-import Confirmation from "../components/Confirmation";
+import EditProfile from "../components/forms/EditProfile";
+import BadgeGallery from "../components/cards/BadgeGallery";
+import Confirmation from "../components/ui/Confirmation";
 import defaultPic from "../assets/default-profile.jpg";
 
 export default function ProfilePage() {
@@ -90,7 +90,7 @@ export default function ProfilePage() {
           className={`px-4 py-2 rounded font-semibold transition ${
             isEarthy
               ? "bg-rust-500 hover:bg-rust-600 text-white"
-              : "bg-slate-blue hover:bg-charcoal-grey text-white"
+              : "bg-light-lavender hover:bg-medium-lavender text-white"
           }`}
         >
           ← Back to Dashboard
@@ -101,7 +101,7 @@ export default function ProfilePage() {
       {message && (
         <div
           className={`w-full max-w-lg text-center py-3 px-4 rounded mb-6 ${
-            isEarthy ? "bg-tan-400 text-white" : "bg-slate-blue text-white"
+            isEarthy ? "bg-tan-400 text-white" : "bg-light-lavender text-white"
           }`}
         >
           {message}
@@ -132,7 +132,7 @@ export default function ProfilePage() {
             {/* Email */}
             <p
               className={`text-sm mb-3 ${
-                isEarthy ? "text-brown-600" : "text-slate-blue"
+                isEarthy ? "text-brown-600" : "text-light-lavender"
               }`}
             >
               {profile.email}
@@ -148,7 +148,7 @@ export default function ProfilePage() {
                 className={`px-5 py-2 rounded font-semibold transition ${
                   isEarthy
                     ? "bg-rust-500 hover:bg-rust-600 text-white"
-                    : "bg-slate-blue hover:bg-charcoal-grey text-white"
+                    : "bg-light-lavender hover:bg-medium-lavender text-white"
                 }`}
               >
                 Edit Profile
@@ -158,7 +158,7 @@ export default function ProfilePage() {
                 className={`px-5 py-2 rounded font-semibold transition ${
                   isEarthy
                     ? "bg-brown-700 hover:bg-rust-500 text-white"
-                    : "bg-charcoal-grey hover:bg-slate-blue text-white"
+                    : "bg-charcoal-grey hover:bg-light-lavender text-white"
                 }`}
               >
                 Delete Account

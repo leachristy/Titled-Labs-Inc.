@@ -24,13 +24,13 @@ export const goalStyles = {
     custom: (isEarthy) => `${
       isEarthy
         ? "bg-terracotta-400 hover:bg-terracotta-500"
-        : "bg-blue-grey hover:bg-slate-blue"
+        : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
     } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`,
 
     archive: (isEarthy) => `${
       isEarthy
         ? "bg-tan-500 hover:bg-tan-600"
-        : "bg-cool-grey hover:bg-slate-blue"
+        : "bg-cool-grey hover:bg-[#b49fd3]"
     } text-white px-6 py-3 rounded-lg font-semibold shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`,
 
     complete: (isEarthy, isCompleted) => `absolute -top-2 -left-2 w-6 h-6 rounded border-2 ${
@@ -46,7 +46,7 @@ export const goalStyles = {
     archiveSmall: (isEarthy) => `w-6 h-6 rounded-full ${
       isEarthy
         ? "bg-tan-500 hover:bg-tan-600"
-        : "bg-cool-grey hover:bg-slate-blue"
+        : "bg-cool-grey hover:bg-[#b49fd3]"
     } text-white flex items-center justify-center text-xs shadow-md transition-colors`,
 
     archiveBottomTick: (isEarthy) => `absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center text-lg font-bold shadow-lg transition-all z-10 cursor-pointer hover:scale-110`,
@@ -60,7 +60,7 @@ export const goalStyles = {
     textSize: (isEarthy) => `px-3 py-1 rounded text-xs font-semibold ${
       isEarthy
         ? "bg-terracotta-400 hover:bg-terracotta-500"
-        : "bg-blue-grey hover:bg-slate-blue"
+        : "bg-[#c7b4e2] hover:bg-[#b49fd3]"
     } text-white transition-colors`,
 
     save: (isEarthy) => `flex-1 text-xs py-1 px-2 rounded ${
@@ -72,7 +72,7 @@ export const goalStyles = {
     cancel: (isEarthy) => `flex-1 text-xs py-1 px-2 rounded ${
       isEarthy
         ? "bg-tan-300 hover:bg-tan-400 text-brown-800"
-        : "bg-cool-grey hover:bg-slate-blue text-white"
+        : "bg-cool-grey hover:bg-[#b49fd3] text-white"
     } font-semibold transition-colors`
   },
 
@@ -160,13 +160,13 @@ export const goalStyles = {
     cancelButton: (isEarthy) => `flex-1 ${
       isEarthy
         ? "bg-tan-300 hover:bg-tan-400 text-brown-800"
-        : "bg-cool-grey hover:bg-slate-blue text-white"
+        : "bg-cool-grey hover:bg-[#b49fd3] text-white"
     } px-4 py-2 rounded-lg font-semibold transition-colors`,
 
     closeButton: (isEarthy) => `w-full ${
       isEarthy
         ? "bg-tan-300 hover:bg-tan-400 text-brown-800"
-        : "bg-cool-grey hover:bg-slate-blue text-white"
+        : "bg-cool-grey hover:bg-[#b49fd3] text-white"
     } px-4 py-2 rounded-lg font-semibold transition-colors`,
 
     presetButton: (isEarthy) => `text-left p-3 rounded-lg border-2 ${

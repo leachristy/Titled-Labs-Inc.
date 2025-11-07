@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import UntiltNavBar from "../../components/UntiltNavBar";
+import UntiltNavBar from "../../components/navigation/UntiltNavBar";
 import { useTheme } from "../../contexts/ThemeContext";
 import { goalStyles, getRelativeFontSize, getTextScaleLabel } from "../app-styles/Goal.styles";
 import { db, auth } from "../../src/firebase";
@@ -358,7 +358,7 @@ export default function Goals() {
             className={`mb-6 px-4 py-2 rounded-lg flex items-center gap-2 font-medium shadow-sm ${
               isEarthy
                 ? "bg-tan-300 hover:bg-tan-400 text-brown-900"
-                : "bg-indigo-200 hover:bg-indigo-300 text-indigo-900"
+                : "bg-[#c7b4e2] hover:bg-[#b49fd3] text-indigo-900"
             } transition`}
           >
             ← Back to Self-Care
@@ -444,7 +444,7 @@ export default function Goals() {
                           className={goalStyles.card.pin(isEarthy)}
                           title="Click to switch to tape"
                         >
-                          <div className="w-2 h-2 bg-white rounded-full mx-auto mt-2"></div>
+                          <div className="w-2 h-2 bg-[#3d2b5e] rounded-full mx-auto mt-2"></div>
                         </button>
                       ) : (
                         <button
@@ -672,13 +672,13 @@ export default function Goals() {
                       className={`p-4 rounded-lg border-2 ${
                         isEarthy
                           ? "border-tan-300 bg-cream-50"
-                          : "border-cool-grey bg-pale-lavender"
+                          : "border-cool-grey bg-[#373E4F]"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
                           <p className={`font-medium mb-1 ${
-                            isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                            isEarthy ? "text-brown-800" : "text-white"
                           }`}>
                             {goal.text}
                           </p>
@@ -709,7 +709,7 @@ export default function Goals() {
                             className={`px-3 py-1 rounded text-xs font-semibold ${
                               isEarthy
                                 ? "bg-tan-300 hover:bg-tan-400 text-brown-800"
-                                : "bg-cool-grey hover:bg-slate-blue text-white"
+                                : "bg-cool-grey hover:bg-[#b49fd3] text-white"
                             } transition-colors`}
                             title="Delete permanently"
                           >
