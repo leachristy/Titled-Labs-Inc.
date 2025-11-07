@@ -135,11 +135,11 @@ export default function UntiltNavBar() {
                               ? `${
                                   isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
                                 } text-white`
-                                : `${
-                                    isEarthy
-                                      ? "text-brown-700 hover:bg-tan-100 hover:text-rust-500"
-                                      : "text-white hover:bg-[#646F89] hover:text-[#DFD2D5]"
-                                  }`
+                              : `${
+                                  isEarthy
+                                    ? "text-brown-700 hover:bg-tan-100 hover:text-rust-500"
+                                    : "text-white hover:bg-[#646F89] hover:text-[#DFD2D5]"
+                                }`
                           }`
                         }
                       >
@@ -158,7 +158,7 @@ export default function UntiltNavBar() {
                         ? `${
                             isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
                           } text-white`
-                          : `${
+                        : `${
                             isEarthy
                               ? "text-brown-700 hover:text-rust-500"
                               : "text-purple-200 hover:text-[#c7b4e2]"
@@ -360,13 +360,7 @@ export default function UntiltNavBar() {
               className={({ isActive }) =>
                 `block w-full text-center px-4 py-3 rounded-md text-base font-medium transition ${
                   isActive
-<<<<<<< HEAD:src/components/UntiltNavBar.jsx
                     ? `${isEarthy ? "bg-rust-500" : "bg-slate-blue"} text-white`
-=======
-                    ? `${
-                        isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
-                      } text-white`
->>>>>>> 54c4048046e2e7a3653c22edaa8d5b1d3f92f638:src/components/navigation/UntiltNavBar.jsx
                     : `${
                         isEarthy
                           ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"

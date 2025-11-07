@@ -152,7 +152,7 @@ export default function Community() {
     try {
       // First, get the current document
       const postDoc = await getDoc(postRef);
-      
+
       if (!postDoc.exists()) {
         console.error("Post does not exist!");
         alert("Post not found. Please refresh the page.");
@@ -161,12 +161,12 @@ export default function Community() {
 
       const currentComments = postDoc.data().comments || [];
       const updatedComments = [...currentComments, newComment];
-      
+
       // Update with the new comments array
       await updateDoc(postRef, {
         comments: updatedComments,
       });
-      
+
       setCommentText({ ...commentText, [postId]: "" });
       console.log("Comment added successfully!");
     } catch (error) {
@@ -311,7 +311,7 @@ export default function Community() {
     <>
       <title>Untilt - Community</title>
       <UntiltNavBar />
-      <div  
+      <div
         className={`min-h-screen pt-20 pb-12 ${
           isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
         }`}
@@ -341,7 +341,9 @@ export default function Community() {
             <div className="hidden lg:block lg:col-span-1">
               <div
                 className={`rounded-lg shadow-lg p-4 ${
-                  isEarthy ? "bg-white border-tan-200" : "bg-pale-lavender border-blue-grey"
+                  isEarthy
+                    ? "bg-white border-tan-200"
+                    : "bg-pale-lavender border-blue-grey"
                 } border sticky top-24`}
               >
                 <h2
@@ -428,7 +430,9 @@ export default function Community() {
               {isCategoryMenuOpen && (
                 <div
                   className={`rounded-lg shadow-lg p-3 mb-4 ${
-                    isEarthy ? "bg-white border-tan-200" : "bg-pale-lavender border-blue-grey"
+                    isEarthy
+                      ? "bg-white border-tan-200"
+                      : "bg-pale-lavender border-blue-grey"
                   } border`}
                 >
                   <div className="grid grid-cols-2 gap-2">
@@ -463,7 +467,9 @@ export default function Community() {
               {isCreatingPost && (
                 <div
                   className={`rounded-lg shadow-lg p-6 mb-6 ${
-                    isEarthy ? "bg-white border-tan-200" : "bg-pale-lavender border-blue-grey"
+                    isEarthy
+                      ? "bg-white border-tan-200"
+                      : "bg-pale-lavender border-blue-grey"
                   } border`}
                 >
                   <h2
@@ -573,7 +579,9 @@ export default function Community() {
               {filteredPosts.length === 0 ? (
                 <div
                   className={`rounded-lg shadow-lg p-12 text-center ${
-                    isEarthy ? "bg-white border-tan-200" : "bg-pale-lavender border-blue-grey"
+                    isEarthy
+                      ? "bg-white border-tan-200"
+                      : "bg-pale-lavender border-blue-grey"
                   } border`}
                 >
                   <p
@@ -590,7 +598,9 @@ export default function Community() {
                     <div
                       key={post.id}
                       className={`rounded-lg shadow-lg ${
-                        isEarthy ? "bg-white border-tan-200" : "bg-pale-lavender border-blue-grey"
+                        isEarthy
+                          ? "bg-white border-tan-200"
+                          : "bg-pale-lavender border-blue-grey"
                       } border overflow-hidden`}
                     >
                       <div className="flex">
@@ -823,13 +833,9 @@ export default function Community() {
                                         </button>
                                         <span
                                           className={`text-sm font-semibold my-0.5 ${
-<<<<<<< HEAD
                                             isEarthy
                                               ? "text-brown-800"
                                               : "text-charcoal-grey"
-=======
-                                            isEarthy ? "text-brown-800" : "text-gray-900"
->>>>>>> 54c4048046e2e7a3653c22edaa8d5b1d3f92f638
                                           }`}
                                         >
                                           {getVoteCount(
@@ -870,7 +876,6 @@ export default function Community() {
 
                                       {/* Comment Content */}
                                       <div className="flex-1 p-3">
-<<<<<<< HEAD
                                         <div className="flex items-center space-x-3">
                                           {/* Avatar clickable */}
                                           <Link
@@ -881,13 +886,6 @@ export default function Community() {
                                                 : `/profile/${comment.authorId}`
                                             }
                                             className="flex-shrink-0"
-=======
-                                        <div className="flex items-start space-x-3">
-                                          <div
-                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 ${
-                                              isEarthy ? "bg-rust-500" : "bg-light-lavender"
-                                            }`}
->>>>>>> 54c4048046e2e7a3653c22edaa8d5b1d3f92f638
                                           >
                                             <div
                                               className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${

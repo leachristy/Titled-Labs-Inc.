@@ -15,12 +15,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../src/firebase";
-<<<<<<< HEAD
-import UntiltNavBar from "../components/UntiltNavBar";
-=======
-import { useNavigate } from "react-router-dom";
-import UntiltNavBar from '../components/navigation/UntiltNavBar';
->>>>>>> 54c4048046e2e7a3653c22edaa8d5b1d3f92f638
+import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
 

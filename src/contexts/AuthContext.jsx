@@ -1,16 +1,16 @@
 /**
  * Authentication Context for Firebase Authentication
- * 
+ *
  * Provides global authentication state and functions throughout the app
  * Handles Google OAuth, email/password authentication, and user profile management
  * Syncs with Firestore to maintain user profile data
- * 
+ *
  * Available functions:
  * - googleSignIn(): Sign in with Google OAuth popup
  * - doCreateUserWithEmailAndPassword(): Create new account with email/password
  * - doSignInWithEmailAndPassword(): Sign in with existing email/password
  * - logOut(): Sign out current user
- * 
+ *
  * Available state:
  * - user: Firebase Auth user object
  * - profile: Firestore user document (firstName, lastName, photoUrl, etc.)
@@ -39,10 +39,10 @@ const AuthContext = createContext();
 
 /**
  * AuthContextProvider Component
- * 
+ *
  * Wraps the entire app to provide authentication state and functions to all child components
  * Listens for Firebase auth state changes and syncs with Firestore user profiles
- * 
+ *
  * @param {ReactNode} children - All components wrapped by this provider
  */
 export const AuthContextProvider = ({ children }) => {
@@ -50,7 +50,6 @@ export const AuthContextProvider = ({ children }) => {
   const [profile, setProfile] = useState(null); // Firestore user document
   const [loading, setLoading] = useState(true); // Loading state for initial auth check
 
-<<<<<<< HEAD
   // Detect user online, offline logic:
   useEffect(() => {
     // only run when we know which user is logged in
@@ -104,22 +103,13 @@ export const AuthContextProvider = ({ children }) => {
   }, [user, user?.uid]);
 
   // sign in function
-=======
-  /**
-   * Google Sign-In Function
-   * 
-   * Opens Google OAuth popup, authenticates user, and creates/updates their Firestore profile
-   * Extracts first and last name from Google display name
-   * Stores user data in 'users' collection with Google profile information
-   */
->>>>>>> 54c4048046e2e7a3653c22edaa8d5b1d3f92f638
   const googleSignIn = async () => {
     // create new instance of google provider
     const provider = new GoogleAuthProvider();
-    
+
     // Open Google Login Popup and authenticate user
     const { user } = await signInWithPopup(auth, provider);
-    
+
     // Alternative: Redirect method (currently not used due to bugs)
     // signInWithRedirect(auth, provider);
 
@@ -148,9 +138,9 @@ export const AuthContextProvider = ({ children }) => {
 
   /**
    * Email/Password Sign-Up Function
-   * 
+   *
    * Creates a new Firebase Auth account and Firestore user profile
-   * 
+   *
    * @param {string} firstName - User's first name
    * @param {string} lastName - User's last name
    * @param {string} email - User's email address
@@ -182,9 +172,9 @@ export const AuthContextProvider = ({ children }) => {
 
   /**
    * Email/Password Sign-In Function
-   * 
+   *
    * Signs in existing user with email and password credentials
-   * 
+   *
    * @param {string} email - User's email address
    * @param {string} password - User's password
    * @returns {Promise} Firebase auth promise
@@ -195,7 +185,7 @@ export const AuthContextProvider = ({ children }) => {
 
   // ------------------------------------------------
   // Additional functions for future implementation:
-  // 
+  //
   // Password Reset:
   // const doPasswordReset = (email) => {
   //   return sendPasswordResetEmail(auth, email);
@@ -222,7 +212,7 @@ export const AuthContextProvider = ({ children }) => {
 
   /**
    * Logout Function
-   * 
+   *
    * Signs out the current user from Firebase Auth
    * Auth state listener will automatically update user/profile to null
    */
@@ -232,7 +222,7 @@ export const AuthContextProvider = ({ children }) => {
 
   /**
    * Authentication State Listener
-   * 
+   *
    * Monitors Firebase Auth state changes (login/logout)
    * When user logs in, subscribes to their Firestore profile document
    * Automatically updates user and profile state in real-time
@@ -242,23 +232,26 @@ export const AuthContextProvider = ({ children }) => {
     // Listen for Firebase Auth state changes
     const unsubAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      
+
       // If no user logged in, clear profile and stop loading
       if (!currentUser) {
         setProfile(null);
         setLoading(false);
         return;
       }
-      
+
       // Subscribe to user's Firestore profile document for real-time updates
-      const unsubProfile = onSnapshot(doc(db, "users", currentUser.uid), (snap) => {
-        setProfile(snap.data() || null);
-        setLoading(false);
-      });
-      
+      const unsubProfile = onSnapshot(
+        doc(db, "users", currentUser.uid),
+        (snap) => {
+          setProfile(snap.data() || null);
+          setLoading(false);
+        }
+      );
+
       return unsubProfile;
     });
-    
+
     // Cleanup: Unsubscribe from auth listener when component unmounts
     return () => unsubAuth();
   }, []);
@@ -284,12 +277,12 @@ export const AuthContextProvider = ({ children }) => {
 
 /**
  * Custom Hook: useAuth (exported as UserAuth for backward compatibility)
- * 
+ *
  * Provides easy access to authentication context in any component
- * 
+ *
  * Usage example:
  * const { user, profile, googleSignIn, logOut, loading } = UserAuth();
- * 
+ *
  * @returns {Object} Auth context value with user, profile, functions, and loading state
  */
 export const UserAuth = () => {
