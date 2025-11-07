@@ -170,52 +170,134 @@ export const FriendsPage = () => {
     <>
       <UntiltNavBar />
       <div
-        className={`min-h-screen ${
-          isEarthy ? "bg-cream-100" : "bg-pale-lavender"
+        className={`min-h-screen pt-20 pb-12 ${
+          isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
         }`}
-        style={{
-          backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
-        }}
       >
-        <div className="max-w-4xl p-6 mx-auto mt-20">
-          <h1 className="mb-4 text-2xl font-bold">Friends</h1>
+        <div className="max-w-4xl p-6 mx-auto">
+          <h1
+            className={`text-3xl font-bold mb-6 ${
+              isEarthy ? "text-brown-800" : "text-white"
+            }`}
+          >
+            Friends
+          </h1>
 
-          {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+          {error && (
+            <div
+              className={`mb-4 p-4 rounded-lg ${
+                isEarthy
+                  ? "bg-red-50 text-red-800 border border-red-200"
+                  : "bg-red-900/20 text-red-200 border border-red-700"
+              }`}
+            >
+              {error}
+            </div>
+          )}
 
           {loading ? (
-            <p>Loading friends...</p>
+            <div
+              className={`rounded-lg shadow-lg p-12 text-center ${
+                isEarthy
+                  ? "bg-white border-tan-200"
+                  : "bg-pale-lavender border-blue-grey"
+              } border`}
+            >
+              <div className="flex flex-col items-center justify-center">
+                <svg
+                  className={`animate-spin h-12 w-12 mb-4 ${
+                    isEarthy ? "text-rust-500" : "text-light-lavender"
+                  }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                <p
+                  className={`text-lg ${
+                    isEarthy ? "text-brown-600" : "text-gray-300"
+                  }`}
+                >
+                  Loading friends...
+                </p>
+              </div>
+            </div>
           ) : (
             <>
               {/* Incoming requests */}
               <section className="mb-8">
-                <h2 className="mb-2 text-lg font-semibold">Friend Requests</h2>
+                <h2
+                  className={`text-xl font-semibold mb-4 ${
+                    isEarthy ? "text-brown-800" : "text-white"
+                  }`}
+                >
+                  Friend Requests
+                </h2>
                 {requests.length === 0 ? (
-                  <p className="text-sm text-gray-600">No pending requests.</p>
+                  <div
+                    className={`rounded-lg p-6 text-center ${
+                      isEarthy
+                        ? "bg-white border-tan-200 text-brown-600"
+                        : "bg-pale-lavender border-blue-grey text-blue-gray"
+                    } border shadow-md`}
+                  >
+                    <p>No pending requests.</p>
+                  </div>
                 ) : (
                   <div className="space-y-3">
                     {requests.map((req) => (
                       <div
                         key={req.id}
-                        className="flex items-center justify-between p-3 bg-white rounded-lg shadow"
+                        className={`flex items-center justify-between p-4 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl ${
+                          isEarthy
+                            ? "bg-white border-tan-200"
+                            : "bg-pale-lavender border-blue-grey"
+                        } border`}
                       >
                         <div
-                          className="flex items-center cursor-pointer"
+                          className="flex items-center cursor-pointer flex-1"
                           onClick={() => navigate(`/profile/${req.fromUid}`)}
                         >
-                          <div className="flex items-center justify-center w-10 h-10 mr-3 font-bold text-white bg-gray-400 rounded-full">
+                          <div
+                            className={`flex items-center justify-center w-12 h-12 mr-4 font-bold rounded-full ${
+                              isEarthy
+                                ? "bg-rust-200 text-rust-700"
+                                : "bg-light-lavender text-white"
+                            }`}
+                          >
                             {req.fromProfile?.firstName
                               ?.charAt(0)
                               ?.toUpperCase() || "U"}
                           </div>
                           <div>
-                            <p className="font-medium">
+                            <p
+                              className={`font-semibold ${
+                                isEarthy ? "text-brown-800" : "text-gray-900"
+                              }`}
+                            >
                               {req.fromProfile
                                 ? `${req.fromProfile.firstName || ""} ${
                                     req.fromProfile.lastName || ""
                                   }`
                                 : "Unknown User"}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p
+                              className={`text-sm ${
+                                isEarthy ? "text-brown-500" : "text-gray-600"
+                              }`}
+                            >
                               wants to be your friend
                             </p>
                           </div>
@@ -223,13 +305,21 @@ export const FriendsPage = () => {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleAccept(req)}
-                            className="px-3 py-1 text-sm text-white bg-green-600 rounded hover:bg-green-700"
+                            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition shadow-md hover:shadow-lg ${
+                              isEarthy
+                                ? "bg-green-600 hover:bg-green-700"
+                                : "bg-green-500 hover:bg-green-600"
+                            }`}
                           >
                             Accept
                           </button>
                           <button
                             onClick={() => handleDecline(req)}
-                            className="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700"
+                            className={`px-4 py-2 text-sm font-medium rounded-lg transition shadow-md hover:shadow-lg ${
+                              isEarthy
+                                ? "bg-tan-200 hover:bg-tan-300 text-brown-800"
+                                : "bg-gray-200 hover:bg-gray-300 text-charcoal-grey"
+                            }`}
                           >
                             Decline
                           </button>
@@ -242,36 +332,67 @@ export const FriendsPage = () => {
 
               {/* Friends list */}
               <section>
-                <h2 className="mb-2 text-lg font-semibold">Your Friends</h2>
+                <h2
+                  className={`text-xl font-semibold mb-4 ${
+                    isEarthy ? "text-brown-800" : "text-white"
+                  }`}
+                >
+                  Your Friends ({friends.length})
+                </h2>
                 {friends.length === 0 ? (
-                  <p className="text-sm text-gray-600">
-                    You don't have any friends yet.
-                  </p>
+                  <div
+                    className={`rounded-lg p-6 text-center ${
+                      isEarthy
+                        ? "bg-white border-tan-200 text-brown-600"
+                        : "bg-pale-lavender border-blue-grey text-blue-gray"
+                    } border shadow-md`}
+                  >
+                    <p>You don't have any friends yet.</p>
+                    <p className="text-sm mt-2 opacity-75">
+                      Start connecting with others in the community!
+                    </p>
+                  </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {friends.map((friend) => (
                       <div
                         key={friend.uid}
-                        className="flex items-center justify-between p-3 bg-white rounded-lg shadow cursor-pointer"
+                        className={`flex items-center p-4 rounded-lg shadow-lg cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+                          isEarthy
+                            ? "bg-white border-tan-200"
+                            : "bg-pale-lavender border-blue-grey"
+                        } border`}
                         onClick={() => navigate(`/profile/${friend.uid}`)}
                       >
-                        <div className="flex items-center">
-                          <div className="flex items-center justify-center w-10 h-10 mr-3 font-bold text-white bg-gray-400 rounded-full">
-                            {friend.firstName?.charAt(0)?.toUpperCase() || "U"}
-                          </div>
-                          <div>
-                            <p className="flex items-center font-medium">
-                              {renderStatusDot(friend)}
-                              <span>
-                                {friend.firstName} {friend.lastName}
-                              </span>
+                        <div
+                          className={`flex items-center justify-center w-12 h-12 mr-4 font-bold rounded-full shrink-0 ${
+                            isEarthy
+                              ? "bg-rust-200 text-rust-700"
+                              : "bg-light-lavender text-white"
+                          }`}
+                        >
+                          {friend.firstName?.charAt(0)?.toUpperCase() || "U"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className={`flex items-center font-semibold ${
+                              isEarthy ? "text-brown-800" : "text-gray-900"
+                            }`}
+                          >
+                            {renderStatusDot(friend)}
+                            <span className="truncate">
+                              {friend.firstName} {friend.lastName}
+                            </span>
+                          </p>
+                          {friend.bio && (
+                            <p
+                              className={`text-sm mt-1 truncate ${
+                                isEarthy ? "text-brown-500" : "text-gray-600"
+                              }`}
+                            >
+                              {friend.bio}
                             </p>
-                            {friend.bio && (
-                              <p className="text-xs text-gray-500">
-                                {friend.bio}
-                              </p>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </div>
                     ))}
