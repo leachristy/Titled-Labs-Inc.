@@ -13,7 +13,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth, db } from "../src/firebase.js";
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 
 // Create a React Context object that will hold the global authentication data: user info, login/logout functions
 const AuthContext = createContext();
@@ -23,6 +23,58 @@ const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState({});
   const [profile, setProfile] = useState(null); // Firestore user document
+
+  // Detect user online, offline logic:
+  useEffect(() => {
+    // only run when we know which user is logged in
+    if (!user || !user.uid) return;
+
+    const userRef = doc(db, "users", user.uid);
+
+    // mark online + update lastActive
+    const markOnline = () => {
+      setDoc(
+        userRef,
+        {
+          online: true,
+          lastActive: serverTimestamp(),
+        },
+        { merge: true }
+      ).catch(() => {});
+    };
+
+    // mark offline (fire-and-forget, no await)
+    const markOffline = () => {
+      setDoc(
+        userRef,
+        {
+          online: false,
+          lastActive: serverTimestamp(),
+        },
+        { merge: true }
+      ).catch(() => {});
+    };
+
+    // immediately mark online when this effect runs
+    markOnline();
+
+    // refresh presence every 60 seconds while the tab is open
+    const intervalId = setInterval(markOnline, 60_000);
+
+    // when user closes or reloads the tab
+    const handleBeforeUnload = () => {
+      markOffline();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // cleanup when user logs out or component unmounts
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      markOffline();
+    };
+  }, [user, user?.uid]);
 
   // sign in function
   const googleSignIn = async () => {

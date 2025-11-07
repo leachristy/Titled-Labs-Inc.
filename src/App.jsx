@@ -26,11 +26,11 @@ import Goals from "./webapp-pages/selfcare-features/Goal";
 import BreathingExercises from "./webapp-pages/selfcare-features/BreathingExercises";
 import GuidedVideos from "./webapp-pages/selfcare-features/GuideVideos/GuideVideos";
 import VideoWatch from "./webapp-pages/selfcare-features/GuideVideos/VideoWatch";
-import ProfilePage from "./pages/ProfilePage"
+import ProfilePage from "./pages/ProfilePage";
 import { FriendProfilePage } from "./pages/FriendProfilePage";
 import { ChatPage } from "./pages/ChatPage";
 import DirectMessages from "./webapp-pages/DirectMessages";
-
+import { FriendsPage } from "./webapp-pages/FriendsPage";
 
 export default function App() {
   return (
@@ -128,20 +128,21 @@ export default function App() {
                 </Protected>
               }
             />
-            <Route 
-              path="/profile/:uid" 
-              element={<FriendProfilePage />
-              } 
-            />
-            <Route 
-              path="/chat/:uid" element={<ChatPage />
-              }
-            />
+            <Route path="/profile/:uid" element={<FriendProfilePage />} />
+            <Route path="/chat/:uid" element={<ChatPage />} />
             <Route
               path="/profile"
               element={
                 <Protected>
                   <ProfilePage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/friends"
+              element={
+                <Protected>
+                  <FriendsPage />
                 </Protected>
               }
             />

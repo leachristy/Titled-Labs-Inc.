@@ -15,8 +15,8 @@ export default function UntiltNavBar() {
 
   const links = [
     { name: "Dashboard", path: "/dashboard" },
-    { 
-      name: "Self Care", 
+    {
+      name: "Self Care",
       path: "/selfcare",
       hasDropdown: true,
       subLinks: [
@@ -24,11 +24,12 @@ export default function UntiltNavBar() {
         { name: "Guided Videos", path: "/guide-videos" },
         { name: "Journal Entries", path: "/journal" },
         { name: "Goals", path: "/goals" },
-      ]
+      ],
     },
     { name: "AI Chat", path: "/aichat" },
     { name: "Community", path: "/community" },
     { name: "Direct Messages", path: "/messages" },
+    { name: "Friends", path: "/friends" },
   ];
 
   const handleSignOut = async () => {
@@ -69,8 +70,8 @@ export default function UntiltNavBar() {
           </NavLink>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-6">
-            {links.map((link) => (
+          <div className="items-center hidden space-x-6 lg:flex">
+            {links.map((link) =>
               link.hasDropdown ? (
                 <div
                   key={link.path}
@@ -168,13 +169,13 @@ export default function UntiltNavBar() {
                   {link.name}
                 </NavLink>
               )
-            ))}
+            )}
           </div>
 
           {/* Desktop User Display */}
-          <div className="hidden lg:flex items-center ml-6 space-x-3">
+          <div className="items-center hidden ml-6 space-x-3 lg:flex">
             <NavLink
-            to={"/profile"}
+              to={"/profile"}
               className={`${
                 isEarthy ? "text-brown-700" : "text-charcoal-grey"
               } px-3 py-2 rounded-md text-sm font-medium`}
@@ -241,7 +242,7 @@ export default function UntiltNavBar() {
               isEarthy ? "bg-cream-50" : "bg-white"
             } rounded-lg mx-2 mb-2`}
           >
-            {links.map((link) => (
+            {links.map((link) =>
               link.hasDropdown ? (
                 <div key={link.path}>
                   {/* Main Self Care Link with Toggle */}
@@ -266,7 +267,9 @@ export default function UntiltNavBar() {
                       {link.name}
                     </NavLink>
                     <button
-                      onClick={() => setIsSelfCareOpenMobile(!isSelfCareOpenMobile)}
+                      onClick={() =>
+                        setIsSelfCareOpenMobile(!isSelfCareOpenMobile)
+                      }
                       className={`px-3 py-3 ${
                         isEarthy
                           ? "text-brown-700 hover:text-rust-500"
@@ -297,7 +300,7 @@ export default function UntiltNavBar() {
                       isSelfCareOpenMobile ? "max-h-64" : "max-h-0"
                     }`}
                   >
-                    <div className="pl-6 space-y-1 mt-1">
+                    <div className="pl-6 mt-1 space-y-1">
                       {link.subLinks.map((subLink) => (
                         <NavLink
                           key={subLink.path}
@@ -348,7 +351,7 @@ export default function UntiltNavBar() {
                   {link.name}
                 </NavLink>
               )
-            ))}
+            )}
 
             {/* Mobile User Display */}
             <NavLink
@@ -357,9 +360,7 @@ export default function UntiltNavBar() {
               className={({ isActive }) =>
                 `block w-full text-center px-4 py-3 rounded-md text-base font-medium transition ${
                   isActive
-                    ? `${
-                        isEarthy ? "bg-rust-500" : "bg-slate-blue"
-                      } text-white`
+                    ? `${isEarthy ? "bg-rust-500" : "bg-slate-blue"} text-white`
                     : `${
                         isEarthy
                           ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"

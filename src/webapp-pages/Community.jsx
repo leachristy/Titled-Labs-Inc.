@@ -44,7 +44,10 @@ export default function Community() {
 
   // Fetch posts from Firebase
   useEffect(() => {
-    const q = query(collection(db, "communityPosts"), orderBy("createdAt", "desc"));
+    const q = query(
+      collection(db, "communityPosts"),
+      orderBy("createdAt", "desc")
+    );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const postsData = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -192,7 +195,12 @@ export default function Community() {
   };
 
   // Handle comment downvote
-  const handleCommentDownvote = async (postId, commentId, upvotes, downvotes) => {
+  const handleCommentDownvote = async (
+    postId,
+    commentId,
+    upvotes,
+    downvotes
+  ) => {
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
 
@@ -291,9 +299,9 @@ export default function Community() {
           backgroundColor: isEarthy ? undefined : "var(--pale-lavender)",
         }}
       >
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="px-4 mx-auto max-w-7xl">
           {/* Header */}
-          <div className="mb-8 mt-4">
+          <div className="mt-4 mb-8">
             <h1
               className={`text-4xl font-bold mb-2 ${
                 isEarthy ? "text-brown-800" : "text-charcoal-grey"
@@ -306,11 +314,12 @@ export default function Community() {
                 isEarthy ? "text-brown-600" : "text-slate-blue"
               }`}
             >
-              Share your experiences, ask questions, and support others in their wellness journey.
+              Share your experiences, ask questions, and support others in their
+              wellness journey.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
             {/* Sidebar - Desktop */}
             <div className="hidden lg:block lg:col-span-1">
               <div
@@ -359,7 +368,7 @@ export default function Community() {
             </div>
 
             {/* Mobile/Tablet Category Dropdown */}
-            <div className="lg:hidden col-span-1">
+            <div className="col-span-1 lg:hidden">
               <div className="flex gap-2 mb-4">
                 <button
                   onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
@@ -465,11 +474,13 @@ export default function Community() {
                             : "border-cool-grey focus:ring-slate-blue"
                         }`}
                       >
-                        {categories.filter((c) => c !== "All").map((category) => (
-                          <option key={category} value={category}>
-                            {category}
-                          </option>
-                        ))}
+                        {categories
+                          .filter((c) => c !== "All")
+                          .map((category) => (
+                            <option key={category} value={category}>
+                              {category}
+                            </option>
+                          ))}
                       </select>
                     </div>
                     <div>
@@ -574,7 +585,11 @@ export default function Community() {
                         >
                           <button
                             onClick={() =>
-                              handleUpvote(post.id, post.upvotes, post.downvotes)
+                              handleUpvote(
+                                post.id,
+                                post.upvotes,
+                                post.downvotes
+                              )
                             }
                             className={`transition ${
                               post.upvotes?.includes(user.uid)
@@ -603,7 +618,11 @@ export default function Community() {
                           </span>
                           <button
                             onClick={() =>
-                              handleDownvote(post.id, post.upvotes, post.downvotes)
+                              handleDownvote(
+                                post.id,
+                                post.upvotes,
+                                post.downvotes
+                              )
                             }
                             className={`transition ${
                               post.downvotes?.includes(user.uid)
@@ -644,20 +663,22 @@ export default function Community() {
                                   isEarthy ? "text-brown-600" : "text-gray-600"
                                 }`}
                               >
-                                Posted by {" "}
+                                Posted by{" "}
                                 <Link
                                   to={`/profile/${post.authorId}`}
                                   className="font-semibold hover:underline"
-                                  >
-                                    {post.authorName}
-                                </Link>{" "} 
+                                >
+                                  {post.authorName}
+                                </Link>{" "}
                                 • {timeAgo(post.createdAt)}
                               </span>
                             </div>
                             {user.uid === post.authorId && (
                               <button
-                                onClick={() => handleDeletePost(post.id, post.authorId)}
-                                className="text-red-500 hover:text-red-700 text-sm font-medium"
+                                onClick={() =>
+                                  handleDeletePost(post.id, post.authorId)
+                                }
+                                className="text-sm font-medium text-red-500 hover:text-red-700"
                               >
                                 Delete
                               </button>
@@ -707,15 +728,13 @@ export default function Community() {
                                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                                 />
                               </svg>
-                              <span>
-                                {post.comments?.length || 0} Comments
-                              </span>
+                              <span>{post.comments?.length || 0} Comments</span>
                             </button>
                           </div>
 
                           {/* Comments Section */}
                           {expandedPost === post.id && (
-                            <div className="mt-4 pt-4 border-t">
+                            <div className="pt-4 mt-4 border-t">
                               {/* Add Comment */}
                               <div className="mb-4">
                                 <textarea
@@ -787,7 +806,9 @@ export default function Community() {
                                         </button>
                                         <span
                                           className={`text-sm font-semibold my-0.5 ${
-                                            isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                                            isEarthy
+                                              ? "text-brown-800"
+                                              : "text-charcoal-grey"
                                           }`}
                                         >
                                           {getVoteCount(
@@ -805,7 +826,9 @@ export default function Community() {
                                             )
                                           }
                                           className={`transition ${
-                                            comment.downvotes?.includes(user.uid)
+                                            comment.downvotes?.includes(
+                                              user.uid
+                                            )
                                               ? isEarthy
                                                 ? "text-rust-600"
                                                 : "text-slate-blue"
@@ -826,25 +849,48 @@ export default function Community() {
 
                                       {/* Comment Content */}
                                       <div className="flex-1 p-3">
-                                        <div className="flex items-start space-x-3">
-                                          <div
-                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 ${
-                                              isEarthy ? "bg-rust-500" : "bg-slate-blue"
-                                            }`}
+                                        <div className="flex items-center space-x-3">
+                                          {/* Avatar clickable */}
+                                          <Link
+                                            to={
+                                              user &&
+                                              user.uid === comment.authorId
+                                                ? "/profile"
+                                                : `/profile/${comment.authorId}`
+                                            }
+                                            className="flex-shrink-0"
                                           >
-                                            {comment.authorName.charAt(0).toUpperCase()}
-                                          </div>
+                                            <div
+                                              className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                                                isEarthy
+                                                  ? "bg-rust-500"
+                                                  : "bg-slate-blue"
+                                              }`}
+                                            >
+                                              {comment.authorName
+                                                .charAt(0)
+                                                .toUpperCase()}
+                                            </div>
+                                          </Link>
+
                                           <div className="flex-1">
-                                            <div className="flex items-center space-x-2 mb-1">
-                                              <span
-                                                className={`text-sm font-semibold ${
+                                            <div className="flex items-center mb-1 space-x-2">
+                                              {/* Name clickable */}
+                                              <Link
+                                                to={
+                                                  user &&
+                                                  user.uid === comment.authorId
+                                                    ? "/profile"
+                                                    : `/profile/${comment.authorId}`
+                                                }
+                                                className={`text-sm font-semibold hover:underline ${
                                                   isEarthy
                                                     ? "text-brown-800"
                                                     : "text-charcoal-grey"
                                                 }`}
                                               >
                                                 {comment.authorName}
-                                              </span>
+                                              </Link>
                                               <span
                                                 className={`text-xs ${
                                                   isEarthy
