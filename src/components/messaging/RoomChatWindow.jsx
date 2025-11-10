@@ -87,7 +87,7 @@ export default function RoomChatWindow({ room, onClose }) {
         <div
           className={`p-4 flex items-center justify-between ${
             isMobile ? "" : "rounded-t-lg"
-          } ${isEarthy ? "bg-amber-700" : "bg-light-lavender"}`}
+          } ${isEarthy ? "bg-amber-700" : "bg-charcoal-grey"}`}
         >
           <div className="flex items-center gap-3 flex-1">
             <button
@@ -226,13 +226,15 @@ export default function RoomChatWindow({ room, onClose }) {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+        <div className={`flex-1 overflow-y-auto p-4 space-y-3 ${
+          isEarthy ? "bg-cream-50" : "bg-cool-grey/10"
+        }`}>
           {messages.length === 0 ? (
             <div className="flex items-center justify-center h-full text-center">
               <div>
                 <div className="text-4xl mb-3">💬</div>
-                <p className="text-gray-500">No messages yet.</p>
-                <p className="text-gray-400 text-sm">Start the conversation!</p>
+                <p className={isEarthy ? "text-brown-600" : "text-slate-blue"}>No messages yet.</p>
+                <p className={`text-sm ${isEarthy ? "text-brown-600/70" : "text-slate-blue/70"}`}>Start the conversation!</p>
               </div>
             </div>
           ) : (
@@ -251,7 +253,11 @@ export default function RoomChatWindow({ room, onClose }) {
                               onClose();
                             }
                           }}
-                          className="text-xs font-semibold text-gray-700 hover:text-blue-600 hover:underline transition"
+                          className={`text-xs font-semibold transition ${
+                            isEarthy 
+                              ? "text-brown-700 hover:text-rust-500" 
+                              : "text-slate-blue hover:text-light-lavender"
+                          } hover:underline`}
                         >
                           {msg.senderName || "Anonymous"}
                         </button>
@@ -267,9 +273,11 @@ export default function RoomChatWindow({ room, onClose }) {
                         className={`max-w-[75%] rounded-2xl px-4 py-2 shadow-sm ${
                           isOwnMessage
                             ? isEarthy
-                              ? "bg-amber-700 text-white"
-                              : "bg-linear-to-r from-blue-500 to-blue-600 text-white"
-                            : "bg-white text-gray-900 border border-gray-200"
+                              ? "bg-rust-500 text-white"
+                              : "bg-light-lavender text-charcoal-grey"
+                            : isEarthy
+                            ? "bg-tan-100 text-brown-800 border border-tan-200"
+                            : "bg-pale-lavender text-charcoal-grey border border-blue-grey"
                         }`}
                       >
                         <p className="text-sm wrap-break-word">{msg.text}</p>
@@ -294,18 +302,24 @@ export default function RoomChatWindow({ room, onClose }) {
         {/* Input Area */}
         <form
           onSubmit={handleSend}
-          className={`p-4 border-t border-gray-200 bg-white ${
+          className={`p-4 border-t bg-white ${
             isMobile ? "" : "rounded-b-lg"
-          }`}
+          } ${isEarthy ? "border-tan-200" : "border-blue-grey"}`}
         >
           <div className="flex items-center gap-2">
-            <div className="flex-1 bg-gray-100 rounded-full px-4 py-3 flex items-center">
+            <div className={`flex-1 rounded-full px-4 py-3 flex items-center ${
+              isEarthy ? "bg-cream-100" : "bg-pale-lavender"
+            }`}>
               <input
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder-gray-500"
+                className={`flex-1 bg-transparent border-none outline-none ${
+                  isEarthy 
+                    ? "text-brown-800 placeholder-brown-600/50" 
+                    : "text-charcoal-grey placeholder-slate-blue/50"
+                }`}
               />
             </div>
             <button
@@ -314,9 +328,11 @@ export default function RoomChatWindow({ room, onClose }) {
               className={`p-3 rounded-full transition-all ${
                 message.trim()
                   ? isEarthy
-                    ? "bg-amber-700 text-white hover:bg-amber-800"
-                    : "bg-blue-500 text-white hover:bg-blue-600"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    ? "bg-rust-500 text-white hover:bg-rust-600"
+                    : "bg-light-lavender text-charcoal-grey hover:bg-medium-lavender"
+                  : isEarthy
+                  ? "bg-tan-200 text-brown-600/50 cursor-not-allowed"
+                  : "bg-cool-grey text-slate-blue/50 cursor-not-allowed"
               }`}
             >
               <svg

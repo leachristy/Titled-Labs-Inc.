@@ -1,7 +1,6 @@
 import "./App.css";
 import "./ThemeStyles.css";
 import NavBar from "./components/navigation/NavBar";
-import ThemeToggle from "./components/ui/ThemeToggle";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { Routes, Route } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
@@ -36,7 +35,6 @@ export default function App() {
   return (
     <ThemeProvider>
       <div className="min-h-screen">
-        <ThemeToggle />
         <AuthContextProvider>
           <MessengerProvider>
             <MessengerWidget />

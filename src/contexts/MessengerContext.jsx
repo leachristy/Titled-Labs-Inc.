@@ -115,6 +115,25 @@ export const MessengerProvider = ({ children }) => {
   const [roomMessages, setRoomMessages] = useState({}); // Room messages: { roomId: messages[] }
   
   /**
+   * Auto-close Chat Windows on Mobile/Tablet
+   * 
+   * Monitors window size and automatically closes all open chat windows
+   * when the screen becomes mobile or tablet sized
+   */
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      // Close all chat windows when switching to mobile or tablet
+      if (width < 1024 && openChats.length > 0) {
+        setOpenChats([]);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [openChats.length]);
+
+  /**
    * Load All Users Effect
    * 
    * Listens for changes to the users collection in Firestore
@@ -621,6 +640,7 @@ export const MessengerProvider = ({ children }) => {
     minimizeChat,
     conversations,
     sendMessage,
+    loadMessages,
     
     // Users
     allUsers,

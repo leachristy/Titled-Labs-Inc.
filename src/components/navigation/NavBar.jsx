@@ -5,7 +5,7 @@ import logoImage from "../../assets/logo.png";
 
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { currentTheme } = useTheme();
+  const { currentTheme, toggleTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
   const links = [
@@ -72,6 +72,28 @@ export default function NavBar() {
             >
               Sign Up
             </NavLink>
+            
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className={`p-2 rounded-full transition-all ${
+                isEarthy 
+                  ? "text-brown-700 hover:bg-cream-200" 
+                  : "text-purple-200 hover:bg-slate-blue"
+              }`}
+              title={`Switch to ${isEarthy ? 'Cool' : 'Earthy'} theme`}
+              aria-label={`Switch to ${isEarthy ? 'Cool' : 'Earthy'} theme`}
+            >
+              {isEarthy ? (
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              ) : (
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              )}
+            </button>
           </div>
 
           {/* Mobile Hamburger */}
@@ -143,6 +165,35 @@ export default function NavBar() {
             >
               Sign Up
             </NavLink>
+            
+            {/* Theme Toggle in Mobile Menu */}
+            <button
+              onClick={() => {
+                toggleTheme();
+                setIsMenuOpen(false);
+              }}
+              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-md text-base font-medium ${
+                isEarthy
+                  ? "text-brown-700 hover:bg-cream-200"
+                  : "text-purple-200 hover:bg-slate-blue"
+              } mt-2`}
+            >
+              {isEarthy ? (
+                <>
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                  <span>Cool Theme</span>
+                </>
+              ) : (
+                <>
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <span>Earthy Theme</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

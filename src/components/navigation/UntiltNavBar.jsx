@@ -6,7 +6,7 @@ import logoImage from "../../assets/logoName.png";
 
 export default function UntiltNavBar() {
   const { user, logOut, profile } = UserAuth();
-  const { currentTheme } = useTheme();
+  const { currentTheme, toggleTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSelfCareOpen, setIsSelfCareOpen] = useState(false);
@@ -64,13 +64,13 @@ export default function UntiltNavBar() {
                   isEarthy ? "text-brown-800" : "text-white"
                 }`}
               >
-                Untilt
+                Tilted
               </span>
             </div>
           </NavLink>
 
           {/* Desktop Navigation */}
-          <div className="items-center hidden space-x-6 lg:flex">
+          <div className="hidden lg:flex items-center space-x-6">
             {links.map((link) =>
               link.hasDropdown ? (
                 <div
@@ -173,7 +173,7 @@ export default function UntiltNavBar() {
           </div>
 
           {/* Desktop User Display */}
-          <div className="items-center hidden ml-6 space-x-3 lg:flex">
+          <div className="hidden lg:flex items-center ml-6 space-x-3">
             <NavLink
               to={"/profile"}
               className={`${
@@ -191,6 +191,28 @@ export default function UntiltNavBar() {
               } text-white px-4 py-2 rounded-md text-sm font-medium transition-colors`}
             >
               Sign Out
+            </button>
+            
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className={`p-2 rounded-full transition-all ${
+                isEarthy 
+                  ? "text-brown-700 hover:bg-cream-200" 
+                  : "text-purple-200 hover:bg-[#646F89]"
+              }`}
+              title={`Switch to ${isEarthy ? 'Cool' : 'Earthy'} theme`}
+              aria-label={`Switch to ${isEarthy ? 'Cool' : 'Earthy'} theme`}
+            >
+              {isEarthy ? (
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              ) : (
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              )}
             </button>
           </div>
 
@@ -259,7 +281,7 @@ export default function UntiltNavBar() {
                             : `${
                                 isEarthy
                                   ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
-                                  : "text-purple-200 hover:text-[#c7b4e2] hover:bg-[#2d1b4e]"
+                                  : "text-purple-200 hover:text-[#c7b4e2] hover:bg-[#646F89]"
                               }`
                         }`
                       }
@@ -300,7 +322,7 @@ export default function UntiltNavBar() {
                       isSelfCareOpenMobile ? "max-h-64" : "max-h-0"
                     }`}
                   >
-                    <div className="pl-6 mt-1 space-y-1">
+                    <div className="pl-6 space-y-1 mt-1">
                       {link.subLinks.map((subLink) => (
                         <NavLink
                           key={subLink.path}
@@ -360,7 +382,9 @@ export default function UntiltNavBar() {
               className={({ isActive }) =>
                 `block w-full text-center px-4 py-3 rounded-md text-base font-medium transition ${
                   isActive
-                    ? `${isEarthy ? "bg-rust-500" : "bg-slate-blue"} text-white`
+                    ? `${
+                        isEarthy ? "bg-rust-500" : "bg-[#c7b4e2]"
+                      } text-white`
                     : `${
                         isEarthy
                           ? "text-brown-700 hover:text-rust-500 hover:bg-cream-200"
@@ -387,6 +411,35 @@ export default function UntiltNavBar() {
               } text-white mt-2`}
             >
               Sign Out
+            </button>
+            
+            {/* Theme Toggle in Mobile Menu */}
+            <button
+              onClick={() => {
+                toggleTheme();
+                setIsMenuOpen(false);
+              }}
+              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-md text-base font-medium ${
+                isEarthy
+                  ? "text-brown-700 hover:bg-cream-200"
+                  : "text-purple-200 hover:bg-[#646F89]"
+              } mt-2`}
+            >
+              {isEarthy ? (
+                <>
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                  <span>Cool Theme</span>
+                </>
+              ) : (
+                <>
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <span>Earthy Theme</span>
+                </>
+              )}
             </button>
           </div>
         </div>

@@ -101,7 +101,7 @@ export default function MessengerPopup() {
         className={`fixed bottom-24 right-6 ${
           isTablet ? "w-96" : "w-80"
         } rounded-lg shadow-2xl ${
-          isMobile ? "z-100" : "z-50"
+          isMobile ? "z-50" : "z-40"
         } bg-white`}
         style={{ maxHeight: isTablet ? "600px" : "550px" }}
       >
@@ -215,7 +215,7 @@ export default function MessengerPopup() {
                     </div>
 
                     {/* Message Icon */}
-                    <div className={isEarthy ? "text-amber-700" : "text-blue-500"}>
+                    <div className={isEarthy ? "text-amber-700" : "text-light-lavender"}>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-5 w-5"
@@ -333,7 +333,7 @@ export default function MessengerPopup() {
                   type="text"
                   value={roomName}
                   onChange={(e) => setRoomName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:border-lavender-500"
                   placeholder="Enter room name"
                 />
               </div>
@@ -345,7 +345,7 @@ export default function MessengerPopup() {
                 <textarea
                   value={roomDescription}
                   onChange={(e) => setRoomDescription(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:border-blue-500 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:border-lavender-500 resize-none"
                   placeholder="Enter room description"
                   rows="3"
                 />

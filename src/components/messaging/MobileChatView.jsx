@@ -4,7 +4,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { UserAuth } from "../../contexts/AuthContext";
 
 const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
-  const { conversations, sendMessage } = useMessenger();
+  const { conversations, sendMessage, loadMessages } = useMessenger();
   const { currentTheme } = useTheme();
   const { user } = UserAuth();
   const isEarthy = currentTheme === "earthy";
@@ -12,6 +12,13 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
   const messagesEndRef = useRef(null);
 
   const messages = conversations[userId] || [];
+
+  // Load messages when component mounts
+  useEffect(() => {
+    if (userId && !conversations[userId]) {
+      loadMessages(userId);
+    }
+  }, [userId, conversations, loadMessages]);
 
   // Group consecutive messages from same sender
   const groupMessages = (messages) => {
@@ -58,10 +65,14 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
   if (!user) return null;
 
   return (
-    <div className="fixed inset-0 bg-white dark:bg-gray-900 z-100 flex flex-col">
+    <div className={`fixed inset-0 flex flex-col ${
+      isEarthy ? "bg-white" : "bg-pale-lavender"
+    }`} style={{ zIndex: 9999 }}>
       {/* Header */}
-      <div className={`text-white p-4 flex items-center gap-3 shadow-lg ${
-        isEarthy ? "bg-amber-700" : "bg-light-lavender"
+      <div className={`p-4 flex items-center gap-3 shadow-lg ${
+        isEarthy 
+          ? "bg-amber-700 text-white" 
+          : "bg-light-lavender text-white"
       }`}>
         <button
           onClick={onClose}
@@ -104,9 +115,13 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-800">
+      <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${
+        isEarthy ? "bg-cream-50" : "bg-cream-100"
+      }`}>
         {groupedMessages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
+          <div className={`flex items-center justify-center h-full ${
+            isEarthy ? "text-brown-600" : "text-slate-blue"
+          }`}>
             <p>Start a conversation!</p>
           </div>
         ) : (
@@ -155,9 +170,11 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
                         } wrap-break-word ${
                           isCurrentUser
                             ? isEarthy
-                              ? "bg-amber-700 text-white"
-                              : "bg-linear-to-r from-blue-500 to-blue-600 text-white"
-                            : "bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                              ? "bg-rust-500 text-white"
+                              : "bg-light-lavender text-charcoal-grey"
+                            : isEarthy
+                            ? "bg-tan-100 text-brown-800"
+                            : "bg-tan-100 text-charcoal-grey"
                         } ${
                           isCurrentUser
                             ? isFirst && isLast
@@ -183,7 +200,9 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
 
                   {/* Timestamp (only on last message of group) */}
                   {group.messages[group.messages.length - 1].createdAt && (
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 px-2">
+                    <span className={`text-xs mt-1 px-2 ${
+                      isEarthy ? "text-brown-600" : "text-slate-blue"
+                    }`}>
                       {group.messages[group.messages.length - 1].createdAt
                         .toDate()
                         .toLocaleTimeString([], {
@@ -204,16 +223,28 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
       </div>
 
       {/* Input Area */}
-      <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-4">
+      <div className={`border-t p-4 ${
+        isEarthy 
+          ? "bg-white border-tan-200" 
+          : "bg-pale-lavender border-blue-grey"
+      }`}>
         <form onSubmit={handleSend} className="flex items-center gap-2">
           {/* Message Input */}
-          <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-3 flex items-center">
+          <div className={`flex-1 rounded-full px-4 py-3 flex items-center ${
+            isEarthy 
+              ? "bg-cream-100" 
+              : "bg-white"
+          }`}>
             <input
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Aa"
-              className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              className={`flex-1 bg-transparent border-none outline-none ${
+                isEarthy 
+                  ? "text-brown-800 placeholder-brown-600/50" 
+                  : "text-charcoal-grey placeholder-slate-blue/50"
+              }`}
             />
           </div>
 
@@ -224,9 +255,11 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
             className={`p-3 rounded-full transition-all ${
               message.trim()
                 ? isEarthy
-                  ? "bg-amber-700 text-white hover:bg-amber-800"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
-                : "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
+                  ? "bg-rust-500 text-white hover:bg-rust-600"
+                  : "bg-light-lavender text-charcoal-grey hover:bg-medium-lavender"
+                : isEarthy
+                ? "bg-tan-200 text-brown-600/50 cursor-not-allowed"
+                : "bg-cool-grey text-slate-blue/50 cursor-not-allowed"
             }`}
           >
             <svg
