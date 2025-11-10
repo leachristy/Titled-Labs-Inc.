@@ -2,7 +2,7 @@
  * Messenger Context for Real-Time Chat Functionality
  * 
  * Provides comprehensive messaging features throughout the app:
- * - Direct messages: 1-on-1 conversations with other users
+ * - Direct messages: 1-on-1 conversations with friends
  * - Global chat: Public chat room for all users
  * - Chat rooms: User-created topic-based chat rooms
  * 
@@ -12,6 +12,7 @@
  * - Message persistence across sessions
  * - User presence and profile integration
  * - Room creation, joining, and management
+ * - Only shows friends in the chat list (users must be friends to message)
  * 
  * Available functions:
  * Direct Messages:
@@ -36,7 +37,7 @@
  * - isMessengerOpen: Boolean for messenger popup visibility
  * - openChats: Array of currently open chat windows
  * - conversations: Object mapping userId to their messages
- * - allUsers: Array of all registered users
+ * - allUsers: Array of user's friends (only friends shown for messaging)
  * - globalMessages: Array of global chat messages
  * - chatRooms: Array of available chat rooms
  * - roomMessages: Object mapping roomId to their messages
@@ -54,6 +55,7 @@ import {
   serverTimestamp,
   orderBy,
   getDocs,
+  getDoc,
   doc,
   updateDoc,
   arrayUnion,
@@ -134,10 +136,10 @@ export const MessengerProvider = ({ children }) => {
   }, [openChats.length]);
 
   /**
-   * Load All Users Effect
+   * Load Friends (Users to Chat With) Effect
    * 
-   * Listens for changes to the users collection in Firestore
-   * Filters out the current user from the list
+   * Listens for changes to the current user's friends collection
+   * Loads full user profiles for each friend
    * Clears state when user logs out
    */
   useEffect(() => {
@@ -153,20 +155,34 @@ export const MessengerProvider = ({ children }) => {
       return;
     }
 
-    // Subscribe to users collection for real-time updates
-    const usersRef = collection(db, "users");
-    const unsubscribe = onSnapshot(usersRef, (snapshot) => {
-      const users = snapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        .filter((u) => u.id !== user.uid); // Exclude current user from list
+    // Subscribe to the current user's friends collection
+    const friendsRef = collection(db, `users/${user.uid}/friends`);
+    const unsubscribe = onSnapshot(friendsRef, async (snapshot) => {
+      const friendUids = snapshot.docs.map((doc) => doc.id);
+      
+      if (friendUids.length === 0) {
+        setAllUsers([]);
+        return;
+      }
 
-      setAllUsers(users);
+      // Load full user profiles for all friends
+      const friendProfiles = await Promise.all(
+        friendUids.map(async (friendUid) => {
+          const userRef = doc(db, "users", friendUid);
+          const userSnap = await getDoc(userRef);
+          if (!userSnap.exists()) return null;
+          return {
+            id: friendUid,
+            ...userSnap.data(),
+          };
+        })
+      );
+
+      // Filter out any null values and set the friends list
+      setAllUsers(friendProfiles.filter(Boolean));
     });
 
-    // Cleanup: Unsubscribe from users listener when component unmounts or user changes
+    // Cleanup: Unsubscribe from friends listener when component unmounts or user changes
     return () => unsubscribe();
   }, [user]);
 

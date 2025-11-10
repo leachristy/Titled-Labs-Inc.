@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useMessenger } from "../../contexts/MessengerContext";
 import { useTheme } from "../../contexts/ThemeContext";
 
-export default function RoomChatWindow({ room, onClose }) {
-  const { roomMessages, sendRoomMessage, loadRoomMessages, user, leaveChatRoom, deleteChatRoom, clearRoomMessages } = useMessenger();
+export default function RoomChatWindow({ room, onClose, onOpenChat }) {
+  const { roomMessages, sendRoomMessage, loadRoomMessages, user, leaveChatRoom, deleteChatRoom, clearRoomMessages, openChat, allUsers } = useMessenger();
   const navigate = useNavigate();
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
@@ -241,15 +241,26 @@ export default function RoomChatWindow({ room, onClose }) {
             <>
               {messages.map((msg) => {
                 const isOwnMessage = msg.senderId === user?.uid;
+                
+                // Get sender info for opening chat
+                const sender = allUsers.find(u => u.id === msg.senderId);
+                const senderName = msg.senderName || "Anonymous";
+                const senderAvatar = msg.senderAvatar || sender?.photoUrl || null;
+                
                 return (
                   <div key={msg.id} className="flex flex-col gap-1">
-                    {/* Username (clickable) */}
+                    {/* Username (clickable to open chat) */}
                     {!isOwnMessage && (
                       <div className="flex items-center gap-2 px-2">
                         <button
                           onClick={() => {
                             if (msg.senderId) {
-                              navigate(`/profile/${msg.senderId}`);
+                              // Use onOpenChat if provided (from MessengerPopup), otherwise use openChat directly
+                              if (onOpenChat) {
+                                onOpenChat(msg.senderId, senderName, senderAvatar);
+                              } else {
+                                openChat(msg.senderId, senderName, senderAvatar);
+                              }
                               onClose();
                             }
                           }}
@@ -259,7 +270,7 @@ export default function RoomChatWindow({ room, onClose }) {
                               : "text-slate-blue hover:text-light-lavender"
                           } hover:underline`}
                         >
-                          {msg.senderName || "Anonymous"}
+                          {senderName}
                         </button>
                       </div>
                     )}

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useMessenger } from "../../contexts/MessengerContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../../src/firebase";
 import MobileChatView from "./MobileChatView";
 import GlobalChatWindow from "./GlobalChatWindow";
 import RoomChatWindow from "./RoomChatWindow";
@@ -29,6 +31,8 @@ export default function MessengerPopup() {
   const isEarthy = currentTheme === "earthy";
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isTablet, setIsTablet] = useState(
     window.innerWidth >= 768 && window.innerWidth <= 1024
@@ -50,6 +54,46 @@ export default function MessengerPopup() {
     return () => window.removeEventListener("resize", checkDevice);
   }, []);
 
+  // Search all users when search query changes
+  useEffect(() => {
+    const searchUsers = async () => {
+      if (!searchQuery.trim()) {
+        setSearchResults([]);
+        setIsSearching(false);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const usersRef = collection(db, "users");
+        const snapshot = await getDocs(usersRef);
+        
+        const searchLower = searchQuery.toLowerCase();
+        const results = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter((u) => {
+            if (u.id === user.uid) return false; // Exclude current user
+            const fullName = `${u.firstName || ""} ${u.lastName || ""}`.toLowerCase();
+            return fullName.includes(searchLower);
+          });
+
+        setSearchResults(results);
+      } catch (error) {
+        console.error("Error searching users:", error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    // Debounce search
+    const timeoutId = setTimeout(searchUsers, 300);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, user]);
+
   // Don't show messenger if user is not logged in
   if (!user) return null;
 
@@ -67,14 +111,10 @@ export default function MessengerPopup() {
     );
   }
 
-  const filteredUsers = allUsers.filter((user) => {
-    const fullName = `${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
-    return fullName.includes(searchQuery.toLowerCase());
-  });
-
-  const handleUserClick = (user) => {
-    navigate(`/profile/${user.id}`);
-  };
+  // Use search results when searching, otherwise show friends
+  const displayUsers = searchQuery.trim() 
+    ? searchResults 
+    : allUsers;
 
   const handleMessageClick = (user) => {
     if (isMobile) {
@@ -91,6 +131,20 @@ export default function MessengerPopup() {
         `${user.firstName || "User"} ${user.lastName || ""}`,
         user.photoUrl || null
       );
+    }
+  };
+
+  const handleOpenChatFromMessage = (userId, userName, userAvatar) => {
+    if (isMobile) {
+      // Open mobile single-chat view
+      setMobileChat({
+        userId,
+        userName,
+        userAvatar,
+      });
+    } else {
+      // Open desktop floating chat window
+      openChat(userId, userName, userAvatar);
     }
   };
 
@@ -179,60 +233,101 @@ export default function MessengerPopup() {
           {/* Chats View */}
           {activeView === "chats" && (
             <>
-              {filteredUsers.length === 0 ? (
+              {isSearching ? (
                 <div className="p-4 text-center text-gray-500">
-                  {searchQuery ? "No users found" : "No users available"}
+                  <div className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Searching...
+                  </div>
+                </div>
+              ) : displayUsers.length === 0 ? (
+                <div className="p-4 text-center text-gray-500">
+                  {searchQuery ? "No users found" : "No friends yet. Add friends to start chatting!"}
                 </div>
               ) : (
-                filteredUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="p-3 border-b border-gray-100 flex items-center justify-between transition hover:bg-gray-50 cursor-pointer"
-                    onClick={() => handleMessageClick(user)}
-                  >
-                    <div className="flex items-center gap-3 flex-1">
-                      {/* Avatar */}
-                      <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                        {user.photoUrl ? (
-                          <img
-                            src={user.photoUrl}
-                            alt={user.firstName}
-                            className="w-full h-full object-cover"
+                displayUsers.map((user) => {
+                  const isOnline = user.online === true;
+                  return (
+                    <button
+                      key={user.id}
+                      onClick={() => handleMessageClick(user)}
+                      className={`w-full p-3 border-b border-gray-100 flex items-center justify-between transition-all duration-200 text-left group ${
+                        isEarthy
+                          ? "hover:bg-cream-100 hover:border-tan-200"
+                          : "hover:bg-purple-50 hover:border-light-lavender/30"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        {/* Avatar with Online Status */}
+                        <div className="relative shrink-0 transition-transform duration-200 group-hover:scale-105">
+                          <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                            {user.photoUrl ? (
+                              <img
+                                src={user.photoUrl}
+                                alt={user.firstName}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-gray-600 font-semibold text-lg">
+                                {user.firstName?.[0]?.toUpperCase() || "?"}
+                              </span>
+                            )}
+                          </div>
+                          {/* Online Status Indicator */}
+                          <div
+                            className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white transition-transform duration-200 group-hover:scale-110 ${
+                              isOnline ? "bg-green-500" : "bg-gray-400"
+                            }`}
+                            title={isOnline ? "Online" : "Offline"}
                           />
-                        ) : (
-                          <span className="text-gray-600 font-semibold text-lg">
-                            {user.firstName?.[0]?.toUpperCase() || "?"}
-                          </span>
-                        )}
+                        </div>
+
+                        {/* Name */}
+                        <div className="flex-1 min-w-0">
+                          <p className={`font-semibold truncate transition-colors duration-200 ${
+                            isEarthy 
+                              ? "text-gray-900 group-hover:text-rust-500" 
+                              : "text-gray-900 group-hover:text-light-lavender"
+                          }`}>
+                            {user.firstName || "User"} {user.lastName || ""}
+                          </p>
+                          <p className={`text-xs transition-colors duration-200 ${
+                            isEarthy
+                              ? "text-gray-500 group-hover:text-brown-600"
+                              : "text-gray-500 group-hover:text-slate-blue"
+                          }`}>
+                            {isOnline ? "Active now" : "Offline"}
+                          </p>
+                        </div>
                       </div>
 
-                      {/* Name */}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 truncate">
-                          {user.firstName || "User"} {user.lastName || ""}
-                        </p>
+                      {/* Message Icon */}
+                      <div className={`shrink-0 transition-all duration-200 group-hover:translate-x-1 ${
+                        isEarthy 
+                          ? "text-amber-700 group-hover:text-rust-500" 
+                          : "text-light-lavender group-hover:text-purple-500"
+                      }`}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                          />
+                        </svg>
                       </div>
-                    </div>
-
-                    {/* Message Icon */}
-                    <div className={isEarthy ? "text-amber-700" : "text-light-lavender"}>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                ))
+                    </button>
+                  );
+                })
               )}
             </>
           )}
@@ -313,10 +408,21 @@ export default function MessengerPopup() {
       </div>
 
       {/* Global Chat Window */}
-      {showGlobalChat && <GlobalChatWindow onClose={() => setShowGlobalChat(false)} />}
+      {showGlobalChat && (
+        <GlobalChatWindow 
+          onClose={() => setShowGlobalChat(false)} 
+          onOpenChat={handleOpenChatFromMessage}
+        />
+      )}
 
       {/* Room Chat Window */}
-      {activeRoom && <RoomChatWindow room={activeRoom} onClose={() => setActiveRoom(null)} />}
+      {activeRoom && (
+        <RoomChatWindow 
+          room={activeRoom} 
+          onClose={() => setActiveRoom(null)} 
+          onOpenChat={handleOpenChatFromMessage}
+        />
+      )}
 
       {/* Create Room Modal */}
       {showCreateRoom && (

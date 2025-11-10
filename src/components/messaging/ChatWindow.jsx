@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { UserAuth } from "../../contexts/AuthContext";
 
 export default function ChatWindow({ userId, userName, userAvatar, index }) {
-  const { closeChat, minimizeChat, conversations, sendMessage } = useMessenger();
+  const { closeChat, minimizeChat, conversations, sendMessage, allUsers } = useMessenger();
   const { currentTheme } = useTheme();
   const { user } = UserAuth();
   const isEarthy = currentTheme === "earthy";
@@ -18,6 +18,10 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
   const messagesEndRef = useRef(null);
 
   const messages = conversations[userId] || [];
+  
+  // Get online status from allUsers
+  const chatUser = allUsers.find(u => u.id === userId);
+  const isOnline = chatUser?.online === true;
 
   // Check for tablet on resize
   useEffect(() => {
@@ -100,31 +104,49 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
         }`}
         onClick={() => setIsMinimized(!isMinimized)}
       >
-        <div className="flex items-center gap-2">
-          {/* Avatar */}
-          <div
-            className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center overflow-hidden cursor-pointer border-2 border-white"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleProfileClick();
-            }}
-          >
-            {userAvatar ? (
-              <img
-                src={userAvatar}
-                alt={userName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-white font-semibold text-sm">
-                {userName?.[0]?.toUpperCase() || "?"}
-              </span>
-            )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleProfileClick();
+          }}
+          className="flex items-center gap-2"
+        >
+          {/* Avatar with Online Status */}
+          <div className="relative">
+            <div
+              className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center overflow-hidden border-2 border-white"
+            >
+              {userAvatar ? (
+                <img
+                  src={userAvatar}
+                  alt={userName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-white font-semibold text-sm">
+                  {userName?.[0]?.toUpperCase() || "?"}
+                </span>
+              )}
+            </div>
+            {/* Online Status Indicator */}
+            <div
+              className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 ${
+                isEarthy ? "border-amber-700" : "border-light-lavender"
+              } ${
+                isOnline ? "bg-green-500" : "bg-gray-400"
+              }`}
+              title={isOnline ? "Online" : "Offline"}
+            />
           </div>
 
-          {/* Name */}
-          <span className="text-white font-semibold text-sm">{userName}</span>
-        </div>
+          {/* Name with Status */}
+          <div className="text-left">
+            <span className="text-white font-semibold text-sm block">{userName}</span>
+            <span className="text-white/80 text-xs">
+              {isOnline ? "Active now" : "Offline"}
+            </span>
+          </div>
+        </button>
 
         <div className="flex items-center gap-1">
           {/* Minimize Button */}

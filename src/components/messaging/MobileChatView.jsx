@@ -2,16 +2,22 @@ import React, { useState, useEffect, useRef } from "react";
 import { useMessenger } from "../../contexts/MessengerContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { UserAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
-  const { conversations, sendMessage, loadMessages } = useMessenger();
+  const { conversations, sendMessage, loadMessages, allUsers } = useMessenger();
   const { currentTheme } = useTheme();
   const { user } = UserAuth();
+  const navigate = useNavigate();
   const isEarthy = currentTheme === "earthy";
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef(null);
 
   const messages = conversations[userId] || [];
+  
+  // Get online status from allUsers
+  const chatUser = allUsers.find(u => u.id === userId);
+  const isOnline = chatUser?.online === true;
 
   // Load messages when component mounts
   useEffect(() => {
@@ -94,7 +100,13 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
           </svg>
         </button>
 
-        <div className="flex items-center gap-3 flex-1">
+        <button
+          onClick={() => {
+            navigate(`/profile/${userId}`);
+            onClose();
+          }}
+          className="flex items-center gap-3 flex-1 min-w-0"
+        >
           <div className="relative">
             <img
               src={
@@ -106,12 +118,22 @@ const MobileChatView = ({ userId, userName, userAvatar, onClose }) => {
               alt={userName}
               className="w-10 h-10 rounded-full border-2 border-white"
             />
+            {/* Online Status Indicator */}
+            <div
+              className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                isOnline ? "bg-green-500" : "bg-gray-400"
+              }`}
+              title={isOnline ? "Online" : "Offline"}
+            />
           </div>
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 text-left">
             <h3 className="font-semibold text-lg truncate">{userName}</h3>
+            <p className="text-xs opacity-80">
+              {isOnline ? "Active now" : "Offline"}
+            </p>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Messages Area */}
