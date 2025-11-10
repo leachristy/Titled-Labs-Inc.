@@ -8,6 +8,10 @@ export default function CommentsSection({
   handleAddComment,
   handleCommentUpvote,
   handleCommentDownvote,
+  handleEditComment,
+  handleDeleteComment,
+  editingComment,
+  setEditingComment,
   user,
   getVoteCount,
   timeAgo,
@@ -62,6 +66,10 @@ export default function CommentsSection({
             user={user}
             handleCommentUpvote={handleCommentUpvote}
             handleCommentDownvote={handleCommentDownvote}
+            handleEditComment={handleEditComment}
+            handleDeleteComment={handleDeleteComment}
+            editingComment={editingComment}
+            setEditingComment={setEditingComment}
             getVoteCount={getVoteCount}
             timeAgo={timeAgo}
             isEarthy={isEarthy}

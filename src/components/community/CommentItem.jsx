@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 export default function CommentItem({
   comment,
@@ -6,10 +7,27 @@ export default function CommentItem({
   user,
   handleCommentUpvote,
   handleCommentDownvote,
+  handleEditComment,
+  handleDeleteComment,
+  editingComment,
+  setEditingComment,
   getVoteCount,
   timeAgo,
   isEarthy,
 }) {
+  const [editText, setEditText] = useState(comment.text);
+
+  const isEditing = editingComment === `${postId}-${comment.id}`;
+
+  const handleSaveEdit = () => {
+    handleEditComment(postId, comment.id, editText);
+  };
+
+  const handleCancelEdit = () => {
+    setEditText(comment.text);
+    setEditingComment(null);
+  };
+
   return (
     <div
       className={`rounded-lg ${isEarthy ? "bg-cream-50" : "bg-cool-grey"}`}
@@ -94,35 +112,101 @@ export default function CommentItem({
             </Link>
 
             <div className="flex-1">
-              <div className="flex items-center mb-1 space-x-2">
-                {/* Name clickable */}
-                <Link
-                  to={
-                    user && user.uid === comment.authorId
-                      ? "/profile"
-                      : `/profile/${comment.authorId}`
-                  }
-                  className={`text-sm font-semibold hover:underline ${
-                    isEarthy ? "text-brown-800" : "text-gray-900"
-                  }`}
-                >
-                  {comment.authorName}
-                </Link>
-                <span
-                  className={`text-xs ${
-                    isEarthy ? "text-brown-600" : "text-gray-600"
-                  }`}
-                >
-                  {timeAgo(comment.createdAt)}
-                </span>
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center space-x-2">
+                  {/* Name clickable */}
+                  <Link
+                    to={
+                      user && user.uid === comment.authorId
+                        ? "/profile"
+                        : `/profile/${comment.authorId}`
+                    }
+                    className={`text-sm font-semibold hover:underline ${
+                      isEarthy ? "text-brown-800" : "text-gray-900"
+                    }`}
+                  >
+                    {comment.authorName}
+                  </Link>
+                  <span
+                    className={`text-xs ${
+                      isEarthy ? "text-brown-600" : "text-gray-600"
+                    }`}
+                  >
+                    {timeAgo(comment.createdAt)}
+                    {comment.editedAt && <span> (edited)</span>}
+                  </span>
+                </div>
+
+                {/* Edit/Delete buttons for comment author */}
+                {user.uid === comment.authorId && (
+                  <div className="flex gap-2">
+                    {!isEditing && (
+                      <button
+                        onClick={() => setEditingComment(`${postId}-${comment.id}`)}
+                        className={`text-xs font-medium transition ${
+                          isEarthy
+                            ? "text-brown-600 hover:text-rust-500"
+                            : "text-gray-600 hover:text-light-lavender"
+                        }`}
+                      >
+                        Edit
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDeleteComment(postId, comment.id)}
+                      className="text-xs font-medium text-red-500 hover:text-red-700"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
-              <p
-                className={`text-sm ${
-                  isEarthy ? "text-brown-700" : "text-gray-700"
-                }`}
-              >
-                {comment.text}
-              </p>
+
+              {/* Edit mode */}
+              {isEditing ? (
+                <div className="space-y-2">
+                  <textarea
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    rows="2"
+                    className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 resize-none ${
+                      isEarthy
+                        ? "border-tan-300 focus:ring-rust-500"
+                        : "bg-white text-gray-900 border-blue-grey focus:ring-light-lavender"
+                    }`}
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveEdit}
+                      className={`px-3 py-1 rounded text-xs font-medium text-white transition ${
+                        isEarthy
+                          ? "bg-rust-500 hover:bg-rust-600"
+                          : "bg-light-lavender hover:bg-medium-lavender"
+                      }`}
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className={`px-3 py-1 rounded text-xs font-medium transition ${
+                        isEarthy
+                          ? "bg-tan-200 hover:bg-tan-300 text-brown-800"
+                          : "bg-gray-200 hover:bg-gray-300 text-charcoal-grey"
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p
+                  className={`text-sm ${
+                    isEarthy ? "text-brown-700" : "text-gray-700"
+                  }`}
+                >
+                  {comment.text}
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -25,6 +25,7 @@ import CategorySidebar from "../components/community/CategorySidebar";
 import SearchAndSort from "../components/community/SearchAndSort";
 import CreatePostForm from "../components/community/CreatePostForm";
 import PostsList from "../components/community/PostsList";
+import Pagination from "../components/community/Pagination";
 
 export default function Community() {
   const { currentTheme } = useTheme();
@@ -35,10 +36,14 @@ export default function Community() {
   const [posts, setPosts] = useState([]);
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
+  const [newPostImageUrl, setNewPostImageUrl] = useState("");
+  const [newPostVideoUrl, setNewPostVideoUrl] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [isCreatingPost, setIsCreatingPost] = useState(false);
   const [expandedPost, setExpandedPost] = useState(null);
   const [commentText, setCommentText] = useState({});
+  const [editingPost, setEditingPost] = useState(null);
+  const [editingComment, setEditingComment] = useState(null);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState("newest"); // newest, oldest, popular
@@ -46,6 +51,8 @@ export default function Community() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [votingAnimation, setVotingAnimation] = useState({}); // Track voting animations
+  const [currentPage, setCurrentPage] = useState(1);
+  const POSTS_PER_PAGE = 5;
 
   // Handle scroll to show/hide scroll-to-top button
   useEffect(() => {
@@ -116,6 +123,8 @@ export default function Community() {
       await addDoc(collection(db, "communityPosts"), {
         title: newPostTitle,
         content: newPostContent,
+        imageUrl: newPostImageUrl.trim() || null,
+        videoUrl: newPostVideoUrl.trim() || null,
         category: selectedCategory === "All" ? "General" : selectedCategory,
         authorId: user.uid,
         authorName: profile?.firstName
@@ -130,6 +139,8 @@ export default function Community() {
 
       setNewPostTitle("");
       setNewPostContent("");
+      setNewPostImageUrl("");
+      setNewPostVideoUrl("");
       setIsCreatingPost(false);
     } catch (error) {
       console.error("Error creating post:", error);
@@ -328,6 +339,70 @@ export default function Community() {
     }
   };
 
+  // Edit post
+  const handleEditPost = async (postId, updatedTitle, updatedContent, updatedImageUrl, updatedVideoUrl) => {
+    try {
+      const postRef = doc(db, "communityPosts", postId);
+      await updateDoc(postRef, {
+        title: updatedTitle,
+        content: updatedContent,
+        imageUrl: updatedImageUrl?.trim() || null,
+        videoUrl: updatedVideoUrl?.trim() || null,
+        editedAt: serverTimestamp(),
+      });
+      setEditingPost(null);
+    } catch (error) {
+      console.error("Error editing post:", error);
+      alert("Failed to edit post. Please try again.");
+    }
+  };
+
+  // Edit comment
+  const handleEditComment = async (postId, commentId, updatedText) => {
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return;
+
+    const updatedComments = post.comments.map((comment) => {
+      if (comment.id === commentId) {
+        return {
+          ...comment,
+          text: updatedText,
+          editedAt: new Date().toISOString(),
+        };
+      }
+      return comment;
+    });
+
+    try {
+      const postRef = doc(db, "communityPosts", postId);
+      await updateDoc(postRef, {
+        comments: updatedComments,
+      });
+      setEditingComment(null);
+    } catch (error) {
+      console.error("Error editing comment:", error);
+      alert("Failed to edit comment. Please try again.");
+    }
+  };
+
+  // Delete comment
+  const handleDeleteComment = async (postId, commentId) => {
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return;
+
+    const updatedComments = post.comments.filter((comment) => comment.id !== commentId);
+
+    try {
+      const postRef = doc(db, "communityPosts", postId);
+      await updateDoc(postRef, {
+        comments: updatedComments,
+      });
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      alert("Failed to delete comment. Please try again.");
+    }
+  };
+
   // Filter posts by category
   const filteredPosts =
     selectedCategory === "All"
@@ -361,6 +436,22 @@ export default function Community() {
       return bTime - aTime;
     }
   });
+
+  // Pagination
+  const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const endIndex = startIndex + POSTS_PER_PAGE;
+  const paginatedPosts = sortedPosts.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery, sortBy]);
+
+  // Scroll to top when page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
 
   // Get vote count
   const getVoteCount = (upvotes = [], downvotes = []) => {
@@ -550,6 +641,10 @@ export default function Community() {
                 setNewPostTitle={setNewPostTitle}
                 newPostContent={newPostContent}
                 setNewPostContent={setNewPostContent}
+                newPostImageUrl={newPostImageUrl}
+                setNewPostImageUrl={setNewPostImageUrl}
+                newPostVideoUrl={newPostVideoUrl}
+                setNewPostVideoUrl={setNewPostVideoUrl}
                 handleCreatePost={handleCreatePost}
                 setIsCreatingPost={setIsCreatingPost}
                 isSubmitting={isSubmitting}
@@ -559,12 +654,15 @@ export default function Community() {
               {/* Posts List */}
               <PostsList
                 isLoading={isLoading}
-                sortedPosts={sortedPosts}
+                sortedPosts={paginatedPosts}
                 searchQuery={searchQuery}
                 user={user}
                 handleUpvote={handleUpvote}
                 handleDownvote={handleDownvote}
                 handleDeletePost={handleDeletePost}
+                handleEditPost={handleEditPost}
+                handleEditComment={handleEditComment}
+                handleDeleteComment={handleDeleteComment}
                 setExpandedPost={setExpandedPost}
                 expandedPost={expandedPost}
                 commentText={commentText}
@@ -572,9 +670,21 @@ export default function Community() {
                 handleAddComment={handleAddComment}
                 handleCommentUpvote={handleCommentUpvote}
                 handleCommentDownvote={handleCommentDownvote}
+                editingPost={editingPost}
+                setEditingPost={setEditingPost}
+                editingComment={editingComment}
+                setEditingComment={setEditingComment}
                 votingAnimation={votingAnimation}
                 getVoteCount={getVoteCount}
                 timeAgo={timeAgo}
+                isEarthy={isEarthy}
+              />
+
+              {/* Pagination */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
                 isEarthy={isEarthy}
               />
             </div>

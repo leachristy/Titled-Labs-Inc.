@@ -1,3 +1,5 @@
+import ImageUpload from "./ImageUpload";
+
 export default function CreatePostForm({
   isCreatingPost,
   handleCreatePost,
@@ -5,6 +7,10 @@ export default function CreatePostForm({
   setNewPostTitle,
   newPostContent,
   setNewPostContent,
+  newPostImageUrl,
+  setNewPostImageUrl,
+  newPostVideoUrl,
+  setNewPostVideoUrl,
   selectedCategory,
   setSelectedCategory,
   categories,
@@ -98,6 +104,41 @@ export default function CreatePostForm({
             required
           />
         </div>
+
+        {/* Media Section */}
+        <div className="space-y-4">
+          {/* Image Upload Component */}
+          <ImageUpload
+            onImageUploaded={setNewPostImageUrl}
+            currentImageUrl={newPostImageUrl}
+            isEarthy={isEarthy}
+          />
+
+          <div>
+            <label
+              className={`block text-sm font-medium mb-2 ${
+                isEarthy ? "text-brown-700" : "text-gray-700"
+              }`}
+            >
+              Video URL (optional)
+            </label>
+            <input
+              type="url"
+              value={newPostVideoUrl}
+              onChange={(e) => setNewPostVideoUrl(e.target.value)}
+              placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
+              className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 ${
+                isEarthy
+                  ? "border-tan-300 focus:ring-rust-500"
+                  : "bg-white text-gray-900 border-blue-grey focus:ring-light-lavender"
+              }`}
+            />
+            <p className={`mt-1 text-xs ${isEarthy ? "text-brown-600" : "text-gray-600"}`}>
+              Supports YouTube, Vimeo, and direct video links
+            </p>
+          </div>
+        </div>
+
         <div className="flex gap-3">
           <button
             type="submit"

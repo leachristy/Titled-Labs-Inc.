@@ -8,6 +8,9 @@ export default function PostsList({
   handleUpvote,
   handleDownvote,
   handleDeletePost,
+  handleEditPost,
+  handleEditComment,
+  handleDeleteComment,
   setExpandedPost,
   expandedPost,
   commentText,
@@ -15,6 +18,10 @@ export default function PostsList({
   handleAddComment,
   handleCommentUpvote,
   handleCommentDownvote,
+  editingPost,
+  setEditingPost,
+  editingComment,
+  setEditingComment,
   votingAnimation,
   getVoteCount,
   timeAgo,
@@ -96,6 +103,9 @@ export default function PostsList({
           handleUpvote={handleUpvote}
           handleDownvote={handleDownvote}
           handleDeletePost={handleDeletePost}
+          handleEditPost={handleEditPost}
+          handleEditComment={handleEditComment}
+          handleDeleteComment={handleDeleteComment}
           setExpandedPost={setExpandedPost}
           expandedPost={expandedPost}
           commentText={commentText}
@@ -103,6 +113,10 @@ export default function PostsList({
           handleAddComment={handleAddComment}
           handleCommentUpvote={handleCommentUpvote}
           handleCommentDownvote={handleCommentDownvote}
+          editingPost={editingPost}
+          setEditingPost={setEditingPost}
+          editingComment={editingComment}
+          setEditingComment={setEditingComment}
           votingAnimation={votingAnimation}
           getVoteCount={getVoteCount}
           timeAgo={timeAgo}
