@@ -4,6 +4,19 @@ import VoteButton from "./VoteButton";
 import CommentsSection from "./CommentsSection";
 import ImageUpload from "./ImageUpload";
 
+/**
+ * PostCard Component
+ * 
+ * Displays a single community post with:
+ * - Voting (upvote/downvote)
+ * - Post content (title, text, images, videos)
+ * - Edit/delete functionality (for post creator only)
+ * - Comments section
+ * - Media embedding (YouTube, Vimeo, direct video links)
+ * 
+ * Props include handlers for all post and comment actions,
+ * theme settings, and state management.
+ */
 export default function PostCard({
   post,
   index,
@@ -30,17 +43,27 @@ export default function PostCard({
   timeAgo,
   isEarthy,
 }) {
+  // Local state for editing post content
   const [editTitle, setEditTitle] = useState(post.title);
   const [editContent, setEditContent] = useState(post.content);
   const [editImageUrl, setEditImageUrl] = useState(post.imageUrl || "");
   const [editVideoUrl, setEditVideoUrl] = useState(post.videoUrl || "");
 
+  // Check if this post is currently being edited
   const isEditing = editingPost === post.id;
 
+  /**
+   * Saves the edited post content
+   * Calls the parent handler with updated values
+   */
   const handleSaveEdit = () => {
     handleEditPost(post.id, editTitle, editContent, editImageUrl, editVideoUrl);
   };
 
+  /**
+   * Cancels editing mode
+   * Resets local state to original post values
+   */
   const handleCancelEdit = () => {
     setEditTitle(post.title);
     setEditContent(post.content);
@@ -49,17 +72,40 @@ export default function PostCard({
     setEditingPost(null);
   };
 
-  // Function to get YouTube embed URL
+  /**
+   * Extracts YouTube video ID from various YouTube URL formats
+   * and converts it to an embeddable iframe URL
+   * 
+   * Supports formats:
+   * - https://www.youtube.com/watch?v=VIDEO_ID
+   * - https://youtu.be/VIDEO_ID
+   * - https://www.youtube.com/embed/VIDEO_ID
+   * 
+   * @param {string} url - YouTube URL
+   * @returns {string|null} - Embed URL or null if invalid
+   */
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
+    // YouTube video IDs are always 11 characters
     return match && match[2].length === 11
       ? `https://www.youtube.com/embed/${match[2]}`
       : null;
   };
 
-  // Function to get Vimeo embed URL
+  /**
+   * Extracts Vimeo video ID from Vimeo URL
+   * and converts it to an embeddable iframe URL
+   * 
+   * Supports formats:
+   * - https://vimeo.com/VIDEO_ID
+   * - https://vimeo.com/channels/CHANNEL/VIDEO_ID
+   * - https://vimeo.com/video/VIDEO_ID
+   * 
+   * @param {string} url - Vimeo URL
+   * @returns {string|null} - Embed URL or null if invalid
+   */
   const getVimeoEmbedUrl = (url) => {
     if (!url) return null;
     const regExp = /(?:vimeo)\.com.*(?:videos|video|channels|)\/([\d]+)/i;
@@ -67,6 +113,8 @@ export default function PostCard({
     return match ? `https://player.vimeo.com/video/${match[1]}` : null;
   };
 
+  // Try to get an embeddable URL from the video URL
+  // Checks for YouTube first, then Vimeo
   const videoEmbedUrl = post.videoUrl
     ? getYouTubeEmbedUrl(post.videoUrl) || getVimeoEmbedUrl(post.videoUrl)
     : null;

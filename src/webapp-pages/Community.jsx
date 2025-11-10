@@ -33,26 +33,40 @@ export default function Community() {
   const { user, profile } = UserAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState([]); // All posts from Firebase
+  
+  // New post creation state
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
-  const [newPostImageUrl, setNewPostImageUrl] = useState("");
-  const [newPostVideoUrl, setNewPostVideoUrl] = useState("");
+  const [newPostImageUrl, setNewPostImageUrl] = useState(""); // Image URL from upload or direct URL
+  const [newPostVideoUrl, setNewPostVideoUrl] = useState(""); // YouTube/Vimeo/direct video URL
+  
+  // UI state
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [isCreatingPost, setIsCreatingPost] = useState(false);
-  const [expandedPost, setExpandedPost] = useState(null);
-  const [commentText, setCommentText] = useState({});
-  const [editingPost, setEditingPost] = useState(null);
-  const [editingComment, setEditingComment] = useState(null);
+  const [isCreatingPost, setIsCreatingPost] = useState(false); // Show/hide create post form
+  const [expandedPost, setExpandedPost] = useState(null); // Which post's comments are expanded
+  const [commentText, setCommentText] = useState({}); // Comment input text by post ID
+  
+  // Edit mode state
+  const [editingPost, setEditingPost] = useState(null); // ID of post being edited
+  const [editingComment, setEditingComment] = useState(null); // Composite ID of comment being edited (postId-commentId)
+  
+  // Mobile menu state
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  
+  // Loading and sorting state
   const [isLoading, setIsLoading] = useState(true);
-  const [sortBy, setSortBy] = useState("newest"); // newest, oldest, popular
+  const [sortBy, setSortBy] = useState("newest"); // Options: newest, oldest, popular
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // For post creation
+  
+  // Scroll state
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [votingAnimation, setVotingAnimation] = useState({}); // Track voting animations
-  const [currentPage, setCurrentPage] = useState(1);
-  const POSTS_PER_PAGE = 5;
+  const [votingAnimation, setVotingAnimation] = useState({}); // Track voting button animations
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1); // Current page number (1-indexed)
+  const POSTS_PER_PAGE = 5; // Number of posts to display per page
 
   // Handle scroll to show/hide scroll-to-top button
   useEffect(() => {
@@ -73,70 +87,91 @@ export default function Community() {
     "General",
   ];
 
-  // Fetch posts from Firebase
+  /**
+   * Fetches all posts from Firebase Firestore
+   * Sets up real-time listener that updates whenever posts collection changes
+   */
   useEffect(() => {
+    // Query posts collection ordered by creation date (newest first)
     const q = query(
       collection(db, "communityPosts"),
       orderBy("createdAt", "desc")
     );
+    
+    // Set up real-time listener
+    // This will automatically update the posts array whenever data changes in Firestore
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const postsData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setPosts(postsData);
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading spinner once data is fetched
     });
 
+    // Cleanup function to unsubscribe when component unmounts
     return () => unsubscribe();
   }, []);
 
-  // Handle navigation to specific post via URL parameter
+  /**
+   * Handle navigation to specific post via URL parameter
+   * Expands and scrolls to a post when ?postId=xyz is in the URL
+   * This allows direct linking to specific posts
+   */
   useEffect(() => {
     const postId = searchParams.get('postId');
     if (postId && posts.length > 0 && !isLoading) {
       const postExists = posts.find(p => p.id === postId);
       if (postExists) {
-        // Expand the target post
+        // Expand the target post to show comments
         setExpandedPost(postId);
         
-        // Scroll to the post after a short delay to ensure rendering
+        // Scroll to the post after a short delay to ensure rendering is complete
         setTimeout(() => {
           const element = document.getElementById(`post-${postId}`);
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
-          // Clear URL parameter after navigation
+          // Clear URL parameter after navigation to prevent re-scrolling
           setSearchParams({});
         }, 300);
       }
     }
   }, [searchParams, posts, isLoading, setSearchParams]);
 
-  // Create new post
+  /**
+   * Creates a new post and adds it to Firebase Firestore
+   * Validates that title and content are not empty
+   * 
+   * @param {Event} e - Form submit event
+   */
   const handleCreatePost = async (e) => {
     e.preventDefault();
+    
+    // Validate required fields
     if (!newPostTitle.trim() || !newPostContent.trim()) return;
 
     setIsSubmitting(true);
     try {
+      // Add new post to Firestore
       await addDoc(collection(db, "communityPosts"), {
         title: newPostTitle,
         content: newPostContent,
-        imageUrl: newPostImageUrl.trim() || null,
-        videoUrl: newPostVideoUrl.trim() || null,
+        imageUrl: newPostImageUrl.trim() || null, // Optional image URL
+        videoUrl: newPostVideoUrl.trim() || null, // Optional video URL
         category: selectedCategory === "All" ? "General" : selectedCategory,
         authorId: user.uid,
         authorName: profile?.firstName
           ? `${profile.firstName} ${profile.lastName || ""}`
           : "Anonymous",
         authorAvatar: profile?.photoUrl || null,
-        upvotes: [],
+        upvotes: [], // Initialize empty vote arrays
         downvotes: [],
         comments: [],
-        createdAt: serverTimestamp(),
+        createdAt: serverTimestamp(), // Firebase server timestamp
       });
 
+      // Reset form fields
       setNewPostTitle("");
       setNewPostContent("");
       setNewPostImageUrl("");
@@ -150,13 +185,21 @@ export default function Community() {
     }
   };
 
-  // Handle upvote
+  /**
+   * Handles upvote action on a post
+   * Toggles upvote and removes downvote if present
+   * Shows animation feedback on vote button
+   * 
+   * @param {string} postId - ID of the post to upvote
+   * @param {Array<string>} upvotes - Array of user IDs who upvoted
+   * @param {Array<string>} downvotes - Array of user IDs who downvoted
+   */
   const handleUpvote = async (postId, upvotes, downvotes) => {
     const postRef = doc(db, "communityPosts", postId);
     const hasUpvoted = upvotes?.includes(user.uid);
     const hasDownvoted = downvotes?.includes(user.uid);
 
-    // Trigger animation
+    // Trigger animation feedback (300ms pulse effect)
     setVotingAnimation((prev) => ({ ...prev, [`${postId}-up`]: true }));
     setTimeout(() => {
       setVotingAnimation((prev) => ({ ...prev, [`${postId}-up`]: false }));
@@ -164,9 +207,12 @@ export default function Community() {
 
     try {
       if (hasUpvoted) {
+        // User already upvoted, so remove the upvote (un-upvote)
         await updateDoc(postRef, { upvotes: arrayRemove(user.uid) });
       } else {
+        // Add upvote
         if (hasDownvoted) {
+          // Remove existing downvote first
           await updateDoc(postRef, { downvotes: arrayRemove(user.uid) });
         }
         await updateDoc(postRef, { upvotes: arrayUnion(user.uid) });
@@ -176,13 +222,21 @@ export default function Community() {
     }
   };
 
-  // Handle downvote
+  /**
+   * Handles downvote action on a post
+   * Toggles downvote and removes upvote if present
+   * Shows animation feedback on vote button
+   * 
+   * @param {string} postId - ID of the post to downvote
+   * @param {Array<string>} upvotes - Array of user IDs who upvoted
+   * @param {Array<string>} downvotes - Array of user IDs who downvoted
+   */
   const handleDownvote = async (postId, upvotes, downvotes) => {
     const postRef = doc(db, "communityPosts", postId);
     const hasUpvoted = upvotes?.includes(user.uid);
     const hasDownvoted = downvotes?.includes(user.uid);
 
-    // Trigger animation
+    // Trigger animation feedback (300ms pulse effect)
     setVotingAnimation((prev) => ({ ...prev, [`${postId}-down`]: true }));
     setTimeout(() => {
       setVotingAnimation((prev) => ({ ...prev, [`${postId}-down`]: false }));
@@ -190,9 +244,12 @@ export default function Community() {
 
     try {
       if (hasDownvoted) {
+        // User already downvoted, so remove the downvote (un-downvote)
         await updateDoc(postRef, { downvotes: arrayRemove(user.uid) });
       } else {
+        // Add downvote
         if (hasUpvoted) {
+          // Remove existing upvote first
           await updateDoc(postRef, { upvotes: arrayRemove(user.uid) });
         }
         await updateDoc(postRef, { downvotes: arrayUnion(user.uid) });
@@ -202,27 +259,34 @@ export default function Community() {
     }
   };
 
-  // Add comment
+  /**
+   * Adds a new comment to a post
+   * Creates comment object with author info and timestamps
+   * 
+   * @param {string} postId - ID of the post to comment on
+   */
   const handleAddComment = async (postId) => {
     const text = commentText[postId]?.trim();
-    if (!text) return;
+    if (!text) return; // Don't add empty comments
 
     const postRef = doc(db, "communityPosts", postId);
+    
+    // Create new comment object
     const newComment = {
-      id: Date.now().toString(),
+      id: Date.now().toString(), // Simple unique ID based on timestamp
       text,
       authorId: user.uid,
       authorName: profile?.firstName
         ? `${profile.firstName} ${profile.lastName || ""}`
         : "Anonymous",
       authorAvatar: profile?.photoUrl || null,
-      upvotes: [],
+      upvotes: [], // Initialize empty vote arrays
       downvotes: [],
-      createdAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(), // ISO string for timestamp
     };
 
     try {
-      // First, get the current document
+      // First, get the current document to ensure it exists
       const postDoc = await getDoc(postRef);
 
       if (!postDoc.exists()) {
@@ -231,14 +295,16 @@ export default function Community() {
         return;
       }
 
+      // Add new comment to existing comments array
       const currentComments = postDoc.data().comments || [];
       const updatedComments = [...currentComments, newComment];
 
-      // Update with the new comments array
+      // Update Firestore with the new comments array
       await updateDoc(postRef, {
         comments: updatedComments,
       });
 
+      // Clear the comment input field for this post
       setCommentText({ ...commentText, [postId]: "" });
       console.log("Comment added successfully!");
     } catch (error) {
@@ -249,7 +315,16 @@ export default function Community() {
     }
   };
 
-  // Handle comment upvote
+  /**
+   * Handles upvote action on a comment
+   * Toggles upvote and removes downvote if present
+   * Updates the entire comments array in Firestore
+   * 
+   * @param {string} postId - ID of the post containing the comment
+   * @param {string} commentId - ID of the comment to upvote
+   * @param {Array<string>} upvotes - Array of user IDs who upvoted this comment
+   * @param {Array<string>} downvotes - Array of user IDs who downvoted this comment
+   */
   const handleCommentUpvote = async (postId, commentId, upvotes, downvotes) => {
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
@@ -257,15 +332,19 @@ export default function Community() {
     const hasUpvoted = upvotes?.includes(user.uid);
     const hasDownvoted = downvotes?.includes(user.uid);
 
+    // Map through comments to find and update the target comment
     const updatedComments = post.comments.map((comment) => {
       if (comment.id === commentId) {
         let newUpvotes = [...(comment.upvotes || [])];
         let newDownvotes = [...(comment.downvotes || [])];
 
         if (hasUpvoted) {
+          // Remove upvote (un-upvote)
           newUpvotes = newUpvotes.filter((id) => id !== user.uid);
         } else {
+          // Add upvote
           if (hasDownvoted) {
+            // Remove existing downvote first
             newDownvotes = newDownvotes.filter((id) => id !== user.uid);
           }
           newUpvotes.push(user.uid);
@@ -278,6 +357,7 @@ export default function Community() {
 
     try {
       const postRef = doc(db, "communityPosts", postId);
+      // Update post with modified comments array
       await updateDoc(postRef, {
         comments: updatedComments,
       });
@@ -286,7 +366,16 @@ export default function Community() {
     }
   };
 
-  // Handle comment downvote
+  /**
+   * Handles downvote action on a comment
+   * Toggles downvote and removes upvote if present
+   * Updates the entire comments array in Firestore
+   * 
+   * @param {string} postId - ID of the post containing the comment
+   * @param {string} commentId - ID of the comment to downvote
+   * @param {Array<string>} upvotes - Array of user IDs who upvoted this comment
+   * @param {Array<string>} downvotes - Array of user IDs who downvoted this comment
+   */
   const handleCommentDownvote = async (
     postId,
     commentId,
@@ -299,15 +388,19 @@ export default function Community() {
     const hasUpvoted = upvotes?.includes(user.uid);
     const hasDownvoted = downvotes?.includes(user.uid);
 
+    // Map through comments to find and update the target comment
     const updatedComments = post.comments.map((comment) => {
       if (comment.id === commentId) {
         let newUpvotes = [...(comment.upvotes || [])];
         let newDownvotes = [...(comment.downvotes || [])];
 
         if (hasDownvoted) {
+          // Remove downvote (un-downvote)
           newDownvotes = newDownvotes.filter((id) => id !== user.uid);
         } else {
+          // Add downvote
           if (hasUpvoted) {
+            // Remove existing upvote first
             newUpvotes = newUpvotes.filter((id) => id !== user.uid);
           }
           newDownvotes.push(user.uid);
@@ -328,9 +421,12 @@ export default function Community() {
     }
   };
 
-  // Delete post
+  /**
+   * Deletes a post from Firestore
+   * Only allows deletion if current user is the post author
+   */
   const handleDeletePost = async (postId, authorId) => {
-    if (user.uid !== authorId) return;
+    if (user.uid !== authorId) return; // Security check
 
     try {
       await deleteDoc(doc(db, "communityPosts", postId));
@@ -339,35 +435,43 @@ export default function Community() {
     }
   };
 
-  // Edit post
+  /**
+   * Updates a post in Firestore with edited content
+   * Updates title, content, image URL, video URL, and adds editedAt timestamp
+   */
   const handleEditPost = async (postId, updatedTitle, updatedContent, updatedImageUrl, updatedVideoUrl) => {
     try {
       const postRef = doc(db, "communityPosts", postId);
       await updateDoc(postRef, {
         title: updatedTitle,
         content: updatedContent,
-        imageUrl: updatedImageUrl?.trim() || null,
-        videoUrl: updatedVideoUrl?.trim() || null,
-        editedAt: serverTimestamp(),
+        imageUrl: updatedImageUrl?.trim() || null, // Store null if empty
+        videoUrl: updatedVideoUrl?.trim() || null, // Store null if empty
+        editedAt: serverTimestamp(), // Add timestamp to show post was edited
       });
-      setEditingPost(null);
+      setEditingPost(null); // Exit edit mode
     } catch (error) {
       console.error("Error editing post:", error);
       alert("Failed to edit post. Please try again.");
     }
   };
 
-  // Edit comment
+  /**
+   * Updates a comment in a post
+   * Finds the comment in the post's comments array and updates its text
+   * Also adds editedAt timestamp to the comment
+   */
   const handleEditComment = async (postId, commentId, updatedText) => {
     const post = posts.find((p) => p.id === postId);
-    if (!post) return;
+    if (!post) return; // Post not found
 
+    // Map through comments array and update the target comment
     const updatedComments = post.comments.map((comment) => {
       if (comment.id === commentId) {
         return {
           ...comment,
           text: updatedText,
-          editedAt: new Date().toISOString(),
+          editedAt: new Date().toISOString(), // Add edited timestamp
         };
       }
       return comment;
@@ -376,20 +480,24 @@ export default function Community() {
     try {
       const postRef = doc(db, "communityPosts", postId);
       await updateDoc(postRef, {
-        comments: updatedComments,
+        comments: updatedComments, // Update entire comments array
       });
-      setEditingComment(null);
+      setEditingComment(null); // Exit edit mode
     } catch (error) {
       console.error("Error editing comment:", error);
       alert("Failed to edit comment. Please try again.");
     }
   };
 
-  // Delete comment
+  /**
+   * Deletes a comment from a post
+   * Filters out the comment from the post's comments array
+   */
   const handleDeleteComment = async (postId, commentId) => {
     const post = posts.find((p) => p.id === postId);
-    if (!post) return;
+    if (!post) return; // Post not found
 
+    // Filter out the comment to delete
     const updatedComments = post.comments.filter((comment) => comment.id !== commentId);
 
     try {
@@ -404,12 +512,14 @@ export default function Community() {
   };
 
   // Filter posts by category
+  // "All" shows all posts, otherwise filter by matching category
   const filteredPosts =
     selectedCategory === "All"
       ? posts
       : posts.filter((post) => post.category === selectedCategory);
 
   // Filter by search query
+  // Searches in post title, content, and author name (case-insensitive)
   const searchedPosts = searchQuery.trim()
     ? filteredPosts.filter(
         (post) =>
@@ -417,43 +527,48 @@ export default function Community() {
           post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
           post.authorName.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : filteredPosts;
+      : filteredPosts;
 
-  // Sort posts
+  // Sort posts based on selected sort option
   const sortedPosts = [...searchedPosts].sort((a, b) => {
     if (sortBy === "popular") {
+      // Sort by vote score (upvotes - downvotes)
       const aScore = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
       const bScore = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
-      return bScore - aScore;
+      return bScore - aScore; // Highest score first
     } else if (sortBy === "oldest") {
+      // Sort by creation date (oldest first)
       const aTime = a.createdAt?.toDate?.() || new Date(a.createdAt);
       const bTime = b.createdAt?.toDate?.() || new Date(b.createdAt);
       return aTime - bTime;
     } else {
-      // newest (default)
+      // Default: Sort by newest first
       const aTime = a.createdAt?.toDate?.() || new Date(a.createdAt);
       const bTime = b.createdAt?.toDate?.() || new Date(b.createdAt);
       return bTime - aTime;
     }
   });
 
-  // Pagination
+  // Pagination logic
+  // Calculate total number of pages needed
   const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
-  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
-  const endIndex = startIndex + POSTS_PER_PAGE;
-  const paginatedPosts = sortedPosts.slice(startIndex, endIndex);
+  
+  // Calculate which posts to show on current page
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE; // First post index
+  const endIndex = startIndex + POSTS_PER_PAGE; // Last post index + 1
+  const paginatedPosts = sortedPosts.slice(startIndex, endIndex); // Extract posts for current page
 
   // Reset to page 1 when filters change
+  // This ensures users don't end up on an empty page after filtering
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, searchQuery, sortBy]);
 
   // Scroll to top when page changes
+  // Provides better UX by showing the start of the new page
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
-
-  // Get vote count
+  }, [currentPage]);  // Get vote count
   const getVoteCount = (upvotes = [], downvotes = []) => {
     return upvotes.length - downvotes.length;
   };
@@ -487,13 +602,22 @@ export default function Community() {
     return "just now";
   };
 
-  // Get category count
+  /**
+   * Get the count of posts in a specific category
+   * Returns total posts for "All" category
+   * 
+   * @param {string} category - Category name to count
+   * @returns {number} Number of posts in the category
+   */
   const getCategoryCount = (category) => {
     if (category === "All") return posts.length;
     return posts.filter((post) => post.category === category).length;
   };
 
-  // Scroll to top
+  /**
+   * Smoothly scrolls the page to the top
+   * Used in "Back to Top" button
+   */
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -511,7 +635,7 @@ export default function Community() {
         }`}
       >
         <div className="px-4 mx-auto max-w-7xl">
-          {/* Header */}
+          {/* Header Section - Title and description */}
           <div className="mt-4 mb-8">
             <h1
               className={`text-4xl font-bold mb-2 ${
@@ -529,7 +653,7 @@ export default function Community() {
               wellness journey.
             </p>
 
-            {/* Live Stats */}
+            {/* Live Stats - Shows real-time community statistics */}
             <CommunityStats posts={posts} isEarthy={isEarthy} />
           </div>
 
@@ -544,9 +668,10 @@ export default function Community() {
               isEarthy={isEarthy}
             />
 
-            {/* Mobile/Tablet Category Dropdown */}
+            {/* Mobile/Tablet Category Dropdown - Shows on smaller screens */}
             <div className="col-span-1 lg:hidden">
               <div className="flex gap-2 mb-4">
+                {/* Category selector button */}
                 <button
                   onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
                   className={`flex-1 px-4 py-3 rounded-lg font-medium transition shadow-md flex items-center justify-between ${
@@ -556,6 +681,7 @@ export default function Community() {
                   }`}
                 >
                   <span>Category: {selectedCategory}</span>
+                  {/* Dropdown arrow icon - rotates when open */}
                   <svg
                     className={`w-5 h-5 transition-transform ${
                       isCategoryMenuOpen ? "rotate-180" : ""
@@ -572,6 +698,7 @@ export default function Community() {
                     />
                   </svg>
                 </button>
+                {/* Create post button */}
                 <button
                   onClick={() => setIsCreatingPost(!isCreatingPost)}
                   className={`px-4 py-3 rounded-lg font-bold text-white transition shadow-md ${
@@ -584,7 +711,7 @@ export default function Community() {
                 </button>
               </div>
 
-              {/* Category Dropdown Menu */}
+              {/* Category Dropdown Menu - Appears when button is clicked */}
               {isCategoryMenuOpen && (
                 <div
                   className={`rounded-lg shadow-lg p-3 mb-4 ${
@@ -619,9 +746,9 @@ export default function Community() {
               )}
             </div>
 
-            {/* Main Content */}
+            {/* Main Content Area - Contains posts, search, and pagination */}
             <div className="lg:col-span-3">
-              {/* Search and Sort Bar */}
+              {/* Search and Sort Bar - Filters and sorts posts */}
               <SearchAndSort
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
@@ -631,7 +758,7 @@ export default function Community() {
                 isEarthy={isEarthy}
               />
 
-              {/* Create Post Form */}
+              {/* Create Post Form - Shows when user clicks "Create Post" button */}
               <CreatePostForm
                 isCreatingPost={isCreatingPost}
                 categories={categories}
@@ -651,10 +778,10 @@ export default function Community() {
                 isEarthy={isEarthy}
               />
 
-              {/* Posts List */}
+              {/* Posts List - Displays paginated posts with all interaction handlers */}
               <PostsList
                 isLoading={isLoading}
-                sortedPosts={paginatedPosts}
+                sortedPosts={paginatedPosts} // Only shows current page's posts
                 searchQuery={searchQuery}
                 user={user}
                 handleUpvote={handleUpvote}
@@ -680,7 +807,7 @@ export default function Community() {
                 isEarthy={isEarthy}
               />
 
-              {/* Pagination */}
+              {/* Pagination Controls - Shows page navigation (Previous, 1,2,3..., Next) */}
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -691,7 +818,7 @@ export default function Community() {
           </div>
         </div>
 
-        {/* Scroll to Top Button */}
+        {/* Scroll to Top Button - Appears when user scrolls down */}
         {showScrollTop && (
           <button
             onClick={scrollToTop}
@@ -704,6 +831,7 @@ export default function Community() {
               animation: "fadeIn 0.3s ease-out",
             }}
           >
+            {/* Up arrow icon */}
             <svg
               className="w-6 h-6"
               fill="none"

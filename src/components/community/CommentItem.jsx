@@ -1,6 +1,18 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
+/**
+ * CommentItem Component
+ * 
+ * Displays a single comment on a post with:
+ * - Author information and avatar
+ * - Comment text
+ * - Upvote/downvote buttons
+ * - Edit/delete functionality (for comment author only)
+ * - Timestamp with "edited" indicator
+ * 
+ * Provides inline editing with save/cancel actions.
+ */
 export default function CommentItem({
   comment,
   postId,
@@ -15,14 +27,25 @@ export default function CommentItem({
   timeAgo,
   isEarthy,
 }) {
+  // Local state for editing comment text
   const [editText, setEditText] = useState(comment.text);
 
+  // Check if this comment is currently being edited
+  // Using composite key: postId-commentId to allow editing different comments on different posts
   const isEditing = editingComment === `${postId}-${comment.id}`;
 
+  /**
+   * Saves the edited comment text
+   * Calls the parent handler with updated text
+   */
   const handleSaveEdit = () => {
     handleEditComment(postId, comment.id, editText);
   };
 
+  /**
+   * Cancels editing mode
+   * Resets local state to original comment text
+   */
   const handleCancelEdit = () => {
     setEditText(comment.text);
     setEditingComment(null);

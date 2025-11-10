@@ -1,3 +1,35 @@
+/**
+ * CreatePostForm Component
+ * 
+ * Displays a form for creating new community posts
+ * Includes fields for title, content, category selection, image upload, and video URL
+ * 
+ * Features:
+ * - Category dropdown (excludes "All" option)
+ * - Title input (required)
+ * - Content textarea (required)
+ * - Image upload via ImageUpload component (drag-and-drop or file picker)
+ * - Video URL input for YouTube/Vimeo (optional)
+ * - Submit button with loading state
+ * - Cancel button to close form
+ * 
+ * @param {boolean} isCreatingPost - Whether the form should be displayed
+ * @param {Function} handleCreatePost - Handler for form submission
+ * @param {string} newPostTitle - Current title input value
+ * @param {Function} setNewPostTitle - Setter for title
+ * @param {string} newPostContent - Current content input value
+ * @param {Function} setNewPostContent - Setter for content
+ * @param {string} newPostImageUrl - URL of uploaded image
+ * @param {Function} setNewPostImageUrl - Setter for image URL (called by ImageUpload)
+ * @param {string} newPostVideoUrl - Current video URL input value
+ * @param {Function} setNewPostVideoUrl - Setter for video URL
+ * @param {string} selectedCategory - Currently selected category
+ * @param {Function} setSelectedCategory - Setter for category
+ * @param {Array<string>} categories - List of available categories
+ * @param {boolean} isSubmitting - Whether form is currently being submitted
+ * @param {Function} setIsCreatingPost - Setter to show/hide form
+ * @param {boolean} isEarthy - Theme flag (earthy vs cool)
+ */
 import ImageUpload from "./ImageUpload";
 
 export default function CreatePostForm({
@@ -18,6 +50,7 @@ export default function CreatePostForm({
   setIsCreatingPost,
   isEarthy,
 }) {
+  // Don't render anything if form is not open
   if (!isCreatingPost) return null;
 
   return (
@@ -36,6 +69,7 @@ export default function CreatePostForm({
         Create a New Post
       </h2>
       <form onSubmit={handleCreatePost} className="space-y-4">
+        {/* Category Selection Dropdown */}
         <div>
           <label
             className={`block text-sm font-medium mb-2 ${
@@ -53,6 +87,7 @@ export default function CreatePostForm({
                 : "bg-white text-gray-900 border-blue-grey focus:ring-light-lavender"
             }`}
           >
+            {/* Filter out "All" category since it's not a valid post category */}
             {categories
               .filter((c) => c !== "All")
               .map((category) => (
@@ -62,6 +97,8 @@ export default function CreatePostForm({
               ))}
           </select>
         </div>
+        
+        {/* Title Input (Required) */}
         <div>
           <label
             className={`block text-sm font-medium mb-2 ${
@@ -83,6 +120,8 @@ export default function CreatePostForm({
             required
           />
         </div>
+        
+        {/* Content Textarea (Required) */}
         <div>
           <label
             className={`block text-sm font-medium mb-2 ${
@@ -105,15 +144,16 @@ export default function CreatePostForm({
           />
         </div>
 
-        {/* Media Section */}
+        {/* Media Section - Image Upload and Video URL */}
         <div className="space-y-4">
-          {/* Image Upload Component */}
+          {/* Image Upload Component - Handles drag-and-drop and file picker */}
           <ImageUpload
             onImageUploaded={setNewPostImageUrl}
             currentImageUrl={newPostImageUrl}
             isEarthy={isEarthy}
           />
 
+          {/* Video URL Input (Optional) - Supports YouTube, Vimeo, and direct links */}
           <div>
             <label
               className={`block text-sm font-medium mb-2 ${
@@ -139,7 +179,9 @@ export default function CreatePostForm({
           </div>
         </div>
 
+        {/* Form Action Buttons */}
         <div className="flex gap-3">
+          {/* Submit Button - Shows loading spinner when submitting */}
           <button
             type="submit"
             disabled={isSubmitting}
@@ -151,6 +193,7 @@ export default function CreatePostForm({
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
+                {/* Loading spinner icon */}
                 <svg
                   className="animate-spin h-5 w-5"
                   fill="none"
@@ -176,6 +219,8 @@ export default function CreatePostForm({
               "Post"
             )}
           </button>
+          
+          {/* Cancel Button - Closes the form without submitting */}
           <button
             type="button"
             onClick={() => setIsCreatingPost(false)}
