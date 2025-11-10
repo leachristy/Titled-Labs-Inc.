@@ -64,7 +64,7 @@ export default function UntiltNavBar() {
                   isEarthy ? "text-brown-800" : "text-white"
                 }`}
               >
-                Tilted
+                Untilt
               </span>
             </div>
           </NavLink>

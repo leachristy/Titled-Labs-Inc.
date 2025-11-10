@@ -114,32 +114,6 @@ export default function Community() {
   }, []);
 
   /**
-   * Handle navigation to specific post via URL parameter
-   * Expands and scrolls to a post when ?postId=xyz is in the URL
-   * This allows direct linking to specific posts
-   */
-  useEffect(() => {
-    const postId = searchParams.get('postId');
-    if (postId && posts.length > 0 && !isLoading) {
-      const postExists = posts.find(p => p.id === postId);
-      if (postExists) {
-        // Expand the target post to show comments
-        setExpandedPost(postId);
-        
-        // Scroll to the post after a short delay to ensure rendering is complete
-        setTimeout(() => {
-          const element = document.getElementById(`post-${postId}`);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-          // Clear URL parameter after navigation to prevent re-scrolling
-          setSearchParams({});
-        }, 300);
-      }
-    }
-  }, [searchParams, posts, isLoading, setSearchParams]);
-
-  /**
    * Creates a new post and adds it to Firebase Firestore
    * Validates that title and content are not empty
    * 
@@ -568,7 +542,45 @@ export default function Community() {
   // Provides better UX by showing the start of the new page
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);  // Get vote count
+  }, [currentPage]);
+
+  /**
+   * Handle navigation to specific post via URL parameter
+   * Expands and scrolls to a post when ?postId=xyz is in the URL
+   * This allows direct linking to specific posts
+   * Also handles pagination - navigates to the correct page if needed
+   */
+  useEffect(() => {
+    const postId = searchParams.get('postId');
+    if (postId && posts.length > 0 && !isLoading) {
+      // Find the post in the full sorted posts array
+      const postIndex = sortedPosts.findIndex(p => p.id === postId);
+      
+      if (postIndex !== -1) {
+        // Calculate which page this post is on
+        const pageNumber = Math.floor(postIndex / POSTS_PER_PAGE) + 1;
+        
+        // Set to the correct page
+        setCurrentPage(pageNumber);
+        
+        // Expand the target post to show comments
+        setExpandedPost(postId);
+        
+        // Scroll to the post after a short delay to ensure rendering is complete
+        setTimeout(() => {
+          const element = document.getElementById(`post-${postId}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          // Clear URL parameter after navigation to prevent re-scrolling
+          setSearchParams({});
+        }, 500); // Increased timeout to allow for page change
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, posts, isLoading]);
+
+  // Get vote count
   const getVoteCount = (upvotes = [], downvotes = []) => {
     return upvotes.length - downvotes.length;
   };

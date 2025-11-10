@@ -16,7 +16,7 @@ export default function CTASection({ onNavigate }) {
             ></div>
             <span
               className={`text-xs font-semibold ${
-                isEarthy ? "text-cream-100" : "text-pale-lavender"
+                isEarthy ? "text-cream-100" : "text-white"
               } tracking-wider`}
             >
               NO CREDIT CARD REQUIRED
@@ -25,7 +25,7 @@ export default function CTASection({ onNavigate }) {
           <h2 className="mb-4 text-4xl font-bold text-white">Ready to begin your wellness journey?</h2>
           <p
             className={`max-w-2xl mx-auto mb-8 text-lg ${
-              isEarthy ? "text-cream-100" : "text-pale-lavender"
+              isEarthy ? "text-cream-100" : "text-white"
             }`}
           >
             Join Untilt today to access self-care tools, supportive communities, AI assistance, and personalized wellness tracking—all in one secure platform.
@@ -50,7 +50,7 @@ export default function CTASection({ onNavigate }) {
           </div>
           <p
             className={`text-sm ${
-              isEarthy ? "text-cream-200" : "text-pale-lavender"
+              isEarthy ? "text-cream-200" : "text-white"
             }`}
           >
             Begin your wellness journey today—no credit card required
