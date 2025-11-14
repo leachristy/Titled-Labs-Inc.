@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { UserAuth } from "../../contexts/AuthContext";
+import DailyCheckIn from "./CheckIn";
 
 export default function MoodTracker() {
   const { user } = UserAuth();
@@ -35,7 +36,6 @@ export default function MoodTracker() {
     return tips[mood] || ["Take a deep breath", "Practice self-compassion"];
   }
 
-  // Handle submit
   function handleSubmit(e) {
     e.preventDefault();
     const moodToSave = customMood || selectedMood;
@@ -55,12 +55,14 @@ export default function MoodTracker() {
   }
 
   return (
-    <div className={` pb-12 ${bgPage}`}>
-      <div className="">
+    <div className={`pb-12 ${bgPage}`}>
+      <div className="space-y-8">
+        <DailyCheckIn />
+
         {/* Mood Check-in Card */}
         <div
           className={`
-            group relative overflow-hidden rounded-2xl shadow-lg p-6 mb-10 border-2 transition-all duration-300
+            group relative overflow-hidden rounded-2xl shadow-lg p-6 border-2 transition-all duration-300
             ${cardBase}
           `}
         >
@@ -68,7 +70,6 @@ export default function MoodTracker() {
             Daily Mood Check-In
           </h2>
           <form onSubmit={handleSubmit} className="space-y-5">
-            
             <div>
               <p className="mb-2 font-semibold">How are you feeling today?</p>
 
@@ -115,7 +116,9 @@ export default function MoodTracker() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-1">Brief description</label>
+              <label className="block text-sm font-semibold mb-1">
+                Brief description
+              </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -140,9 +143,9 @@ export default function MoodTracker() {
               Check In
             </button>
           </form>
+
           <div
             className={`
-              
               ${isEarthy ? "bg-rust-400" : "bg-light-lavender"}
             `}
             style={{ transform: "translate(50%, -50%)" }}
@@ -158,7 +161,9 @@ export default function MoodTracker() {
           <h3 className="text-2xl font-bold mb-4">Your Recent Check-Ins</h3>
 
           {moodHistory.length === 0 ? (
-            <p className="opacity-70">No entries yet. Start by checking in!</p>
+            <p className="opacity-70">
+              No entries yet. Use the mood tracker above to log how you're feeling.
+            </p>
           ) : (
             <ul className="space-y-5">
               {moodHistory.map((entry) => (
