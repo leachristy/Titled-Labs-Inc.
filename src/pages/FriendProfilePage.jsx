@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import {
   doc,
   getDoc,
@@ -22,84 +21,108 @@ import { UserAuth } from "../contexts/AuthContext";
 export const FriendProfilePage = () => {
   const { uid } = useParams();
   const navigate = useNavigate();
+  const { currentTheme } = useTheme();
+  const { user } = UserAuth();
+
+  const isEarthy = currentTheme === "earthy";
+
   const [profile, setProfile] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
+
+  // friend state
   const [friendStatus, setFriendStatus] = useState("loading");
   // 'loading' | 'self' | 'friends' | 'pendingSent' | 'pendingReceived' | 'none'
   const [friendRequestId, setFriendRequestId] = useState(null);
   const [friendError, setFriendError] = useState("");
-  const { currentTheme } = useTheme();
-  const { user } = UserAuth(); // current logged-in Firebase user
-  const isEarthy = currentTheme === "earthy";
 
-  // Fetch profile + posts
+  // block + report state
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportDetails, setReportDetails] = useState("");
+  const [reportSubmitting, setReportSubmitting] = useState(false);
+  const [reportSuccess, setReportSuccess] = useState("");
+  const [reportError, setReportError] = useState("");
+
+  // load profile + posts
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const docRef = doc(db, "users", uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setProfile(docSnap.data());
-        }
-      } catch (err) {
-        console.error("Error fetching profile:", err);
-      }
-    };
+    if (!uid) return;
 
-    const fetchPosts = async () => {
+    const fetchProfileAndPosts = async () => {
       try {
-        const q = query(
+        // profile
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          setProfile(userSnap.data());
+        }
+
+        // posts (same collection / filtering as original)
+        const postsQ = query(
           collection(db, "communityPosts"),
           where("authorId", "==", uid)
         );
-        const snapshot = await getDocs(q);
-        const postsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
+        const postsSnap = await getDocs(postsQ);
+        const posts = postsSnap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
         }));
-        setUserPosts(postsData);
+        setUserPosts(posts);
       } catch (err) {
-        console.error("Error fetching posts:", err);
+        console.error("Error loading profile/posts:", err);
       }
     };
 
-    if (uid) {
-      fetchProfile();
-      fetchPosts();
-    }
+    fetchProfileAndPosts();
   }, [uid]);
 
-  // Check friend status between current user and this profile
+  // friend + block status
   useEffect(() => {
-    const checkFriendStatus = async () => {
-      // Auth is still loading
+    if (!uid || !user) {
+      setFriendStatus("loading");
+      return;
+    }
+
+    const checkStatus = async () => {
       if (!user || !user.uid) {
         setFriendStatus("loading");
         return;
       }
 
-      // Viewing own profile
       if (user.uid === uid) {
         setFriendStatus("self");
+        setIsBlocked(false);
         return;
       }
 
       try {
         setFriendError("");
+        setReportError("");
+        setReportSuccess("");
 
-        // 1. Are we already friends? Check users/{user.uid}/friends/{uid}
-        const friendDocRef = doc(db, `users/${user.uid}/friends/${uid}`);
-        const friendDocSnap = await getDoc(friendDocRef);
+        // 0. check block
+        const blockRef = doc(db, `users/${user.uid}/blocked/${uid}`);
+        const blockSnap = await getDoc(blockRef);
+        if (blockSnap.exists()) {
+          setIsBlocked(true);
+          setFriendStatus("none");
+          setFriendRequestId(null);
+          return;
+        } else {
+          setIsBlocked(false);
+        }
 
-        if (friendDocSnap.exists()) {
+        // 1. friends?
+        const myFriendRef = doc(db, `users/${user.uid}/friends/${uid}`);
+        const myFriendSnap = await getDoc(myFriendRef);
+        if (myFriendSnap.exists()) {
           setFriendStatus("friends");
           setFriendRequestId(null);
           return;
         }
 
+        // 2. pending I sent
         const frRef = collection(db, "friendRequests");
-
-        // 2. Did I send a pending request to them?
         const sentQ = query(
           frRef,
           where("fromUid", "==", user.uid),
@@ -113,7 +136,7 @@ export const FriendProfilePage = () => {
           return;
         }
 
-        // 3. Did they send a pending request to me?
+        // 3. pending they sent
         const receivedQ = query(
           frRef,
           where("fromUid", "==", uid),
@@ -127,7 +150,7 @@ export const FriendProfilePage = () => {
           return;
         }
 
-        // 4. Nothing yet
+        // 4. nothing
         setFriendStatus("none");
         setFriendRequestId(null);
       } catch (err) {
@@ -137,27 +160,18 @@ export const FriendProfilePage = () => {
       }
     };
 
-    if (uid) {
-      setFriendStatus("loading");
-      checkFriendStatus();
-    }
+    setFriendStatus("loading");
+    checkStatus();
   }, [uid, user]);
 
+  // friend actions
   const handleAddFriend = async () => {
-    if (!user || !user.uid) {
-      // In your app they shouldn't reach here, but safe-guard anyway
-      setFriendError("Something went wrong with your session.");
-      return;
-    }
-    if (user.uid === uid) {
-      return; // shouldn't happen because we handle 'self'
-    }
+    if (!user || !user.uid || user.uid === uid || isBlocked) return;
 
     try {
       setFriendError("");
 
-      const frRef = collection(db, "friendRequests");
-      await addDoc(frRef, {
+      await addDoc(collection(db, "friendRequests"), {
         fromUid: user.uid,
         toUid: uid,
         status: "pending",
@@ -172,11 +186,10 @@ export const FriendProfilePage = () => {
   };
 
   const handleAcceptFriend = async () => {
-    if (!user || !user.uid || !friendRequestId) return;
+    if (!user || !user.uid || !friendRequestId || isBlocked) return;
 
     try {
       setFriendError("");
-
       const batch = writeBatch(db);
 
       const requestRef = doc(db, "friendRequests", friendRequestId);
@@ -188,12 +201,8 @@ export const FriendProfilePage = () => {
       const myFriendRef = doc(db, `users/${user.uid}/friends/${uid}`);
       const theirFriendRef = doc(db, `users/${uid}/friends/${user.uid}`);
 
-      batch.set(myFriendRef, {
-        createdAt: serverTimestamp(),
-      });
-      batch.set(theirFriendRef, {
-        createdAt: serverTimestamp(),
-      });
+      batch.set(myFriendRef, { createdAt: serverTimestamp() });
+      batch.set(theirFriendRef, { createdAt: serverTimestamp() });
 
       await batch.commit();
 
@@ -230,17 +239,142 @@ export const FriendProfilePage = () => {
     try {
       setFriendError("");
 
-      // Delete both friendship docs
       await Promise.all([
         deleteDoc(doc(db, `users/${user.uid}/friends/${uid}`)),
         deleteDoc(doc(db, `users/${uid}/friends/${user.uid}`)),
       ]);
 
-      // Update UI
       setFriendStatus("none");
     } catch (err) {
       console.error("Error unfriending:", err);
       setFriendError("Failed to unfriend. Please try again.");
+    }
+  };
+
+  // block / unblock
+  const handleBlock = async () => {
+    if (!user || !user.uid || user.uid === uid) return;
+
+    try {
+      setFriendError("");
+
+      const batch = writeBatch(db);
+
+      const myBlockRef = doc(db, `users/${user.uid}/blocked/${uid}`);
+      const theirBlockRef = doc(db, `users/${uid}/blocked/${user.uid}`);
+
+      batch.set(myBlockRef, { createdAt: serverTimestamp() });
+      batch.set(theirBlockRef, { createdAt: serverTimestamp() });
+
+      const myFriendRef = doc(db, `users/${user.uid}/friends/${uid}`);
+      const theirFriendRef = doc(db, `users/${uid}/friends/${user.uid}`);
+
+      batch.delete(myFriendRef);
+      batch.delete(theirFriendRef);
+
+      const frRef = collection(db, "friendRequests");
+
+      const sentQ = query(
+        frRef,
+        where("fromUid", "==", user.uid),
+        where("toUid", "==", uid),
+        where("status", "==", "pending")
+      );
+      const sentSnap = await getDocs(sentQ);
+      sentSnap.forEach((d) => {
+        batch.update(d.ref, {
+          status: "blocked",
+          respondedAt: serverTimestamp(),
+        });
+      });
+
+      const receivedQ = query(
+        frRef,
+        where("fromUid", "==", uid),
+        where("toUid", "==", user.uid),
+        where("status", "==", "pending")
+      );
+      const receivedSnap = await getDocs(receivedQ);
+      receivedSnap.forEach((d) => {
+        batch.update(d.ref, {
+          status: "blocked",
+          respondedAt: serverTimestamp(),
+        });
+      });
+
+      await batch.commit();
+
+      setIsBlocked(true);
+      setFriendStatus("none");
+      setFriendRequestId(null);
+    } catch (err) {
+      console.error("Error blocking user:", err);
+      setFriendError("Failed to block this user. Please try again.");
+    }
+  };
+
+  const handleUnblock = async () => {
+    if (!user || !user.uid || user.uid === uid) return;
+
+    try {
+      setFriendError("");
+
+      await Promise.all([
+        deleteDoc(doc(db, `users/${user.uid}/blocked/${uid}`)),
+        deleteDoc(doc(db, `users/${uid}/blocked/${user.uid}`)),
+      ]);
+
+      setIsBlocked(false);
+    } catch (err) {
+      console.error("Error unblocking user:", err);
+      setFriendError("Failed to unblock this user. Please try again.");
+    }
+  };
+
+  // report
+  const handleSubmitReport = async (e) => {
+    e.preventDefault();
+
+    if (!user || !user.uid) {
+      setReportError("You need to be signed in to report a user.");
+      return;
+    }
+
+    if (!reportReason) {
+      setReportError("Please choose a reason for your report.");
+      return;
+    }
+
+    try {
+      setReportSubmitting(true);
+      setReportError("");
+      setReportSuccess("");
+
+      await addDoc(collection(db, "userReports"), {
+        reportedUid: uid,
+        reporterUid: user.uid,
+        reason: reportReason,
+        details: reportDetails || "",
+        createdAt: serverTimestamp(),
+        status: "open",
+      });
+
+      // reporting also blocks
+      await handleBlock();
+
+      setReportSuccess(
+        "Thank you for your report. This user has been blocked and will no longer be able to contact you. Our team will review your report as soon as possible."
+      );
+      setIsReportOpen(false);
+      setReportReason("");
+      setReportDetails("");
+    } catch (err) {
+      console.error("Error submitting report:", err);
+      setReportError(
+        "We couldn't submit your report right now. Please try again."
+      );
+    } finally {
+      setReportSubmitting(false);
     }
   };
 
@@ -254,47 +388,26 @@ export const FriendProfilePage = () => {
           }`}
         >
           <div
-            className={`max-w-4xl mx-auto p-6 rounded-lg shadow-lg text-center ${
+            className={`max-w-4xl mx-auto p-6 mt-8 rounded-lg shadow-lg text-center ${
               isEarthy
-                ? "bg-white border-tan-200"
-                : "bg-pale-lavender border-blue-grey"
-            } border`}
+                ? "bg-white border border-tan-200"
+                : "bg-pale-lavender border border-blue-grey"
+            }`}
           >
-            <div className="flex flex-col items-center justify-center">
-              <svg
-                className={`animate-spin h-12 w-12 mb-4 ${
-                  isEarthy ? "text-rust-500" : "text-light-lavender"
-                }`}
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-              <p
-                className={`text-lg ${
-                  isEarthy ? "text-brown-600" : "text-gray-300"
-                }`}
-              >
-                Loading profile...
-              </p>
-            </div>
+            <p
+              className={`text-lg ${
+                isEarthy ? "text-brown-700" : "text-gray-100"
+              }`}
+            >
+              Loading profile...
+            </p>
           </div>
         </div>
       </>
     );
   }
+
+  const isOwnProfile = user && user.uid === uid;
 
   return (
     <>
@@ -304,45 +417,8 @@ export const FriendProfilePage = () => {
           isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
         }`}
       >
-        <div className="max-w-4xl p-6 mx-auto">
-          {/* Profile Header */}
-          <div
-            className={`rounded-lg shadow-lg p-6 mb-6 ${
-              isEarthy
-                ? "bg-white border-tan-200"
-                : "bg-pale-lavender border-blue-grey"
-            } border`}
-          >
-            <div className="flex items-center space-x-6">
-              <div
-                className={`flex items-center justify-center w-20 h-20 text-2xl font-bold rounded-full shrink-0 ${
-                  isEarthy
-                    ? "bg-rust-200 text-rust-700"
-                    : "bg-light-lavender text-white"
-                }`}
-              >
-                {profile.firstName?.charAt(0)?.toUpperCase() || "U"}
-              </div>
-              <div className="flex-1">
-                <h1
-                  className={`text-3xl font-bold mb-2 ${
-                    isEarthy ? "text-brown-800" : "text-gray-900"
-                  }`}
-                >
-                  {profile.firstName} {profile.lastName}
-                </h1>
-                <p
-                  className={`text-sm ${
-                    isEarthy ? "text-brown-500" : "text-gray-600"
-                  }`}
-                >
-                  {profile.bio || "No bio yet"}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Error message for friend actions */}
+        <div className="max-w-4xl px-4 mx-auto">
+          {/* banners */}
           {friendError && (
             <div
               className={`mb-4 p-4 rounded-lg ${
@@ -355,140 +431,339 @@ export const FriendProfilePage = () => {
             </div>
           )}
 
-          {/* Action Buttons */}
+          {reportSuccess && (
+            <div
+              className={`mb-4 p-4 rounded-lg ${
+                isEarthy
+                  ? "bg-green-50 text-green-800 border border-green-200"
+                  : "bg-green-900/20 text-green-200 border border-green-700"
+              }`}
+            >
+              {reportSuccess}
+            </div>
+          )}
+
+          {reportError && (
+            <div
+              className={`mb-4 p-4 rounded-lg ${
+                isEarthy
+                  ? "bg-red-50 text-red-800 border border-red-200"
+                  : "bg-red-900/20 text-red-200 border border-red-700"
+              }`}
+            >
+              {reportError}
+            </div>
+          )}
+
+          {/* profile header */}
           <div
-            className={`rounded-lg shadow-lg p-6 mb-6 ${
+            className={`rounded-2xl shadow-xl p-6 mb-6 ${
               isEarthy
-                ? "bg-white border-tan-200"
-                : "bg-pale-lavender border-blue-grey"
-            } border`}
+                ? "bg-white border border-tan-200"
+                : "bg-pale-lavender border border-blue-grey"
+            }`}
           >
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Chat button */}
-              <button
-                onClick={() => navigate(`/chat/${uid}`)}
-                className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
+            <div className="flex items-start gap-4">
+              <div
+                className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold shrink-0 ${
                   isEarthy
-                    ? "bg-rust-500 hover:bg-rust-600 text-white"
-                    : "bg-light-lavender hover:bg-medium-lavender text-white"
+                    ? "bg-rust-200 text-rust-700"
+                    : "bg-light-lavender text-white"
                 }`}
               >
-                Send Message
-              </button>
-
-              {/* Friend logic according to your rules */}
-              {friendStatus === "loading" && (
-                <button
-                  className={`px-6 py-2.5 rounded-lg font-medium cursor-default ${
-                    isEarthy
-                      ? "bg-tan-200 text-brown-600"
-                      : "bg-gray-200 text-gray-600"
-                  }`}
-                  disabled
-                >
-                  Checking...
-                </button>
-              )}
-
-              {/* Viewing yourself -> go back to /profile */}
-              {friendStatus === "self" && (
-                <button
-                  onClick={() => navigate("/profile")}
-                  className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
-                    isEarthy
-                      ? "bg-tan-200 hover:bg-tan-300 text-brown-800"
-                      : "bg-gray-200 hover:bg-gray-300 text-charcoal-grey"
+                {profile.firstName?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+              <div className="flex-1">
+                <h1
+                  className={`text-2xl font-bold mb-1 ${
+                    isEarthy ? "text-brown-900" : "text-white"
                   }`}
                 >
-                  Go to your profile
-                </button>
-              )}
-
-              {/* Already friends */}
-              {friendStatus === "friends" && (
-                <button
-                  onClick={handleUnfriend}
-                  className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
-                    isEarthy
-                      ? "bg-red-600 hover:bg-red-700 text-white"
-                      : "bg-red-500 hover:bg-red-600 text-white"
-                  }`}
-                >
-                  Unfriend
-                </button>
-              )}
-
-              {/* You sent a request */}
-              {friendStatus === "pendingSent" && (
-                <button
-                  className={`px-6 py-2.5 rounded-lg font-medium cursor-default ${
-                    isEarthy
-                      ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
-                      : "bg-yellow-900/20 text-yellow-200 border border-yellow-700"
-                  }`}
-                  disabled
-                >
-                  Friend Request Sent
-                </button>
-              )}
-
-              {/* They sent a request to you */}
-              {friendStatus === "pendingReceived" && (
-                <>
-                  <button
-                    onClick={handleAcceptFriend}
-                    className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
-                      isEarthy
-                        ? "bg-green-600 hover:bg-green-700 text-white"
-                        : "bg-green-500 hover:bg-green-600 text-white"
+                  {profile.firstName} {profile.lastName}
+                </h1>
+                {profile.username && (
+                  <p
+                    className={`text-sm mb-2 ${
+                      isEarthy ? "text-brown-500" : "text-purple-200"
                     }`}
                   >
-                    Accept Friend Request
-                  </button>
-                  <button
-                    onClick={handleDeclineFriend}
-                    className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
-                      isEarthy
-                        ? "bg-tan-200 hover:bg-tan-300 text-brown-800"
-                        : "bg-gray-200 hover:bg-gray-300 text-charcoal-grey"
+                    @{profile.username}
+                  </p>
+                )}
+                {profile.bio && (
+                  <p
+                    className={`text-sm ${
+                      isEarthy ? "text-brown-700" : "text-gray-100"
                     }`}
                   >
-                    Decline
-                  </button>
-                </>
-              )}
+                    {profile.bio}
+                  </p>
+                )}
 
-              {/* No relationship yet */}
-              {friendStatus === "none" && (
-                <button
-                  onClick={handleAddFriend}
-                  className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
-                    isEarthy
-                      ? "bg-green-600 hover:bg-green-700 text-white"
-                      : "bg-green-500 hover:bg-green-600 text-white"
-                  }`}
-                >
-                  Add Friend
-                </button>
-              )}
+                {/* action buttons */}
+                {!isOwnProfile && (
+                  <div className="flex flex-col gap-3 mt-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      {/* chat */}
+                      {!isBlocked && (
+                        <button
+                          onClick={() => navigate(`/chat/${uid}`)}
+                          className={`px-6 py-2.5 rounded-lg font-medium transition shadow-md hover:shadow-lg ${
+                            isEarthy
+                              ? "bg-rust-500 hover:bg-rust-600 text-white"
+                              : "bg-light-lavender hover:bg-medium-lavender text-white"
+                          }`}
+                        >
+                          Send Message
+                        </button>
+                      )}
+
+                      {isBlocked && (
+                        <button
+                          disabled
+                          className={`px-6 py-2.5 rounded-lg font-medium cursor-default ${
+                            isEarthy
+                              ? "bg-tan-200 text-brown-600"
+                              : "bg-gray-700 text-gray-300"
+                          }`}
+                        >
+                          Messaging blocked
+                        </button>
+                      )}
+
+                      {/* friend buttons */}
+                      {friendStatus === "self" && (
+                        <span
+                          className={`text-sm ${
+                            isEarthy ? "text-brown-500" : "text-purple-200"
+                          }`}
+                        >
+                          This is you 👀
+                        </span>
+                      )}
+
+                      {friendStatus === "loading" && (
+                        <span
+                          className={`text-sm ${
+                            isEarthy ? "text-brown-500" : "text-purple-200"
+                          }`}
+                        >
+                          Checking connection…
+                        </span>
+                      )}
+
+                      {friendStatus === "friends" && !isBlocked && (
+                        <button
+                          onClick={handleUnfriend}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg ${
+                            isEarthy
+                              ? "bg-tan-200 hover:bg-tan-300 text-brown-900"
+                              : "bg-gray-200 hover:bg-gray-300 text-charcoal-grey"
+                          }`}
+                        >
+                          Unfriend
+                        </button>
+                      )}
+
+                      {friendStatus === "none" && !isBlocked && (
+                        <button
+                          onClick={handleAddFriend}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg ${
+                            isEarthy
+                              ? "bg-green-600 hover:bg-green-700 text-white"
+                              : "bg-green-500 hover:bg-green-600 text-white"
+                          }`}
+                        >
+                          Add Friend
+                        </button>
+                      )}
+
+                      {friendStatus === "pendingSent" && !isBlocked && (
+                        <button
+                          disabled
+                          className={`px-4 py-2 rounded-lg text-sm font-medium cursor-default ${
+                            isEarthy
+                              ? "bg-tan-200 text-brown-700"
+                              : "bg-gray-700 text-gray-200"
+                          }`}
+                        >
+                          Friend request sent
+                        </button>
+                      )}
+
+                      {friendStatus === "pendingReceived" && !isBlocked && (
+                        <>
+                          <button
+                            onClick={handleAcceptFriend}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg ${
+                              isEarthy
+                                ? "bg-green-600 hover:bg-green-700 text-white"
+                                : "bg-green-500 hover:bg-green-600 text-white"
+                            }`}
+                          >
+                            Accept request
+                          </button>
+                          <button
+                            onClick={handleDeclineFriend}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg ${
+                              isEarthy
+                                ? "bg-tan-200 hover:bg-tan-300 text-brown-900"
+                                : "bg-gray-200 hover:bg-gray-300 text-charcoal-grey"
+                            }`}
+                          >
+                            Decline
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    {/* block + report row */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {isBlocked ? (
+                        <button
+                          onClick={handleUnblock}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg ${
+                            isEarthy
+                              ? "bg-gray-200 hover:bg-gray-300 text-brown-900"
+                              : "bg-gray-700 hover:bg-gray-600 text-white"
+                          }`}
+                        >
+                          Unblock
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleBlock}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg ${
+                            isEarthy
+                              ? "bg-red-600 hover:bg-red-700 text-white"
+                              : "bg-red-500 hover:bg-red-600 text-white"
+                          }`}
+                        >
+                          Block
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => setIsReportOpen((prev) => !prev)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg ${
+                          isEarthy
+                            ? "bg-orange-100 hover:bg-orange-200 text-brown-900 border border-orange-300"
+                            : "bg-orange-900/20 hover:bg-orange-900/40 text-orange-100 border border-orange-600"
+                        }`}
+                      >
+                        {isReportOpen ? "Cancel Report" : "Report"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
+
+            {/* report form */}
+            {!isOwnProfile && isReportOpen && (
+              <div
+                className={`mt-4 rounded-lg shadow-lg p-5 ${
+                  isEarthy
+                    ? "bg-cream-100 border border-tan-200"
+                    : "bg-charcoal-grey/80 border border-blue-grey"
+                }`}
+              >
+                <h3
+                  className={`text-lg font-semibold mb-3 ${
+                    isEarthy ? "text-brown-900" : "text-white"
+                  }`}
+                >
+                  Report this user
+                </h3>
+                <form onSubmit={handleSubmitReport} className="space-y-3">
+                  <div>
+                    <label
+                      className={`block text-sm font-medium mb-1 ${
+                        isEarthy ? "text-brown-700" : "text-gray-200"
+                      }`}
+                    >
+                      Reason
+                    </label>
+                    <select
+                      className={`w-full rounded-lg px-3 py-2 text-sm outline-none border ${
+                        isEarthy
+                          ? "border-tan-300 bg-white text-brown-900"
+                          : "border-blue-grey bg-charcoal-grey text-white"
+                      }`}
+                      value={reportReason}
+                      onChange={(e) => setReportReason(e.target.value)}
+                    >
+                      <option value="">Select a reason</option>
+                      <option value="harassment">Harassment or bullying</option>
+                      <option value="spam">Spam or unwanted contact</option>
+                      <option value="inappropriate_content">
+                        Inappropriate or harmful content
+                      </option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      className={`block text-sm font-medium mb-1 ${
+                        isEarthy ? "text-brown-700" : "text-gray-200"
+                      }`}
+                    >
+                      Additional details (optional)
+                    </label>
+                    <textarea
+                      className={`w-full rounded-lg px-3 py-2 text-sm resize-y min-h-[80px] outline-none border ${
+                        isEarthy
+                          ? "border-tan-300 bg-white text-brown-900"
+                          : "border-blue-grey bg-charcoal-grey text-white"
+                      }`}
+                      value={reportDetails}
+                      onChange={(e) => setReportDetails(e.target.value)}
+                      placeholder="Describe what happened…"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={reportSubmitting}
+                    className={`px-5 py-2.5 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg ${
+                      reportSubmitting
+                        ? isEarthy
+                          ? "bg-gray-300 text-gray-600 cursor-wait"
+                          : "bg-gray-700 text-gray-400 cursor-wait"
+                        : isEarthy
+                        ? "bg-red-600 hover:bg-red-700 text-white"
+                        : "bg-red-500 hover:bg-red-600 text-white"
+                    }`}
+                  >
+                    {reportSubmitting
+                      ? "Submitting..."
+                      : "Submit report & block user"}
+                  </button>
+
+                  <p
+                    className={`text-xs mt-1 ${
+                      isEarthy ? "text-brown-600" : "text-gray-200"
+                    }`}
+                  >
+                    Reporting will also block this user so they can&apos;t send
+                    you messages or new friend requests.
+                  </p>
+                </form>
+              </div>
+            )}
           </div>
 
-          {/* User Posts */}
-          <div
-            className={`rounded-lg shadow-lg p-6 ${
-              isEarthy
-                ? "bg-white border-tan-200"
-                : "bg-pale-lavender border-blue-grey"
-            } border`}
-          >
+          {/* POSTS SECTION – original style, clickable to community post */}
+          <div className="mt-6">
             <h2
-              className={`text-2xl font-bold mb-4 ${
+              className={`text-xl font-semibold mb-4 ${
                 isEarthy ? "text-brown-800" : "text-gray-900"
               }`}
             >
               Posts by {profile.firstName} ({userPosts.length})
             </h2>
+
             <div className="space-y-4">
               {userPosts.length === 0 && (
                 <p
@@ -499,6 +774,7 @@ export const FriendProfilePage = () => {
                   No posts yet.
                 </p>
               )}
+
               {userPosts.map((post) => (
                 <div
                   key={post.id}
@@ -517,7 +793,7 @@ export const FriendProfilePage = () => {
                           : "bg-light-lavender text-white"
                       }`}
                     >
-                      {post.category}
+                      {post.category || "Post"}
                     </span>
                     <span
                       className={`text-xs ${
@@ -532,7 +808,7 @@ export const FriendProfilePage = () => {
                       isEarthy ? "text-brown-900" : "text-gray-900"
                     }`}
                   >
-                    {post.title}
+                    {post.title || "Untitled"}
                   </h3>
                   <p
                     className={`text-sm ${
@@ -560,3 +836,5 @@ export const FriendProfilePage = () => {
     </>
   );
 };
+
+export default FriendProfilePage;
