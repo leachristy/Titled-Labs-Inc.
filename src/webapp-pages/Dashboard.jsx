@@ -1,6 +1,7 @@
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
 import UntiltNavBar from "../components/navigation/UntiltNavBar";
+import MoodTracker from "./dashboard-features/moodtracker";
 
 export default function Dashboard() {
   const { user, profile, loading } = UserAuth();
@@ -39,6 +40,7 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
+          <MoodTracker />
         </div>
       </div>
     </>

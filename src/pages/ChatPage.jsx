@@ -26,7 +26,6 @@ export const ChatPage = () => {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
-  // Wait for Firebase Auth to load the user
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user || null);
@@ -34,7 +33,6 @@ export const ChatPage = () => {
     return () => unsubscribe();
   }, []);
 
-  // Fetch recipient info
   useEffect(() => {
     const fetchRecipient = async () => {
       const docRef = doc(db, "users", uid);
@@ -44,7 +42,6 @@ export const ChatPage = () => {
     fetchRecipient();
   }, [uid]);
 
-  // Fetch messages
   useEffect(() => {
     if (!currentUser) return;
     const participants = [currentUser.uid, uid].sort();
@@ -67,7 +64,6 @@ export const ChatPage = () => {
     return () => unsubscribe();
   }, [uid, currentUser]);
 
-  // Send message
   const handleSend = async () => {
     if (!currentUser || newMessage.trim() === "") return;
 
@@ -98,43 +94,75 @@ export const ChatPage = () => {
   };
 
   if (currentUser === null) {
-    return <p>Loading chat...</p>;
+    return (
+      <p
+        className={`text-center mt-20 ${
+          isEarthy ? "text-brown-600" : "text-purple-200"
+        }`}
+      >
+        Loading chat...
+      </p>
+    );
   }
 
   return (
     <>
       <UntiltNavBar />
       <div
-        className={`min-h-screen ${isEarthy ? "bg-cream-100" : "bg-pale-lavender"}`}
-        style={{ backgroundColor: isEarthy ? undefined : "var(--pale-lavender)" }}
+        className={`min-h-screen px-4 pt-24 pb-12 ${
+          isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
+        }`}
       >
-        <div className="max-w-2xl mx-auto p-6 mt-20 flex flex-col h-[80vh]">
+        <div className="max-w-3xl mx-auto flex flex-col h-[80vh] gap-4">
           {/* Recipient Info */}
-          <div className="flex items-center gap-4 mb-4 border-b pb-2">
-            <div className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center text-white text-xl font-bold">
+          <div
+            className={`flex items-center gap-4 p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl ${
+              isEarthy
+                ? "bg-linear-to-br from-cream-100 to-tan-50 border-2 border-tan-300 text-brown-800"
+                : "bg-pale-lavender border-2 border-blue-grey text-gray-900"
+            }`}
+          >
+            <div
+              className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold ${
+                isEarthy ? "bg-brown-400 text-white" : "bg-gray-400 text-white"
+              }`}
+            >
               {recipient?.firstName?.charAt(0)}
             </div>
-            <div>
-              <h3 className="font-bold text-lg">
-                {recipient?.firstName} {recipient?.lastName}
-              </h3>
-            </div>
+            <h3 className="font-bold text-lg">
+              {recipient?.firstName} {recipient?.lastName}
+            </h3>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto mb-4 border p-4 rounded bg-gray-50 flex flex-col space-y-2">
+          <div
+            className={`flex-1 overflow-y-auto p-4 rounded-lg ${
+              isEarthy
+                ? "bg-cream-50 border border-tan-200"
+                : "bg-cool-grey border border-blue-grey"
+            } flex flex-col space-y-3`}
+          >
             {messages.length === 0 && (
-              <p className="text-gray-400 text-sm">No messages yet.</p>
+              <p
+                className={`text-center ${
+                  isEarthy ? "text-brown-600" : "text-purple-200"
+                }`}
+              >
+                No messages yet.
+              </p>
             )}
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`p-2 rounded-lg wrap-break-word whitespace-pre-wrap inline-block max-w-[70%] ${
+                className={`p-3 rounded-lg inline-block max-w-[70%] break-words shadow-md transition-all duration-300 ${
                   msg.senderId === currentUser.uid
-                    ? "bg-blue-500 text-white self-end"
-                    : "bg-gray-300 text-black self-start"
+                    ? isEarthy
+                      ? "bg-rust-500 text-white self-end hover:bg-rust-600"
+                      : "bg-light-lavender text-gray-900 self-end hover:bg-medium-lavender"
+                    : isEarthy
+                    ? "bg-cream-200 text-brown-800 self-start hover:bg-cream-300"
+                    : "bg-white text-gray-900 self-start hover:bg-pale-lavender"
                 }`}
-                
               >
                 {msg.content}
               </div>
@@ -148,13 +176,21 @@ export const ChatPage = () => {
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              className="flex-1 border rounded px-3 py-2"
               placeholder="Type a message..."
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              className={`flex-1 rounded-lg px-4 py-2 border shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
+                isEarthy
+                  ? "border-tan-300 bg-cream-50 focus:ring-rust-400 text-brown-800"
+                  : "border-blue-grey bg-white focus:ring-light-lavender text-gray-900"
+              }`}
             />
             <button
               onClick={handleSend}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className={`px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-200 hover:scale-105 ${
+                isEarthy
+                  ? "bg-rust-500 hover:bg-rust-600 text-white"
+                  : "bg-light-lavender hover:bg-medium-lavender text-gray-900"
+              }`}
             >
               Send
             </button>
