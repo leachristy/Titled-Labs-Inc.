@@ -55,8 +55,8 @@ export default function MoodTracker() {
   }
 
   return (
-    <div className={`min-h-screen px-4  pb-12 ${bgPage}`}>
-      <div className="max-w-3xl mx-auto">
+    <div className={` pb-12 ${bgPage}`}>
+      <div className="">
         {/* Mood Check-in Card */}
         <div
           className={`
@@ -142,7 +142,7 @@ export default function MoodTracker() {
           </form>
           <div
             className={`
-              absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition
+              
               ${isEarthy ? "bg-rust-400" : "bg-light-lavender"}
             `}
             style={{ transform: "translate(50%, -50%)" }}
