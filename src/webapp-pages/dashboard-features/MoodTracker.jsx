@@ -45,7 +45,7 @@ function getLastNDays(n) {
   return days;
 }
 
-export default function MoodDailyCheckIn() {
+export default function MoodDailyCheckIn({ moodHistory, setMoodHistory }) {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
@@ -55,7 +55,7 @@ export default function MoodDailyCheckIn() {
   const [customMood, setCustomMood] = useState("");
   const [description, setDescription] = useState("");
 
-  const [moodHistory, setMoodHistory] = useState([]);
+  //const [moodHistory, setMoodHistory] = useState([]);
 
   const [streak, setStreak] = useState(0);
   const [lastCheckInDate, setLastCheckInDate] = useState(null);
@@ -98,6 +98,7 @@ export default function MoodDailyCheckIn() {
     };
 
     setMoodHistory((prev) => [newEntry, ...prev]);
+    
     setSelectedMood("");
     setCustomMood("");
     setDescription("");
