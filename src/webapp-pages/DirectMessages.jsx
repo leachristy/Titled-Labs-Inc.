@@ -1,95 +1,147 @@
+// src/webapp-pages/DirectMessages.jsx
 import React, { useEffect, useState } from "react";
 import {
   collection,
   query,
   where,
-  orderBy,
   onSnapshot,
   doc,
   getDoc,
+  getDocs,
+  collection as subCollection,
+  orderBy,
+  limit,
 } from "firebase/firestore";
-import { db, auth } from "../src/firebase";
+import { db, auth } from "../src/firebase"; // ✅ correct relative path from /webapp-pages
 import { Link } from "react-router-dom";
 import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 
 export default function DirectMessages() {
-  const [conversations, setConversations] = useState([]);
+  const [rows, setRows] = useState([]); // [{ id, otherId, otherName, lastMessage, lastMessageTime }]
   const [loading, setLoading] = useState(true);
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
   useEffect(() => {
-    const unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        setConversations([]);
+    const unsubAuth = auth.onAuthStateChanged(async (me) => {
+      if (!me) {
+        setRows([]);
         setLoading(false);
         return;
       }
 
-      const q = query(
-        collection(db, "messages"),
-        where("participants", "array-contains", user.uid),
-        orderBy("createdAt", "desc")
+      // Conversations where I'm a participant
+      const qConvos = query(
+        collection(db, "conversations"),
+        where("participants", "array-contains", me.uid)
       );
 
-      const unsubscribeMessages = onSnapshot(q, async (snapshot) => {
-        const convoMap = {};
+      const unsubConvos = onSnapshot(qConvos, async (snap) => {
+        const convos = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-        const otherIdsSet = new Set();
-        snapshot.docs.forEach((docSnap) => {
-          const participants = docSnap.data().participants || [];
-          const otherId = participants.find((id) => id !== user.uid);
-          if (otherId) otherIdsSet.add(otherId);
-        });
+        // --- Resolve names ----------------------------------------------------
+        const nameMap = {};
+        const needName = new Set();
 
-        const otherIds = Array.from(otherIdsSet);
+        for (const c of convos) {
+          const otherId = (c.participants || []).find((p) => p !== me.uid);
+          if (!otherId) continue;
 
-        const userDocs = await Promise.all(
-          otherIds.map((id) => getDoc(doc(db, "users", id)))
-        );
-
-        const userMap = {};
-        userDocs.forEach((docSnap, idx) => {
-          const id = otherIds[idx];
-          userMap[id] = docSnap.exists()
-            ? `${docSnap.data().firstName} ${docSnap.data().lastName}`
-            : id;
-        });
-
-        snapshot.docs.forEach((docSnap) => {
-          const msg = docSnap.data();
-          const otherId = msg.participants.find((id) => id !== user.uid);
-          if (!otherId) return;
-
-          const createdAt = msg.createdAt?.toDate?.() || new Date(0);
-
-          if (!convoMap[otherId] || createdAt > convoMap[otherId].createdAt) {
-            convoMap[otherId] = {
-              lastMessage: msg.content,
-              createdAt,
-              otherId,
-              otherName: userMap[otherId],
-            };
+          const fromDetails = c.participantDetails?.[otherId]?.name;
+          if (fromDetails) {
+            nameMap[otherId] = fromDetails;
+          } else {
+            needName.add(otherId);
           }
-        });
+        }
 
-        setConversations(
-          Object.values(convoMap).sort((a, b) => b.createdAt - a.createdAt)
-        );
+        if (needName.size) {
+          const lookups = await Promise.all(
+            [...needName].map(async (uid) => {
+              try {
+                const s = await getDoc(doc(db, "users", uid));
+                if (s.exists()) {
+                  const u = s.data();
+                  const name =
+                    `${u.firstName || ""} ${u.lastName || ""}`.trim() || uid;
+                  return [uid, name];
+                }
+              } catch {}
+              return [uid, uid];
+            })
+          );
+          lookups.forEach(([uid, name]) => (nameMap[uid] = name));
+        }
+
+        // --- Deduplicate by other user & pick most recent --------------------
+        // Some old code created multiple conversation docs per pair.
+        const bestByOther = new Map(); // otherId -> { convo, ts }
+        for (const c of convos) {
+          const otherId = (c.participants || []).find((p) => p !== me.uid);
+          if (!otherId) continue;
+
+          const ts =
+            (c.lastMessageTime?.toDate?.() && c.lastMessageTime.toDate()) ||
+            (c.createdAt?.toDate?.() && c.createdAt.toDate()) ||
+            new Date(0);
+
+          const cur = bestByOther.get(otherId);
+          if (!cur || ts > cur.ts) bestByOther.set(otherId, { convo: c, ts });
+        }
+
+        // --- Build rows; lazy-fill preview if parent has no lastMessage -------
+        const rowsTmp = [];
+        for (const [otherId, { convo, ts }] of bestByOther) {
+          let lastText = convo.lastMessage || "";
+          let lastTime = ts;
+
+          if (!lastText) {
+            // Fetch latest message from subcollection for preview only
+            try {
+              const latestSnap = await getDocs(
+                query(
+                  subCollection(db, "conversations", convo.id, "messages"),
+                  orderBy("createdAt", "desc"),
+                  limit(1)
+                )
+              );
+              const m = latestSnap.docs[0]?.data();
+              if (m) {
+                lastText = m.text || m.content || "";
+                const mt =
+                  (m.createdAt?.toDate?.() && m.createdAt.toDate()) || lastTime;
+                lastTime = mt;
+              }
+            } catch {
+              // ignore preview failure; keep "No messages yet"
+            }
+          }
+
+          rowsTmp.push({
+            id: convo.id,
+            otherId,
+            otherName: nameMap[otherId] || otherId || "Unknown",
+            lastMessage: lastText,
+            lastMessageTime: lastTime,
+          });
+        }
+
+        // --- Sort newest-first & set state -----------------------------------
+        rowsTmp.sort((a, b) => b.lastMessageTime - a.lastMessageTime);
+        setRows(rowsTmp);
         setLoading(false);
       });
 
-      return () => unsubscribeMessages();
+      return () => unsubConvos();
     });
 
-    return () => unsubscribeAuth();
+    return () => unsubAuth();
   }, []);
 
   return (
     <>
       <UntiltNavBar />
-
       <div
         className={`min-h-screen px-4 pt-24 pb-12 ${
           isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
@@ -103,7 +155,6 @@ export default function DirectMessages() {
           >
             Direct Messages
           </h1>
-
           <p
             className={`text-md ${
               isEarthy ? "text-brown-600" : "text-purple-200"
@@ -113,28 +164,31 @@ export default function DirectMessages() {
           </p>
         </div>
 
-        {/* Conversation List */}
-        <div className="max-w-3xl mx-auto grid grid-cols-1 gap-6">
+        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto">
           {loading ? (
             <p
-              className={`text-center ${
-                isEarthy ? "text-brown-600" : "text-purple-200"
-              }`}
+              className={
+                isEarthy
+                  ? "text-brown-600 text-center"
+                  : "text-purple-200 text-center"
+              }
             >
               Loading conversations...
             </p>
-          ) : conversations.length === 0 ? (
+          ) : rows.length === 0 ? (
             <p
-              className={`text-center ${
-                isEarthy ? "text-brown-600" : "text-purple-200"
-              }`}
+              className={
+                isEarthy
+                  ? "text-brown-600 text-center"
+                  : "text-purple-200 text-center"
+              }
             >
               No conversations yet.
             </p>
           ) : (
-            conversations.map((convo) => (
+            rows.map((convo) => (
               <Link
-                key={convo.otherId}
+                key={convo.id}
                 to={`/chat/${convo.otherId}`}
                 className={`
                   group relative overflow-hidden rounded-lg shadow-lg 
@@ -147,11 +201,6 @@ export default function DirectMessages() {
                   }
                 `}
               >
-                {/* Decorative background like SelfCareCard */}
-                <div className="absolute inset-0 opacity-5">
-                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzBoLTZhMSAxIDAgMCAxIDAtMmg2YTEgMSAwIDAgMSAwIDJ6bS0xMiAwSDhhMSAxIDAgMCAxIDAtMmgxNmExIDEgMCAwIDEgMCAyek0zNiAxOGgtNmExIDEgMCAwIDEgMC0yaDZhMSAxIDAgMCAxIDAgem0tMTIgMEg4YTEgMSAwIDAgMSAwLTJoMTZhMSAxIDAgMCAxIDAgem0xMiAyNGg2YTEgMSAwIDAgMSAwIDJoLTZhMSAxIDAgMCAxIDAtMnptLTEyIDBoMTZhMSAxIDAgMCAxIDAgMkg4YTEgMSAwIDAgMSAwLTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')]"></div>
-                </div>
-
                 <div className="relative">
                   <h3
                     className={`text-2xl font-bold mb-2 ${
@@ -162,23 +211,21 @@ export default function DirectMessages() {
                   >
                     {convo.otherName}
                   </h3>
-
                   <p
                     className={`text-md ${
                       isEarthy ? "text-brown-600" : "text-gray-700"
                     }`}
                   >
-                    {convo.lastMessage}
+                    {convo.lastMessage || "No messages yet"}
                   </p>
                 </div>
 
-                {/* Hover overlay glow */}
                 <div
                   className={`absolute top-0 right-0 w-32 h-32 rounded-lg blur-3xl transition-opacity duration-300 opacity-0 group-hover:opacity-20 ${
                     isEarthy ? "bg-rust-400" : "bg-light-lavender"
                   }`}
                   style={{ transform: "translate(50%, -50%)" }}
-                ></div>
+                />
               </Link>
             ))
           )}

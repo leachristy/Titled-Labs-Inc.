@@ -1,3 +1,4 @@
+// src/webapp-pages/ChatPage.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -7,87 +8,104 @@ import {
   orderBy,
   onSnapshot,
   serverTimestamp,
-  where,
   doc,
   getDoc,
+  setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "../src/firebase";
 import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 
+const convIdFor = (a, b) => [a, b].sort().join("_");
+
 export const ChatPage = () => {
   const { uid } = useParams(); // recipient ID
   const [currentUser, setCurrentUser] = useState(null);
+  const [recipient, setRecipient] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [recipient, setRecipient] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
   const messagesEndRef = useRef(null);
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
+  // auth
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user || null);
-    });
-    return () => unsubscribe();
+    const unsub = onAuthStateChanged(auth, (user) =>
+      setCurrentUser(user || null)
+    );
+    return () => unsub();
   }, []);
 
+  // recipient profile (for header)
   useEffect(() => {
-    const fetchRecipient = async () => {
-      const docRef = doc(db, "users", uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) setRecipient(docSnap.data());
-    };
-    fetchRecipient();
+    if (!uid) return;
+    (async () => {
+      const snap = await getDoc(doc(db, "users", uid));
+      if (snap.exists()) setRecipient(snap.data());
+    })();
   }, [uid]);
 
+  // ensure/fetch conversation doc id (deterministic)
   useEffect(() => {
-    if (!currentUser) return;
-    const participants = [currentUser.uid, uid].sort();
+    if (!currentUser || !uid) return;
+    (async () => {
+      const convId = convIdFor(currentUser.uid, uid);
+      const convRef = doc(db, "conversations", convId);
 
-    const q = query(
-      collection(db, "messages"),
-      where("participants", "array-contains", currentUser.uid),
-      orderBy("createdAt")
+      // Create/backfill the parent doc so DirectMessages can list it
+      await setDoc(
+        convRef,
+        {
+          participants: [currentUser.uid, uid],
+          participantDetails: {},
+          lastMessage: "",
+          lastMessageTime: serverTimestamp(),
+          createdAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      setConversationId(convId);
+    })();
+  }, [currentUser, uid]);
+
+  // live message listener in conversations/{conversationId}/messages
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const qMsgs = query(
+      collection(db, "conversations", conversationId, "messages"),
+      orderBy("createdAt", "asc")
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter((msg) => msg.participants.sort().join() === participants.join());
-
-      setMessages(msgs);
+    const unsub = onSnapshot(qMsgs, (snapshot) => {
+      const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setMessages(list);
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     });
 
-    return () => unsubscribe();
-  }, [uid, currentUser]);
+    return () => unsub();
+  }, [conversationId]);
 
   const handleSend = async () => {
-    if (!currentUser || newMessage.trim() === "") return;
+    const text = newMessage.trim();
+    if (!currentUser || !conversationId || !text) return;
 
-    const participants = [currentUser.uid, uid].sort();
-    const tempTimestamp = new Date();
-
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: "temp-" + Math.random(),
-        senderId: currentUser.uid,
-        receiverId: uid,
-        participants,
-        content: newMessage,
-        createdAt: tempTimestamp,
-      },
-    ]);
-
-    await addDoc(collection(db, "messages"), {
+    await addDoc(collection(db, "conversations", conversationId, "messages"), {
+      text,
       senderId: currentUser.uid,
-      receiverId: uid,
-      participants,
-      content: newMessage,
+      senderName: `${currentUser.displayName || ""}`.trim() || "Anonymous",
+      recipientId: uid,
       createdAt: serverTimestamp(),
+      read: false,
+    });
+
+    await updateDoc(doc(db, "conversations", conversationId), {
+      lastMessage: text,
+      lastMessageTime: serverTimestamp(),
     });
 
     setNewMessage("");
@@ -116,7 +134,7 @@ export const ChatPage = () => {
         <div className="max-w-3xl mx-auto flex flex-col h-[80vh] gap-4">
           {/* Recipient Info */}
           <div
-            className={`flex items-center gap-4 p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl ${
+            className={`flex items-center gap-4 p-4 rounded-lg shadow-md ${
               isEarthy
                 ? "bg-linear-to-br from-cream-100 to-tan-50 border-2 border-tan-300 text-brown-800"
                 : "bg-pale-lavender border-2 border-blue-grey text-gray-900"
@@ -129,7 +147,7 @@ export const ChatPage = () => {
             >
               {recipient?.firstName?.charAt(0)}
             </div>
-            <h3 className="font-bold text-lg">
+            <h3 className="text-lg font-bold">
               {recipient?.firstName} {recipient?.lastName}
             </h3>
           </div>
@@ -164,7 +182,7 @@ export const ChatPage = () => {
                     : "bg-white text-gray-900 self-start hover:bg-pale-lavender"
                 }`}
               >
-                {msg.content}
+                {msg.text}
               </div>
             ))}
             <div ref={messagesEndRef} />
