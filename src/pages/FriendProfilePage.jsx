@@ -712,7 +712,7 @@ export const FriendProfilePage = () => {
                       Additional details (optional)
                     </label>
                     <textarea
-                      className={`w-full rounded-lg px-3 py-2 text-sm resize-y min-h-[80px] outline-none border ${
+                      className={`w-full rounded-lg px-3 py-2 text-sm resize-y min-h-20 outline-none border ${
                         isEarthy
                           ? "border-tan-300 bg-white text-brown-900"
                           : "border-blue-grey bg-charcoal-grey text-white"
