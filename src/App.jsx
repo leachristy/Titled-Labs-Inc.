@@ -17,6 +17,8 @@ import AIChat from "./webapp-pages/AIChat";
 import Community from "./webapp-pages/Community";
 import { AuthContextProvider } from "./contexts/AuthContext";
 import { MessengerProvider } from "./contexts/MessengerContext";
+import { AchievementProvider } from "./contexts/AchievementContext";
+import AchievementModal from "./components/ui/AchievementModal";
 import Protected from "./components/ui/Protected";
 import MessengerWidget from "./components/messaging/MessengerWidget";
 import { SelfCare } from "./webapp-pages/SelfCare";
@@ -37,114 +39,118 @@ export default function App() {
       <div className="min-h-screen">
         <AuthContextProvider>
           <MessengerProvider>
-            <MessengerWidget />
-            <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<UnifiedHome />} />
-            <Route path="/home" element={<UnifiedHome />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route
-              path="/dashboard"
-              element={
-                <Protected>
-                  <Dashboard />
-                </Protected>
-              }
-            />
-            <Route
-              path="/breathing"
-              element={
-                <Protected>
-                  <BreathingExercises />
-                </Protected>
-              }
-            />
-            <Route
-              path="/selfcare"
-              element={
-                <Protected>
-                  <SelfCare />
-                </Protected>
-              }
-            />
-            <Route
-              path="/journal"
-              element={
-                <Protected>
-                  <JournalEntries />
-                </Protected>
-              }
-            />
-            <Route
-              path="/guide-videos"
-              element={
-                <Protected>
-                  <GuidedVideos />
-                </Protected>
-              }
-            />
-            <Route
-              path="/guide-videos/:id"
-              element={
-                <Protected>
-                  <VideoWatch />
-                </Protected>
-              }
-            />
-            <Route
-              path="/goals"
-              element={
-                <Protected>
-                  <Goals />
-                </Protected>
-              }
-            />
-            <Route
-              path="/aichat"
-              element={
-                <Protected>
-                  <AIChat />
-                </Protected>
-              }
-            />
-            <Route
-              path="/community"
-              element={
-                <Protected>
-                  <Community />
-                </Protected>
-              }
-            />
-            <Route
-              path="/messages"
-              element={
-                <Protected>
-                  <DirectMessages />
-                </Protected>
-              }
-            />
-            <Route path="/profile/:uid" element={<FriendProfilePage />} />
-            <Route path="/chat/:uid" element={<ChatPage />} />
-            <Route
-              path="/profile"
-              element={
-                <Protected>
-                  <ProfilePage />
-                </Protected>
-              }
-            />
-            <Route
-              path="/friends"
-              element={
-                <Protected>
-                  <FriendsPage />
-                </Protected>
-              }
-            />
-          </Routes>
+            <AchievementProvider>
+              <AchievementModal /> 
+              
+              <MessengerWidget />
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/" element={<UnifiedHome />} />
+                <Route path="/home" element={<UnifiedHome />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <Protected>
+                      <Dashboard />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/breathing"
+                  element={
+                    <Protected>
+                      <BreathingExercises />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/selfcare"
+                  element={
+                    <Protected>
+                      <SelfCare />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/journal"
+                  element={
+                    <Protected>
+                      <JournalEntries />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/guide-videos"
+                  element={
+                    <Protected>
+                      <GuidedVideos />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/guide-videos/:id"
+                  element={
+                    <Protected>
+                      <VideoWatch />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/goals"
+                  element={
+                    <Protected>
+                      <Goals />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/aichat"
+                  element={
+                    <Protected>
+                      <AIChat />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/community"
+                  element={
+                    <Protected>
+                      <Community />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/messages"
+                  element={
+                    <Protected>
+                      <DirectMessages />
+                    </Protected>
+                  }
+                />
+                <Route path="/profile/:uid" element={<FriendProfilePage />} />
+                <Route path="/chat/:uid" element={<ChatPage />} />
+                <Route
+                  path="/profile"
+                  element={
+                    <Protected>
+                      <ProfilePage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/friends"
+                  element={
+                    <Protected>
+                      <FriendsPage />
+                    </Protected>
+                  }
+                />
+              </Routes>
+            </AchievementProvider>
           </MessengerProvider>
         </AuthContextProvider>
       </div>

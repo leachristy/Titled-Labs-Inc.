@@ -6,6 +6,8 @@ import { db, auth } from "../../src/firebase";
 import { collection, addDoc, updateDoc, deleteDoc, doc, query, where, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useAchievements } from "../../contexts/AchievementContext";
+import { ACHIEVEMENTS } from "../../data/achievements";
 
 const PRESET_GOALS = [
   "Reduce anxiety levels",
@@ -35,6 +37,7 @@ const INITIAL_GOALS = [
 export default function Goals() {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  const { unlockAchievement } = useAchievements();
   
   const [goals, setGoals] = useState([]);
   const [archivedGoals, setArchivedGoals] = useState([]);
@@ -157,6 +160,18 @@ export default function Goals() {
     if (!goal) return;
 
     const newCompletedState = !goal.isCompleted;
+
+    if (newCompletedState){
+      unlockAchievement(ACHIEVEMENTS.GOAL_ROOKIE.id);
+
+      const allOthersComplete = goals
+      .filter(g => g.id !== id)
+      .every(g => g.isCompleted);
+
+      if (allOthersComplete){
+        unlockAchievement(ACHIEVEMENTS.GOAL_MASTER.id);
+      }
+    }
     await updateGoalInDB(id, { isCompleted: newCompletedState });
   };
 

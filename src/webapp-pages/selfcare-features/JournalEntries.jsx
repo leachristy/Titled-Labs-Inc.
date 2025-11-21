@@ -3,6 +3,8 @@ import UntiltNavBar from "../../components/navigation/UntiltNavBar";
 import { useTheme } from "../../contexts/ThemeContext";
 import { db, auth } from "../../src/firebase";
 import { useNavigate } from "react-router-dom";
+import { ACHIEVEMENTS } from "../../data/achievements";
+import { useAchievements } from "../../contexts/AchievementContext";
 
 import {
   collection,
@@ -34,6 +36,7 @@ export default function JournalEntries() {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
   const navigate = useNavigate();
+  const { unlockAchievement } = useAchievements();
 
   const [entries, setEntries] = useState([]);
   const [userId, setUserId] = useState(null);
@@ -76,6 +79,7 @@ export default function JournalEntries() {
       createdAt: new Date().toISOString(),
     };
     await addDoc(collection(db, "journalEntries"), newEntry);
+    unlockAchievement(ACHIEVEMENTS.JOURNAL_ROOKIE.id);
   };
 
   const deleteEntry = async (id) => {
