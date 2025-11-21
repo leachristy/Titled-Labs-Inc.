@@ -1,4 +1,3 @@
-// DirectChat.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "././contexts/ThemeContext";
 import { UserAuth } from "././contexts/AuthContext";

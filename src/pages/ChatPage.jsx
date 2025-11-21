@@ -1,4 +1,3 @@
-// src/webapp-pages/ChatPage.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -172,7 +171,7 @@ export const ChatPage = () => {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`p-3 rounded-lg inline-block max-w-[70%] break-words shadow-md transition-all duration-300 ${
+                className={`p-3 rounded-lg inline-block max-w-[70%] wrap-break-word shadow-md transition-all duration-300 ${
                   msg.senderId === currentUser.uid
                     ? isEarthy
                       ? "bg-rust-500 text-white self-end hover:bg-rust-600"

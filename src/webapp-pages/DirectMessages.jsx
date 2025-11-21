@@ -1,4 +1,3 @@
-// src/webapp-pages/DirectMessages.jsx
 import React, { useEffect, useState } from "react";
 import {
   collection,
