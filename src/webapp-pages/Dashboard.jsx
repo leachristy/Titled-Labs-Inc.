@@ -1,12 +1,19 @@
+import { useState, useEffect } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
 import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import MoodTracker from "./dashboard-features/moodtracker";
+import StatTracker from "./dashboard-features/StatTracker";
 
 export default function Dashboard() {
   const { user, profile, loading } = UserAuth();
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+
+  const [moodHistory, setMoodHistory] = useState([
+    { id: 1, mood: "neutral", timestamp: new Date(Date.now() - 86400000 * 2) },
+    { id: 2, mood: "very happy", timestamp: new Date(Date.now() - 86400000 * 1) },
+  ]);
 
   return (
     <>
@@ -40,9 +47,19 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-          <MoodTracker />
+          <div className = "grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
+            <div>
+          <MoodTracker 
+            moodHistory={moodHistory}
+            setMoodHistory={setMoodHistory}
+          />
+        </div>
+        <div className = "h-full">
+          <StatTracker moodHistory={moodHistory} />
         </div>
       </div>
+    </div>
+  </div>
     </>
   );
 }
