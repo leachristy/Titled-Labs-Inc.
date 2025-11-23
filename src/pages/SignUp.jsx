@@ -1,3 +1,57 @@
+/**
+ * ========================================
+ * SIGN UP PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * Registers new users to create a Tilted wellness platform account.
+ * Supports email/password registration and OAuth (Google, Twitter).
+ * 
+ * Features:
+ * - User registration with Firebase authentication
+ * - First name, last name, email, and password collection
+ * - Password confirmation validation
+ * - Terms of Service and Privacy Policy agreement
+ * - Google OAuth signup integration
+ * - Error handling with validation messages
+ * - Loading states during registration
+ * - Auto-redirect to login page after successful signup
+ * - Account benefits display
+ * - Social signup options (Google, Twitter)
+ * - Crisis hotline information
+ * 
+ * Registration Flow:
+ * 1. User fills out registration form
+ * 2. Validate password match
+ * 3. Validate terms agreement
+ * 4. Firebase authentication via doCreateUserWithEmailAndPassword()
+ * 5. On success: Navigate to /login
+ * 6. On error: Display error message
+ * 
+ * Form Validation:
+ * - Password confirmation must match password
+ * - Terms of Service agreement required
+ * - Minimum 8 characters with letters and numbers
+ * 
+ * State Management:
+ * - formData: User input for all form fields
+ * - isLoading: Controls loading state during registration
+ * - error: Displays validation/registration errors
+ * 
+ * Firebase Methods Used:
+ * - doCreateUserWithEmailAndPassword: Creates new user account
+ * - googleSignIn: Google OAuth signup
+ * 
+ * Navigation:
+ * - Redirects to /dashboard if user already logged in
+ * - Links to /login for existing users
+ * - Links to /terms and /privacy for legal documents
+ * 
+ * Theme Support:
+ * - Earthy: Cream background, rust/tan accents
+ * - Cool: Pale lavender background, slate/charcoal accents
+ */
+
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
