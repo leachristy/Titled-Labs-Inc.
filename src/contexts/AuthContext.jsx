@@ -104,36 +104,43 @@ export const AuthContextProvider = ({ children }) => {
 
   // sign in function
   const googleSignIn = async () => {
-    // create new instance of google provider
-    const provider = new GoogleAuthProvider();
+    try {
+      // create new instance of google provider
+      const provider = new GoogleAuthProvider();
 
-    // Open Google Login Popup and authenticate user
-    const { user } = await signInWithPopup(auth, provider);
+      // Open Google Login Popup and authenticate user
+      const result = await signInWithPopup(auth, provider);
 
-    // Alternative: Redirect method (currently not used due to bugs)
-    // signInWithRedirect(auth, provider);
+      // Alternative: Redirect method (currently not used due to bugs)
+      // signInWithRedirect(auth, provider);
 
-    // Extract firstName and lastName from Google display name
-    // Splits "John Doe" into firstName="John", lastName="Doe"
-    const [firstName = "", ...rest] = (user.displayName || "").split(" ");
-    const lastName = rest.join(" ");
+      // Extract firstName and lastName from Google display name
+      // Splits "John Doe" into firstName="John", lastName="Doe"
+      const [firstName = "", ...rest] = (result.user.displayName || "").split(" ");
+      const lastName = rest.join(" ");
 
-    // Create or update user document in Firestore 'users' collection
-    await setDoc(doc(db, "users", user.uid), {
-      firstName,
-      lastName,
-      email: user.email,
-      photoUrl: user.photoURL | null,
-      loginType: "google-signin",
-      createdAt: new Date(),
-    });
+      // Create or update user document in Firestore 'users' collection
+      await setDoc(doc(db, "users", result.user.uid), {
+        firstName,
+        lastName,
+        email: result.user.email,
+        photoUrl: result.user.photoURL || null,
+        loginType: "google-signin",
+        createdAt: new Date(),
+      });
 
-    // Update Firebase Auth profile with Google display name and photo
-    // Ensures consistency if user changes their Google profile
-    await updateProfile(user, {
-      displayName: user.displayName,
-      photoURL: user.photoURL,
-    });
+      // Update Firebase Auth profile with Google display name and photo
+      // Ensures consistency if user changes their Google profile
+      await updateProfile(result.user, {
+        displayName: result.user.displayName,
+        photoURL: result.user.photoURL,
+      });
+
+      return result;
+    } catch (error) {
+      console.error("Error in googleSignIn:", error);
+      throw error;
+    }
   };
 
   /**
@@ -152,22 +159,29 @@ export const AuthContextProvider = ({ children }) => {
     email,
     password
   ) => {
-    // Create Firebase Auth account
-    const { user } = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+    try {
+      // Create Firebase Auth account
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-    // Create user profile document in Firestore 'users' collection
-    await setDoc(doc(db, "users", user.uid), {
-      firstName,
-      lastName,
-      email,
-      photoUrl: null, // No photo for email signups initially
-      loginType: "email-password",
-      createdAt: new Date(),
-    });
+      // Create user profile document in Firestore 'users' collection
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        firstName,
+        lastName,
+        email,
+        photoUrl: null, // No photo for email signups initially
+        loginType: "email-password",
+        createdAt: new Date(),
+      });
+
+      return userCredential;
+    } catch (error) {
+      console.error("Error in doCreateUserWithEmailAndPassword:", error);
+      throw error;
+    }
   };
 
   /**
