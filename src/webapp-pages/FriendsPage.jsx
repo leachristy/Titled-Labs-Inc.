@@ -1,3 +1,144 @@
+/**
+ * ========================================
+ * FRIENDS PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * Comprehensive friends management interface for users.
+ * Handles friend requests, friends list, and blocked users.
+ * Provides full CRUD operations for social connections.
+ * 
+ * Features:
+ * - View incoming friend requests with accept/decline/block options
+ * - View friends list with online status indicators
+ * - Block/unblock users functionality
+ * - Navigate to user profiles by clicking on cards
+ * - Real-time online status display (green = online, gray = offline)
+ * - Responsive grid layout for friends display
+ * - Error handling with user-friendly messages
+ * 
+ * Firebase Structure:
+ * 
+ * 1. Friend Requests Collection:
+ *    Collection: "friendRequests"
+ *    Document: {
+ *      fromUid: string,
+ *      toUid: string,
+ *      status: "pending" | "accepted" | "declined" | "blocked",
+ *      createdAt: timestamp,
+ *      respondedAt?: timestamp
+ *    }
+ * 
+ * 2. Friends Subcollection:
+ *    Path: "users/{userId}/friends/{friendId}"
+ *    Document: {
+ *      createdAt: timestamp
+ *    }
+ * 
+ * 3. Blocked Subcollection:
+ *    Path: "users/{userId}/blocked/{blockedId}"
+ *    Document: {
+ *      createdAt: timestamp
+ *    }
+ * 
+ * Main Sections:
+ * 1. Friend Requests:
+ *    - Shows pending incoming requests
+ *    - Actions: Accept, Decline, Block
+ *    - Displays requester's profile with avatar
+ * 
+ * 2. Friends List:
+ *    - Grid of all accepted friends
+ *    - Online status indicator (dot)
+ *    - Shows bio if available
+ *    - Block button to remove friend
+ *    - Count display in header
+ * 
+ * 3. Blocked Users:
+ *    - List of all blocked users
+ *    - Unblock button to restore access
+ *    - Count display in header
+ *    - Safety note for users
+ * 
+ * Friend Request Actions:
+ * 
+ * - Accept:
+ *   1. Update request status to "accepted"
+ *   2. Add friend to both users' friends subcollections
+ *   3. Use batched writes for atomicity
+ *   4. Update local state immediately
+ * 
+ * - Decline:
+ *   1. Update request status to "declined"
+ *   2. Remove from pending requests list
+ *   3. Does not create friendship
+ * 
+ * - Block from Request:
+ *   1. Update request status to "blocked"
+ *   2. Add to both users' blocked subcollections
+ *   3. Remove any existing friendship
+ *   4. Remove from requests list
+ *   5. Add to blocked list
+ * 
+ * Friend Actions:
+ * 
+ * - Block Friend:
+ *   1. Add to both users' blocked subcollections
+ *   2. Delete from both users' friends subcollections
+ *   3. Use batched writes for atomicity
+ *   4. Remove from friends list
+ *   5. Add to blocked list
+ * 
+ * Blocked User Actions:
+ * 
+ * - Unblock:
+ *   1. Delete from both users' blocked subcollections
+ *   2. Remove from blocked list
+ *   3. Does not restore friendship
+ * 
+ * Data Loading:
+ * - Loads on component mount and when user changes
+ * - Fetches friends, requests, and blocked in parallel
+ * - Resolves user profiles for each UID
+ * - Shows loading spinner during fetch
+ * - Displays errors with styled alert
+ * 
+ * Profile Resolution:
+ * - For each UID, fetches full profile from users collection
+ * - Includes: firstName, lastName, bio, online status
+ * - Filters out null profiles (deleted users)
+ * 
+ * Navigation:
+ * - Clicking on any user card navigates to their profile
+ * - Uses React Router navigate function
+ * - Path: /profile/{userId}
+ * 
+ * State Management:
+ * - friends: Array of friend profile objects
+ * - requests: Array of request objects with fromProfile
+ * - blocked: Array of blocked user profiles
+ * - loading: Global loading state
+ * - error: Error message string
+ * 
+ * Online Status:
+ * - renderStatusDot function creates colored indicator
+ * - Green dot = friend.online === true
+ * - Gray dot = friend.online === false/undefined
+ * - Tooltip shows "Online" or "Offline"
+ * 
+ * Theme Support:
+ * - Earthy: Cream backgrounds, tan borders, brown/rust accents
+ * - Cool: Charcoal grey backgrounds, lavender cards, light purple accents
+ * - Consistent with platform-wide theming
+ * 
+ * User Experience:
+ * - Hover effects on cards (lift and glow)
+ * - Truncated text for long names/bios
+ * - Empty states with helpful messages
+ * - Loading spinner with branded colors
+ * - Action buttons with clear labels
+ */
+
 import React, { useEffect, useState } from "react";
 import {
   collection,
