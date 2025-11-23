@@ -197,13 +197,20 @@ export const AuthContextProvider = ({ children }) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
+  /**
+   * Password Reset Function
+   *
+   * Sends a password reset email to the user's email address
+   *
+   * @param {string} email - User's email address
+   * @returns {Promise} Firebase auth promise
+   */
+  const doPasswordReset = (email) => {
+    return sendPasswordResetEmail(auth, email);
+  };
+
   // ------------------------------------------------
   // Additional functions for future implementation:
-  //
-  // Password Reset:
-  // const doPasswordReset = (email) => {
-  //   return sendPasswordResetEmail(auth, email);
-  // };
   //
   // Password Change:
   // const doPasswordChange = (password) => {
@@ -277,6 +284,7 @@ export const AuthContextProvider = ({ children }) => {
         googleSignIn,
         doCreateUserWithEmailAndPassword,
         doSignInWithEmailAndPassword,
+        doPasswordReset,
         logOut,
         user,
         profile,
