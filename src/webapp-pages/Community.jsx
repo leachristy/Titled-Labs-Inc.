@@ -1,3 +1,115 @@
+/**
+ * ========================================
+ * COMMUNITY FORUM PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * Interactive community forum for mental wellness discussions.
+ * Users can create posts, comment, vote, and filter by categories.
+ * Built with Firebase Firestore for real-time data synchronization.
+ * 
+ * Features:
+ * - Create, edit, and delete posts with title, content, images, and videos
+ * - Comment system with nested replies
+ * - Upvote/downvote system for posts and comments
+ * - Category filtering (Mental Health, Self Care, Success Stories, etc.)
+ * - Search functionality across posts, content, and authors
+ * - Sort options (newest, oldest, popular)
+ * - Pagination (5 posts per page)
+ * - Direct post linking via URL parameters (?postId=xyz)
+ * - Real-time updates via Firestore onSnapshot
+ * - Responsive layout (mobile, tablet, desktop)
+ * 
+ * Firebase Structure:
+ * Collection: communityPosts
+ * Document: {
+ *   title: string,
+ *   content: string,
+ *   imageUrl: string | null,
+ *   videoUrl: string | null,
+ *   category: string,
+ *   authorId: string,
+ *   authorName: string,
+ *   authorAvatar: string | null,
+ *   upvotes: [userId1, userId2...],
+ *   downvotes: [userId1, userId2...],
+ *   comments: [{
+ *     id: string,
+ *     text: string,
+ *     authorId: string,
+ *     authorName: string,
+ *     authorAvatar: string | null,
+ *     upvotes: [userId1...],
+ *     downvotes: [userId1...],
+ *     createdAt: ISO string,
+ *     editedAt?: ISO string
+ *   }],
+ *   createdAt: Firestore timestamp,
+ *   editedAt?: Firestore timestamp
+ * }
+ * 
+ * Main Components:
+ * - CommunityStats: Live statistics (total posts, active users, categories)
+ * - CategorySidebar: Desktop category navigation and create button
+ * - SearchAndSort: Search bar and sort dropdown
+ * - CreatePostForm: Post creation form with image/video support
+ * - PostsList: Paginated posts with voting, comments, and interactions
+ * - Pagination: Page navigation controls
+ * 
+ * Post Actions:
+ * - handleCreatePost: Add new post to Firestore
+ * - handleUpvote/handleDownvote: Toggle votes on posts
+ * - handleEditPost: Update post content
+ * - handleDeletePost: Remove post (author only)
+ * 
+ * Comment Actions:
+ * - handleAddComment: Add comment to post
+ * - handleCommentUpvote/handleCommentDownvote: Toggle votes on comments
+ * - handleEditComment: Update comment text
+ * - handleDeleteComment: Remove comment (author only)
+ * 
+ * Filtering & Sorting:
+ * - Category filter: All / Mental Health / Self Care / etc.
+ * - Search: Title, content, and author name
+ * - Sort: Newest (default) / Oldest / Popular (by vote count)
+ * 
+ * Pagination:
+ * - 5 posts per page (POSTS_PER_PAGE constant)
+ * - Auto-scroll to top on page change
+ * - Reset to page 1 when filters change
+ * - Calculate page number for direct post links
+ * 
+ * URL Navigation:
+ * - ?postId=abc123 expands and scrolls to specific post
+ * - Automatically calculates correct page number
+ * - Clears parameter after navigation
+ * 
+ * State Management:
+ * - posts: All posts from Firestore (real-time)
+ * - selectedCategory: Current category filter
+ * - searchQuery: Search input text
+ * - sortBy: Sort option (newest/oldest/popular)
+ * - currentPage: Current pagination page
+ * - expandedPost: Which post's comments are visible
+ * - editingPost/editingComment: IDs of items being edited
+ * - commentText: Comment input by post ID
+ * 
+ * Real-Time Updates:
+ * - onSnapshot listener on communityPosts collection
+ * - Automatic UI updates when data changes
+ * - No manual refresh needed
+ * 
+ * Theme Support:
+ * - Earthy: Cream backgrounds, rust accents, brown text
+ * - Cool: Charcoal grey backgrounds, lavender accents, white text
+ * 
+ * Mobile Features:
+ * - Collapsible category menu button
+ * - Responsive grid (2 columns on tablet)
+ * - Touch-friendly vote buttons
+ * - Scroll-to-top button (appears after scrolling 400px)
+ */
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import UntiltNavBar from "../components/navigation/UntiltNavBar";

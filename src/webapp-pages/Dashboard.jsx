@@ -1,3 +1,45 @@
+/**
+ * ========================================
+ * DASHBOARD PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * Main user dashboard displaying personalized wellness overview and tools.
+ * Shows welcome message, mood tracking interface, and usage statistics.
+ * 
+ * Features:
+ * - Personalized greeting with user's name
+ * - MoodTracker: Interactive mood logging and visualization
+ * - StatTracker: Dashboard analytics and mood history charts
+ * - Responsive grid layout (1 column mobile, 2 columns desktop)
+ * - Theme-aware styling (Earthy vs Cool themes)
+ * 
+ * Components Used:
+ * - UntiltNavBar: Navigation bar with user menu
+ * - MoodTracker: Mood selection and history component
+ * - StatTracker: Statistics visualization component
+ * 
+ * State Management:
+ * - moodHistory: Array of mood entries with timestamp
+ * - Each entry: { id, mood, timestamp }
+ * - Passed down to both MoodTracker and StatTracker
+ * 
+ * User Data:
+ * - user: Firebase auth user object
+ * - profile: User profile from Firestore (firstName, lastName)
+ * - loading: Loading state for user data
+ * 
+ * Layout:
+ * - Fixed navbar with pt-32 to account for navbar height
+ * - 2-column grid on large screens (lg:grid-cols-2)
+ * - Full width on mobile (grid-cols-1)
+ * - Max width container for content (max-w-4xl)
+ * 
+ * Theme Support:
+ * - Earthy: Cream backgrounds, brown text, tan accents
+ * - Cool: Charcoal grey background, lavender card backgrounds
+ */
+
 import { useState, useEffect } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";

@@ -1,3 +1,75 @@
+/**
+ * ========================================
+ * AI CHAT PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * AI-powered self-care assistant providing empathetic support and guidance.
+ * Uses OpenRouter API with Mistral-7B-Instruct model for mental wellness conversations.
+ * Includes safety features for crisis detection and scope filtering.
+ * 
+ * Features:
+ * - Real-time AI chat with Mistral-7B-Instruct model
+ * - Crisis keyword detection with emergency resources
+ * - Scope filtering (only self-care topics allowed)
+ * - Resource link suggestions based on keywords
+ * - Message history with visual chat bubbles
+ * - Theme-aware styling with smooth transitions
+ * - Clickable navigation links in bot responses
+ * 
+ * Safety Features:
+ * 1. Crisis Detection:
+ *    - Scans for keywords: suicide, self-harm, etc.
+ *    - Provides 988 Suicide & Crisis Lifeline
+ *    - Blocks AI response, shows emergency resources
+ * 
+ * 2. Scope Filtering:
+ *    - Blocks non-self-care topics (coding, recipes, etc.)
+ *    - Only allows mental health conversations
+ *    - Keywords: stress, anxiety, mindfulness, etc.
+ * 
+ * 3. Resource Matching:
+ *    - Pre-AI keyword checking for quick responses
+ *    - Suggests relevant app pages (/breathing, /journal, etc.)
+ *    - Includes selfCareResources from data/resource.js
+ * 
+ * AI Integration:
+ * - API: OpenRouter (https://openrouter.ai/api/v1/chat/completions)
+ * - Model: mistralai/mistral-7b-instruct
+ * - System Prompt: "Kind and empathetic self-care assistant"
+ * - Response: 2-4 sentences, concise and warm
+ * - No conversation history (stateless, current message only)
+ * 
+ * Message Flow:
+ * 1. User types message → input state
+ * 2. Check crisis keywords → emergency response if match
+ * 3. Check scope filter → rejection if off-topic
+ * 4. Check resource keywords → direct link if match
+ * 5. Send to OpenRouter API → AI response
+ * 6. Clean AI text (remove model artifacts)
+ * 7. Display in chat with clickable links
+ * 
+ * State Management:
+ * - messages: Array of { sender: "user"|"bot", text: string }
+ * - input: Current user input text
+ * - loading: API request in progress
+ * 
+ * Text Processing:
+ * - cleanAIText: Removes [INST], <s>, [OUT] tags
+ * - escapeRegex: Safely escapes special regex characters
+ * - Link detection: Parses /path patterns for navigation
+ * 
+ * Navigation Links:
+ * - Valid paths: /selfcare, /breathing, /goals, /journal, etc.
+ * - Rendered as clickable <Link> components
+ * - Custom styling per theme
+ * 
+ * Theme Support:
+ * - Earthy: Cream/tan backgrounds, brown text, orange accents
+ * - Dark: Charcoal backgrounds, gray text, purple accents
+ * - Cool: Lavender backgrounds, gray text, purple accents
+ */
+
 import { useState} from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
