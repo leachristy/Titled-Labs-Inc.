@@ -35,20 +35,23 @@ export default function Testimonial() {
         {/* Trust Stats */}
         <div className="text-center">
           <p className={`text-xs font-semibold ${isEarthy ? 'text-cream-100' : 'text-pale-lavender'} tracking-wider mb-6`}>TRUSTED BY THOUSANDS OF USERS NATIONWIDE</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-white mb-2">225k+</div>
-              <div className={`text-sm ${isEarthy ? 'text-cream-200' : 'text-pale-lavender'}`}>Active Users</div>
+          
+          {/*
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-white mb-2">225k+</div>
+                <div className={`text-sm ${isEarthy ? 'text-cream-200' : 'text-pale-lavender'}`}>Active Users</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-white mb-2">4.9/5</div>
+                <div className={`text-sm ${isEarthy ? 'text-cream-200' : 'text-pale-lavender'}`}>User Rating</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-white mb-2">98%</div>
+                <div className={`text-sm ${isEarthy ? 'text-cream-200' : 'text-pale-lavender'}`}>Would Recommend</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-white mb-2">4.9/5</div>
-              <div className={`text-sm ${isEarthy ? 'text-cream-200' : 'text-pale-lavender'}`}>User Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-white mb-2">98%</div>
-              <div className={`text-sm ${isEarthy ? 'text-cream-200' : 'text-pale-lavender'}`}>Would Recommend</div>
-            </div>
-          </div>
+          */}
         </div>
       </div>
     </section>
