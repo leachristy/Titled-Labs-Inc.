@@ -1,3 +1,49 @@
+/**
+ * ========================================
+ * LOGIN PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * Authenticates existing users to access their Tilted wellness platform account.
+ * Supports email/password login and OAuth (Google, Twitter).
+ * 
+ * Features:
+ * - Email and password authentication via Firebase
+ * - Google OAuth signin integration
+ * - Remember me checkbox functionality
+ * - Forgot password link
+ * - Error handling with user-friendly messages
+ * - Loading states during authentication
+ * - Auto-redirect to dashboard on successful login
+ * - Social login options (Google, Twitter)
+ * - Crisis hotline information for immediate support
+ * 
+ * Authentication Flow:
+ * 1. User enters email and password
+ * 2. Form validation on submit
+ * 3. Firebase authentication via doSignInWithEmailAndPassword()
+ * 4. On success: Navigate to /dashboard
+ * 5. On error: Display error message
+ * 
+ * State Management:
+ * - formData: Email and password inputs
+ * - isLoading: Controls loading state during auth
+ * - error: Displays authentication errors
+ * 
+ * Firebase Methods Used:
+ * - doSignInWithEmailAndPassword: Email/password auth
+ * - googleSignIn: Google OAuth authentication
+ * 
+ * Navigation:
+ * - Redirects to /dashboard if user already logged in
+ * - Links to /signup for new users
+ * - Links to /forgot-password for password recovery
+ * 
+ * Theme Support:
+ * - Earthy: Cream background, rust/brown accents
+ * - Cool: Pale lavender background, slate blue accents
+ */
+
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";

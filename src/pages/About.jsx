@@ -1,3 +1,31 @@
+/**
+ * ========================================
+ * ABOUT PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * Displays information about Tilted Lab Inc. and introduces the team members.
+ * Showcases the company's mission to make mental health care accessible,
+ * affordable, and effective through licensed professionals.
+ * 
+ * Features:
+ * - Company mission statement and description
+ * - Grid display of team members with photos and roles
+ * - Theme-aware styling (Earthy vs Cool themes)
+ * - Responsive layout for all screen sizes
+ * 
+ * Components Used:
+ * - NavBar: Navigation header
+ * - TeamCard: Individual team member card with photo, name, role, and bio
+ * 
+ * Data Sources:
+ * - team.js: Array of team member information
+ * 
+ * Theme Support:
+ * - Earthy: Cream background, brown text
+ * - Cool: Pale lavender background, charcoal/slate text
+ */
+
 import { useTheme } from "../contexts/ThemeContext";
 import TeamCard from "../components/cards/TeamCard";
 import { team } from "../data/team";
