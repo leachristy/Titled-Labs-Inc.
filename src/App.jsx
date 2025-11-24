@@ -12,6 +12,8 @@ import Contact from "./pages/Contact";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import Dashboard from "./webapp-pages/Dashboard";
 import AIChat from "./webapp-pages/AIChat";
 import Community from "./webapp-pages/Community";
@@ -51,6 +53,8 @@ export default function App() {
                 <Route path="/about" element={<About />} />
                 <Route path="/users" element={<Users />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
                 <Route
                   path="/dashboard"
                   element={
