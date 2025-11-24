@@ -328,7 +328,7 @@ const findResourceReply = (text = "") => {
   const displayName = profile?.firstName || user?.displayName || "Friend";
 
   return (
-    <div className={`${isEarthy ? "bg-cream-100" : "bg-[#646F89]"} min-h-screen`}>
+    <div className={`${isEarthy ? "bg-cream-100" : "bg-[#646F89]"} min-h-screen hide-messenger-mobile`}>
       <UntiltNavBar />
 
       <div

@@ -221,7 +221,7 @@ export default function DirectMessages() {
     <>
       <UntiltNavBar />
       <div
-        className={`min-h-screen px-4 pt-24 pb-12 ${
+        className={`min-h-screen px-4 pt-24 pb-12 hide-messenger-mobile ${
           isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
         }`}
       >

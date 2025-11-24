@@ -78,8 +78,8 @@ export default function StatTracker({ moodHistory = [] }) {
   };
 
   return (
-    <div className={`rounded-2xl shadow-lg p-6 border-2 h-full ${cardBase}`}>
-      <div className="flex justify-between items-center mb-6">
+    <div className={`rounded-2xl shadow-lg p-4 border-2 h-full flex flex-col ${cardBase}`}>
+      <div className="flex justify-between items-center mb-3">
         <h3 className="text-xl font-bold">Wellness Trends</h3>
         <div className="flex gap-2">
           <button
@@ -98,23 +98,25 @@ export default function StatTracker({ moodHistory = [] }) {
       </div>
 
       {chartData.length === 0 ? (
-        <div className="h-64 flex items-center justify-center opacity-60">
+        <div className="flex-1 flex items-center justify-center opacity-60 min-h-[250px]">
           <p>Check in to see your stats!</p>
         </div>
       ) : (
-        <div className="h-64 w-full">
+        <div className="flex-1 w-full min-h-[250px] md:min-h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             {chartType === "line" ? (
-              <LineChart data={chartData}>
+              <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                <XAxis dataKey="date" fontSize={12} tickMargin={10} />
+                <XAxis dataKey="date" fontSize={10} tickMargin={5} />
                 <YAxis
                   domain={[0, 6]}
                   ticks={[1, 2, 3, 4, 5]}
+                  width={30}
                   tickFormatter={(val) => {
-                    if (val === 1) return "☹️";
+                   if (val === 1) return "☹️";
                     if (val === 3) return "😐";
                     if (val === 5) return "😄";
+
                     return "";
                   }}
                 />
@@ -123,17 +125,18 @@ export default function StatTracker({ moodHistory = [] }) {
                   type="monotone"
                   dataKey="score"
                   stroke={chartColor}
-                  strokeWidth={3}
-                  activeDot={{ r: 8 }}
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
                 />
               </LineChart>
             ) : (
-              <BarChart data={chartData}>
+              <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
-                <XAxis dataKey="date" fontSize={12} tickMargin={10} />
+                <XAxis dataKey="date" fontSize={10} tickMargin={5} />
                 <YAxis
                   domain={[0, 6]}
                   ticks={[1, 2, 3, 4, 5]}
+                  width={30}
                   tickFormatter={(val) => {
                      if (val === 1) return "Vs";
                      if (val === 5) return "Vh";
