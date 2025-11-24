@@ -258,7 +258,7 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
                               isCurrentUser
                                 ? isEarthy
                                   ? "bg-amber-700 text-white"
-                                  : "bg-linear-to-r from-blue-500 to-blue-600 text-white"
+                                  : "bg-light-lavender text-white"
                                 : "bg-gray-200 text-gray-900"
                             } ${
                               isCurrentUser
@@ -329,7 +329,7 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
                   message.trim()
                     ? isEarthy
                       ? "bg-amber-700 text-white hover:bg-amber-800"
-                      : "bg-blue-500 text-white hover:bg-blue-600"
+                      : "bg-light-lavender text-white hover:bg-medium-lavender"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
