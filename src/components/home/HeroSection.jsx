@@ -9,85 +9,98 @@ export default function HeroSection({ onNavigate }) {
   const headerRef = useRef(null);
 
   useEffect(() => {
-    if (!headerRef.current || !window.FinisherHeader) {
-      console.log("⏳ Waiting for FinisherHeader library or DOM...");
-      return;
-    }
+    // Small delay to ensure DOM is fully ready
+    const timer = setTimeout(() => {
+      if (!headerRef.current || !window.FinisherHeader) {
+        console.log("Waiting for FinisherHeader library or DOM...");
+        console.log("headerRef.current:", headerRef.current);
+        console.log("window.FinisherHeader:", window.FinisherHeader);
+        return;
+      }
 
-    // Remove any existing canvas before creating new one
-    const existingCanvas = document.querySelector('#finisher-canvas');
-    if (existingCanvas) {
-      existingCanvas.remove();
-      console.log("🗑️ Removed previous canvas");
-    }
+      // Remove any existing canvas before creating new one
+      const existingCanvas = document.querySelector('#finisher-canvas');
+      if (existingCanvas) {
+        existingCanvas.remove();
+        console.log("Removed previous canvas");
+      }
 
-    try {
-      const config = isEarthy ? {
-        // Earthy theme animation
-        count: 4,
-        size: {
-          min: 1200,
-          max: 1500,
-          pulse: 0.1
-        },
-        speed: {
-          x: { min: 0, max: 0.2 },
-          y: { min: 0, max: 0.2 }
-        },
-        colors: {
-          background: "#ecdac8",
-          particles: ["#d1a693", "#d8966f", "#bf5b3c", "#955749"]
-        },
-        blending: "lighten",
-        opacity: {
-          center: 0.8,
-          edge: 0.2
-        },
-        skew: -2,
-        shapes: ["c"]
-      } : {
-        // Cool theme animation - ULTRA visible
-        count: 20,
-        size: {
-          min: 1200,
-          max: 2000,
-          pulse: 1
-        },
-        speed: {
-          x: { min: 0.5, max: 1 },
-          y: { min: 0.5, max: 1 }
-        },
-        colors: {
-          background: "#373E4F",
-          particles: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"]
-        },
-        blending: "lighter",
-        opacity: {
-          center: 1,
-          edge: 0.9
-        },
-        skew: -2,
-        shapes: ["c", "t"]
-      };
+      try {
+        const config = isEarthy ? {
+          // Earthy theme animation
+          className: "finisher-header",
+          count: 4,
+          size: {
+            min: 1200,
+            max: 1500,
+            pulse: 0.1
+          },
+          speed: {
+            x: { min: 0, max: 0.2 },
+            y: { min: 0, max: 0.2 }
+          },
+          colors: {
+            background: "#ecdac8",
+            particles: ["#d1a693", "#d8966f", "#bf5b3c", "#955749"]
+          },
+          blending: "lighten",
+          opacity: {
+            center: 0.8,
+            edge: 0.2
+          },
+          skew: -2,
+          shapes: ["c"]
+        } : {
+          // Cool theme animation - BRIGHT NEON COLORS
+          className: "finisher-header",
+          count: 10,
+          size: {
+            min: 500,
+            max: 800,
+            pulse: 4
+          },
+          speed: {
+            x: { min: 0.5, max: 1 },
+            y: { min: 0.5, max: 1 }
+          },
+          colors: {
+            background: "bg-charcoal-grey",
+            particles: ["lavender", "#ff00ff", "#00ffff", "#ffff00"]
+          },
+          blending: "lighter",
+          opacity: {
+            center: 1,
+            edge: 0.8
+          },
+          skew: -2,
+          shapes: ["c"]
+        };
 
-      console.log(`🎨 Creating ${isEarthy ? 'EARTHY' : 'COOL'} animation`);
-      new window.FinisherHeader(config);
-      
-      // Verify it was created
-      setTimeout(() => {
-        const canvas = document.querySelector('#finisher-canvas');
-        console.log(canvas ? `✅ Canvas created for ${isEarthy ? 'EARTHY' : 'COOL'} theme` : `❌ NO CANVAS for ${isEarthy ? 'EARTHY' : 'COOL'} theme`);
-      }, 100);
-    } catch (error) {
-      console.error("❌ Animation initialization failed:", error);
-    }
+        console.log(`Creating ${isEarthy ? 'EARTHY' : 'COOL'} animation`);
+        console.log('Config:', config);
+        new window.FinisherHeader(config);
+        
+        // Verify it was created
+        setTimeout(() => {
+          const canvas = document.querySelector('#finisher-canvas');
+          console.log(canvas ? `Canvas created for ${isEarthy ? 'EARTHY' : 'COOL'} theme` : `NO CANVAS for ${isEarthy ? 'EARTHY' : 'COOL'} theme`);
+          if (canvas) {
+            console.log('Canvas styles:', canvas.getAttribute('style'));
+            console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+          }
+        }, 100);
+      } catch (error) {
+        console.error("Animation initialization failed:", error);
+      }
+    }, 100);
 
     // Cleanup function
     return () => {
+      clearTimeout(timer);
       const canvas = document.querySelector('#finisher-canvas');
       if (canvas) {
         canvas.remove();
-        console.log("🧹 Cleanup: Canvas removed");
+        console.log("Cleanup: Canvas removed");
       }
     };
   }, [isEarthy]);
@@ -96,7 +109,7 @@ export default function HeroSection({ onNavigate }) {
     <section 
       key={currentTheme}
       ref={headerRef}
-      className={`finisher-header relative py-20 overflow-hidden ${isEarthy ? "bg-terracotta-200" : "bg-charcoal-grey"}`}
+      className={`finisher-header relative py-20 ${isEarthy ? "bg-terracotta-200" : "bg-charcoal-grey"}`}
       style={{ minHeight: "600px", position: "relative" }}
     >
       <div className="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 z-10">

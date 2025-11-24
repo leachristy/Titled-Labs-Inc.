@@ -79,7 +79,7 @@ export const whoWeServeData = [
     title: "Therapists & Practices",
     description: "Streamline your practice management and provide better care with our comprehensive platform.",
     features: [
-      "Automated scheduling and billing",
+      "Place to pratice management",
       "Client progress tracking",
       "Secure messaging system"
     ],
