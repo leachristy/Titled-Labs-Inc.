@@ -174,15 +174,13 @@ export default function ProfilePage() {
         isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
       }`}
     >
-      {/* Theme toggle */}
-      <div className="fixed top-4 right-4 z-50">
       {/* Fixed theme toggle button - top right */}
       <div className="fixed top-4 right-4">
         <ThemeToggle />
       </div>
 
       {/* Fixed back button - top left */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4">
         <button
           onClick={handleBack}
           className={`px-4 py-2 rounded-lg font-semibold transition shadow-md hover:shadow-lg ${
@@ -232,7 +230,7 @@ export default function ProfilePage() {
               }`}
             />
 
-            {/* Name */}
+            {/* User's full name */}
             <h2
               className={`text-3xl font-bold mb-2 ${
                 isEarthy ? "text-brown-800" : "text-gray-900"
@@ -250,7 +248,7 @@ export default function ProfilePage() {
               {profile.email}
             </p>
 
-            {/* Badges */}
+            {/* Badges earned by user */}
             <div className="mb-6">
               <BadgeGallery badges={Array.isArray(profile.badges) ? profile.badges : []} />
             </div>
