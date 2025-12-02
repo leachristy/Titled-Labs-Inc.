@@ -230,6 +230,16 @@
   .hover\:border-charcoal-grey:hover { border-color: var(--color-charcoal-grey); }
 }
 
+/* ====================================
+   MESSENGER MOBILE HIDE
+   Hide messenger widget on mobile for AI Chat and Direct Messages pages
+   ==================================== */
+@media (max-width: 768px) {
+  body:has(.hide-messenger-mobile) #messenger-widget {
+    display: none !important;
+  }
+}
+
 /* Cool Theme Component Styles */
 .card-new {
   background-color: white;

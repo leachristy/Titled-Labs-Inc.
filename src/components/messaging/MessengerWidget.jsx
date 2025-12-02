@@ -7,7 +7,7 @@ export default function MessengerWidget() {
   const { openChats } = useMessenger();
 
   return (
-    <>
+    <div id="messenger-widget">
       <MessengerButton />
       <MessengerPopup />
       
@@ -21,6 +21,6 @@ export default function MessengerWidget() {
           index={index}
         />
       ))}
-    </>
+    </div>
   );
 }

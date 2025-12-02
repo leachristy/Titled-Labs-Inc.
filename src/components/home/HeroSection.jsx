@@ -1,16 +1,147 @@
 import { useTheme } from "../../contexts/ThemeContext";
+import { useEffect, useRef } from "react";
 import landingImage from "../../assets/landing.jpg";
 import landingImage2 from "../../assets/landing2.png";
 
 export default function HeroSection({ onNavigate }) {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    if (!window.FinisherHeader || !headerRef.current) return;
+
+    const initAnimation = () => {
+      // Remove any existing canvas before creating new one
+      const existingCanvas = document.querySelector('#finisher-canvas');
+      if (existingCanvas) {
+        existingCanvas.remove();
+      }
+
+      try {
+        const config = isEarthy ? {
+          // Earthy theme animation - Original colors restored
+          count: 5,
+          size: {
+            min: 1000,
+            max: 1400,
+            pulse: 0.1
+          },
+          speed: {
+            x: { min: 0.1, max: 0.25 },
+            y: { min: 0.1, max: 0.25 }
+          },
+          colors: {
+            background: "#ECDAC8",
+            particles: ["#D1A693", "#D8966F", "#BF5B3C", "#955749"]
+          },
+          blending: "lighten",
+          opacity: {
+            center: 0.8,
+            edge: 0.2
+          },
+          skew: 0,
+          shapes: ["c"]
+        } : {
+          // Cool theme animation
+          count: 14,
+          size: {
+            min: 2,
+            max: 251,
+            pulse: 0
+          },
+          speed: {
+            x: {
+              min: 0,
+              max: 0.8
+            },
+            y: {
+              min: 0,
+              max: 0.2
+            }
+          },
+          colors: {
+            background: "#373e4f",
+            particles: [
+              "#ff926b",
+              "#87ddfe",
+              "#acaaff",
+              "#1bffc2",
+              "#f9a5fe"
+            ]
+          },
+          blending: "screen",
+          opacity: {
+            center: 1,
+            edge: 1
+          },
+          skew: -1,
+          shapes: [
+            "c",
+            "s",
+            "t"
+          ]
+        };
+
+        console.log(`Creating ${isEarthy ? 'EARTHY' : 'COOL'} theme animation`);
+        new window.FinisherHeader(config);
+        
+        // Verify canvas creation
+        setTimeout(() => {
+          const canvas = document.querySelector('#finisher-canvas');
+          if (canvas) {
+            console.log('Canvas created successfully');
+            // Only set positioning, not dimensions - let library handle size
+            canvas.style.position = 'absolute';
+            canvas.style.top = '0';
+            canvas.style.left = '0';
+            canvas.style.zIndex = '1';
+            canvas.style.pointerEvents = 'none';
+            console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+          } else {
+            console.log('Canvas not found');
+          }
+        }, 100);
+      } catch (error) {
+        console.error("Animation initialization failed:", error);
+      }
+    };
+
+    // Initial animation creation
+    const timer = setTimeout(initAnimation, 100);
+
+    // Handle window resize - recreate animation
+    let resizeTimeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        console.log('Window resized, recreating animation');
+        initAnimation();
+      }, 250);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup function
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(resizeTimeout);
+      window.removeEventListener('resize', handleResize);
+      const canvas = document.querySelector('#finisher-canvas');
+      if (canvas) {
+        canvas.remove();
+      }
+    };
+  }, [isEarthy]);
 
   return (
-    <section className={`relative py-20 overflow-hidden ${isEarthy ? "bg-terracotta-200" : "bg-charcoal-grey"}`}>
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzBoLTZhMSAxIDAgMCAxIDAtMmg2YTEgMSAwIDAgMSAwIDJ6bS0xMiAwSDhhMSAxIDAgMCAxIDAtMmgxNmExIDEgMCAwIDEgMCAyek0zNiAxOGgtNmExIDEgMCAwIDEgMC0yaDZhMSAxIDAgMCAxIDAgem0tMTIgMEg4YTEgMSAwIDAgMSAwLTJoMTZhMSAxIDAgMCAxIDAgek0zNiA0Mmg2YTEgMSAwIDAgMSAwIDJoLTZhMSAxIDAgMCAxIDAtMnptLTEyIDBoMTZhMSAxIDAgMCAxIDAgMkg4YTEgMSAwIDAgMSAwLTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30"></div>
-
-      <div className="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <section 
+      key={currentTheme}
+      ref={headerRef}
+      className={`finisher-header relative py-20 ${isEarthy ? "bg-cream-200" : "bg-charcoal-grey"}`}
+      style={{ minHeight: "600px", position: "relative", overflow: "hidden" }}
+    >
+      <div className="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 z-10" style={{ zIndex: 10, position: 'relative' }}>
         <div className="text-center">
           {/* Landing Image */}
           <div className="flex justify-center mb-8">

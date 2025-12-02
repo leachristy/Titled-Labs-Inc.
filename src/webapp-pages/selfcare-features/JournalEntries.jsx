@@ -3,6 +3,8 @@ import UntiltNavBar from "../../components/navigation/UntiltNavBar";
 import { useTheme } from "../../contexts/ThemeContext";
 import { db, auth } from "../../src/firebase";
 import { useNavigate } from "react-router-dom";
+import { ACHIEVEMENTS } from "../../data/achievements";
+import { useAchievements } from "../../contexts/AchievementContext";
 
 import {
   collection,
@@ -34,6 +36,7 @@ export default function JournalEntries() {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
   const navigate = useNavigate();
+  const { unlockAchievement } = useAchievements();
 
   const [entries, setEntries] = useState([]);
   const [userId, setUserId] = useState(null);
@@ -76,6 +79,7 @@ export default function JournalEntries() {
       createdAt: new Date().toISOString(),
     };
     await addDoc(collection(db, "journalEntries"), newEntry);
+    unlockAchievement(ACHIEVEMENTS.JOURNAL_ROOKIE.id);
   };
 
   const deleteEntry = async (id) => {
@@ -112,10 +116,10 @@ export default function JournalEntries() {
           </button>
           {/* Header */}
           <div className="mb-8 text-center">
-            <h1 className={`text-4xl font-bold ${isEarthy ? "text-brown-800" : "text-gray-900"}`}>
+            <h1 className={`text-4xl font-bold ${isEarthy ? "text-brown-800" : "text-cream-100"}`}>
               My Journal
             </h1>
-            <p className={`mt-2 ${isEarthy ? "text-brown-600" : "text-gray-600"}`}>
+            <p className={`mt-2 ${isEarthy ? "text-brown-600" : "text-gray-100"}`}>
               Reflect, release, and write freely. Choose a prompt or start your own entry.
             </p>
           </div>
@@ -146,7 +150,7 @@ export default function JournalEntries() {
 
           {/* Journal Entries List */}
           {entries.length === 0 ? (
-            <p className="text-center text-gray-500 italic">No journal entries yet. Start writing!</p>
+            <p className="text-center text-gray-400 italic">No journal entries yet. Start writing!</p>
           ) : (
             <div className="space-y-6">
               {entries.map((entry) => (

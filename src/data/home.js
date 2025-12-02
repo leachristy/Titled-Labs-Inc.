@@ -79,7 +79,7 @@ export const whoWeServeData = [
     title: "Therapists & Practices",
     description: "Streamline your practice management and provide better care with our comprehensive platform.",
     features: [
-      "Automated scheduling and billing",
+      "Place to pratice management",
       "Client progress tracking",
       "Secure messaging system"
     ],
@@ -114,16 +114,6 @@ export const resourcesData = [
 ];
 
 export const detailedFeaturesData = [
-  {
-    id: 1,
-    badge: "PROFESSIONAL SUPPORT",
-    title: "Connect with licensed therapists and supportive communities",
-    description: "Join specialized groups, attend sessions, and access evidence-based therapy tools—all in one secure platform.",
-    linkText: "Learn more about our team",
-    link: "/about",
-    mockupType: "therapist",
-    reverse: false
-  },
   {
     id: 2,
     badge: "WELLNESS SUPPORT",
