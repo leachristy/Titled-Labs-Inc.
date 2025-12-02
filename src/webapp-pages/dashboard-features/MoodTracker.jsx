@@ -55,14 +55,24 @@ export default function MoodDailyCheckIn({ moodHistory, setMoodHistory }) {
   const [customMood, setCustomMood] = useState("");
   const [description, setDescription] = useState("");
 
-  //const [moodHistory, setMoodHistory] = useState([]);
-
   const [streak, setStreak] = useState(0);
   const [lastCheckInDate, setLastCheckInDate] = useState(null);
-  const [checkedDates, setCheckedDates] = useState([]);
 
   const todayKey = getTodayKey();
-  const hasCheckedToday = checkedDates.includes(todayKey);
+  
+  // Check if user has already checked in today by looking at moodHistory
+  const hasCheckedToday = useMemo(() => {
+    if (!moodHistory || moodHistory.length === 0) return false;
+    
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    
+    return moodHistory.some(entry => {
+      const entryDate = new Date(entry.timestamp);
+      entryDate.setHours(0, 0, 0, 0);
+      return entryDate.getTime() === todayStart.getTime();
+    });
+  }, [moodHistory]);
 
   const displayStreak = useMemo(() => {
     if (!lastCheckInDate) return 0;
@@ -75,6 +85,11 @@ export default function MoodDailyCheckIn({ moodHistory, setMoodHistory }) {
     const moodToSave = customMood || selectedMood;
     if (!moodToSave) return alert("Please select a mood for today!");
 
+    // Check again to prevent duplicate entries
+    if (hasCheckedToday) {
+      return alert("You've already checked in today!");
+    }
+
     let newStreak = 1;
 
     if (lastCheckInDate) {
@@ -85,10 +100,6 @@ export default function MoodDailyCheckIn({ moodHistory, setMoodHistory }) {
 
     setStreak(newStreak);
     setLastCheckInDate(todayKey);
-
-    setCheckedDates((prev) =>
-      prev.includes(todayKey) ? prev : [...prev, todayKey]
-    );
 
     const newEntry = {
       id: Date.now(),
@@ -126,6 +137,20 @@ export default function MoodDailyCheckIn({ moodHistory, setMoodHistory }) {
     : "bg-white border-blue-grey";
 
   const days = getLastNDays(7);
+
+  // Check which days have mood entries
+  const getDayHasEntry = (dayKey) => {
+    if (!moodHistory || moodHistory.length === 0) return false;
+    
+    return moodHistory.some(entry => {
+      const entryDate = new Date(entry.timestamp);
+      const yyyy = entryDate.getFullYear();
+      const mm = String(entryDate.getMonth() + 1).padStart(2, "0");
+      const dd = String(entryDate.getDate()).padStart(2, "0");
+      const entryKey = `${yyyy}-${mm}-${dd}`;
+      return entryKey === dayKey;
+    });
+  };
 
   // ---- self-care tips ----
   const getSelfCareTips = (mood) => {
@@ -217,7 +242,7 @@ export default function MoodDailyCheckIn({ moodHistory, setMoodHistory }) {
                 <div
                   className={`mt-1 w-6 h-6 rounded-full border flex items-center justify-center text-[10px]
                     ${
-                      checkedDates.includes(d.key)
+                      getDayHasEntry(d.key)
                         ? calendarDotFilled
                         : calendarDotEmpty
                     }
