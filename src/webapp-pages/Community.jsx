@@ -115,6 +115,7 @@ import { useSearchParams } from "react-router-dom";
 import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
+import { ACHIEVEMENTS } from "../data/achievements";
 import {
   collection,
   addDoc,
@@ -138,12 +139,14 @@ import SearchAndSort from "../components/community/SearchAndSort";
 import CreatePostForm from "../components/community/CreatePostForm";
 import PostsList from "../components/community/PostsList";
 import Pagination from "../components/community/Pagination";
+import { useAchievements } from "../contexts/AchievementContext";
 
 export default function Community() {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
   const { user, profile } = UserAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { unlockAchievement } = useAchievements();
 
   const [posts, setPosts] = useState([]); // All posts from Firebase
   
@@ -240,6 +243,10 @@ export default function Community() {
     setIsSubmitting(true);
     try {
       // Add new post to Firestore
+      const hasPostedBefore = posts.some(post => post.authorId === user.uid)
+      if (!hasPostedBefore){
+        unlockAchievement(ACHIEVEMENTS.COMMUNITY_ROOKIE.id);
+      }
       await addDoc(collection(db, "communityPosts"), {
         title: newPostTitle,
         content: newPostContent,

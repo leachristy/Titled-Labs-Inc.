@@ -93,6 +93,7 @@ export default function AIChat() {
       .replace(/\[\/OUT\]\s*<\/s>/gi, "")
       .replace(/<\/?s>/gi, "")
       .replace(/\[INST\]|\[\/INST\]/gi, "")
+     // .replace(/\[/s\]gi, "") 
       .trim();
 
 
@@ -103,17 +104,48 @@ const isSelfCareMessage = (text = "") => {
   const lower = text.toLowerCase().trim();
 
   const disallow = [
-    "sandwich", "recipe", "cook", "cooking", "homework", "assignment",
-    "algorithm", "code", "coding", "programming", "java", "javascript",
-    "python", "firebase", "deploy", "website bug", "git", "github", "merge"
+  //forget.*sandwich/i,
+  /forget.*recipe/i,
+  /forget.*cook/i,
+  /forget.*cooking/i,
+  /forget.*homework/i,
+  /forget.*assignment/i,
+  /forget.*algorithm/i,
+  /forget.*code/i,
+  /forget.*coding/i,
+  /forget.*programming/i,
+  /forget.*java/i,
+  /forget.*javascript/i,
+  /forget.*python/i,
+  /forget.*firebase/i,
+  /forget.*deploy/i,
+  /forget.*website/i,
+  /forget.*bug/i,
+  /forget.*git/i,
+  /forget.*github/i,
+  /forget.*merge/i,
+  /forget.*instructions/i,
+  /forget.*programming/i,  
+  /forget.*instruction/i
+];
+
+if (disallow.some(pattern => pattern.test(text))) 
+  return false;
+else 
+  return true;
+
+
+   /*const notallow = [
+    /"forget.*instructions", "forget.*programming"/
   ];
 
-  for (const word of disallow) {
+    for (const word of notallow) {
     const re = new RegExp(`\\b${escapeRegex(word)}\\b`, "i");
-    if (re.test(lower)) return false;
-  }
-
-  const allow = [
+    if (re.test(lower)) 
+      return false;
+  }*/
+  
+  /*const allow = [
     "self care", "self-care", "mental health", "stress", "anxiety",
     "overthinking", "mindfulness", "sleep", "burnout", "motivation",
     "sad", "lonely", "angry", "depressed", "panic", "breathing",
@@ -126,7 +158,7 @@ const isSelfCareMessage = (text = "") => {
   for (const word of allow) {
     const re = new RegExp(`\\b${escapeRegex(word)}\\b`, "i");
     if (re.test(lower)) return true;
-  }
+  }*/
 };
 
 const seemsCrisis = (text = "") => {
@@ -190,7 +222,7 @@ const findResourceReply = (text = "") => {
       return;
     }
 
-    if (!isSelfCareMessage(input)){
+     if (!isSelfCareMessage(input)){
       setMessages((prev) =>[
         ...prev,
         {
@@ -202,6 +234,19 @@ const findResourceReply = (text = "") => {
       setLoading(false);
       return;
     }
+
+    /*if (!isSelfCareMessage(input)){
+      setMessages((prev) =>[
+        ...prev,
+        {
+          send: "bot",
+          text: 
+            "I can help with self-care, supportive reflection, and website navigation."
+        },
+      ]);
+      setLoading(false);
+      return;
+    }*/
 
     // Resource link detection
     const resourceReply = findResourceReply(input);
@@ -223,7 +268,7 @@ const findResourceReply = (text = "") => {
           messages: [
             {
               role: "system",
-              content: "You are a kind and empathetic self-care assistant for the Untitled Community. Respond in a calm, supportive tone. Give helpful, real-world self-care advice (mindfulness, reflection, breaks, positvity).Keep responses concise (2-4 sentences) and warm."
+              content: "You are a kind and empathetic self-care assistant for the Untitled Community. You are the assistant, not the user. Avoid talking about yourself and only keep conversation focused on the user. Respond in a calm, supportive tone. Give helpful, real-world self-care advice (mindfulness, reflection, breaks, positvity).Keep responses concise (2-4 sentences) and warm."
             },
             { role: "user", content: input },
           ],

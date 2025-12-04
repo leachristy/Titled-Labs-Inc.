@@ -8,6 +8,7 @@ const AchievementContext = createContext();
 
 export const AchievementProvider = ({ children }) => {
   const [unlockedAchievements, setUnlockedAchievements] = useState([]);
+  const [achievementStats, setAchievementStats] = useState({});
   const [currentNotification, setCurrentNotification] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -21,6 +22,7 @@ export const AchievementProvider = ({ children }) => {
   useEffect(() => {
     if (!currentUser) {
       setUnlockedAchievements([]);
+      setAchievementStats({});
       return;
     }
 
@@ -30,40 +32,79 @@ export const AchievementProvider = ({ children }) => {
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const existing = userData.unlockedAchievements || [];
-        
+        const stats = userData.achievementStats || {}; 
+
         if (existing.length > unlockedAchievements.length && unlockedAchievements.length > 0) {
              const newBadgeId = existing.find(id => !unlockedAchievements.includes(id));
              const badgeDetails = Object.values(ACHIEVEMENTS).find(a => a.id === newBadgeId);
-             if (badgeDetails) setCurrentNotification(badgeDetails);
+             if (badgeDetails && !badgeDetails.repeatable) setCurrentNotification(badgeDetails);
         }
         
         setUnlockedAchievements(existing);
+        setAchievementStats(stats);
       }
     });
 
     return () => unsubscribeSnapshot();
-  }, [currentUser, unlockedAchievements.length]); // Depend on length to detect changes
+  }, [currentUser, unlockedAchievements.length]);
 
+  // --- UNLOCK LOGIC ---
   const unlockAchievement = async (achievementId) => {
     if (!currentUser) return;
 
-    if (unlockedAchievements.includes(achievementId)) return;
-
     const userDocRef = doc(db, 'users', currentUser.uid);
+    const badgeDetails = Object.values(ACHIEVEMENTS).find(a => a.id === achievementId);
+    if (!badgeDetails) return;
+
+    const todayISO = new Date().toISOString(); 
 
     try {
-      const badgeDetails = Object.values(ACHIEVEMENTS).find(a => a.id === achievementId);
-      if (badgeDetails) setCurrentNotification(badgeDetails);
+      if (badgeDetails.repeatable) {
+        const currentStat = achievementStats[achievementId] || { count: 0, lastUnlocked: null };
+        const todayDateString = new Date().toDateString(); // For daily comparison
 
-      await updateDoc(userDocRef, {
-        unlockedAchievements: arrayUnion(achievementId)
-      });
+        const lastDateString = currentStat.lastUnlocked ? new Date(currentStat.lastUnlocked).toDateString() : null;
+
+        if (lastDateString === todayDateString) {
+          console.log("Already earned this daily badge today.");
+          return; 
+        }
+
+        const newCount = (currentStat.count || 0) + 1;
+        
+        setCurrentNotification({
+          ...badgeDetails,
+          customTitle: `${badgeDetails.title} (${newCount}x)`
+        });
+
+        await setDoc(userDocRef, {
+          unlockedAchievements: arrayUnion(achievementId),
+          achievementStats: {
+            [achievementId]: {
+              count: newCount,
+              lastUnlocked: todayISO
+            }
+          }
+        }, { merge: true });
+
+      } else {
+        if (unlockedAchievements.includes(achievementId)) return;
+
+        setCurrentNotification(badgeDetails);
+
+        await setDoc(userDocRef, {
+          unlockedAchievements: arrayUnion(achievementId),
+          achievementStats: {
+            [achievementId]: {
+              count: 1,
+              lastUnlocked: todayISO
+            }
+          }
+        }, { merge: true });
+      }
       
     } catch (error) {
       console.error("Error unlocking achievement:", error);
-      if (error.code === 'not-found' || error.message.includes("No document to update")) {
-          await setDoc(userDocRef, { unlockedAchievements: [achievementId] }, { merge: true });
-      }
     }
   };
 
@@ -72,7 +113,13 @@ export const AchievementProvider = ({ children }) => {
   };
 
   return (
-    <AchievementContext.Provider value={{ unlockedAchievements, unlockAchievement, currentNotification, closeNotification }}>
+    <AchievementContext.Provider value={{ 
+      unlockedAchievements, 
+      achievementStats, 
+      unlockAchievement, 
+      currentNotification, 
+      closeNotification 
+    }}>
       {children}
     </AchievementContext.Provider>
   );

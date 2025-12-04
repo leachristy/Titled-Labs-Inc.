@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
+import { ACHIEVEMENTS } from "../../data/achievements";
 
 function getTodayKey() {
   const today = new Date();
@@ -69,7 +70,10 @@ export default function DailyCheckIn() {
   }, [streak, lastCheckInDate, todayKey]);
 
   function handleCheckIn() {
-    if (hasCheckedToday) return;
+    if (hasCheckedToday) 
+      return;
+
+    unlockAchievement(ACHIEVEMENTS.CHECKIN_ROOKIE.id);
 
     let newStreak = 1;
 

@@ -209,15 +209,23 @@ export default function Goals() {
 
     const newCompletedState = !goal.isCompleted;
 
-    if (newCompletedState){
-      unlockAchievement(ACHIEVEMENTS.GOAL_ROOKIE.id);
+    if (newCompletedState) {
 
-      const allOthersComplete = goals
-      .filter(g => g.id !== id)
-      .every(g => g.isCompleted);
+      const updatedGoalsList = goals.map(g => 
+        g.id === id ? { ...g, isCompleted: true } : g
+      );
 
-      if (allOthersComplete){
-        unlockAchievement(ACHIEVEMENTS.GOAL_MASTER.id);
+      if (ACHIEVEMENTS.GOAL_ROOKIE?.id) {
+        unlockAchievement(ACHIEVEMENTS.GOAL_ROOKIE.id);
+      }
+
+      const allCompleted = updatedGoalsList.every(g => g.isCompleted);
+
+      if (allCompleted && updatedGoalsList.length > 0) {
+        if (ACHIEVEMENTS.GOAL_MASTER?.id) {
+          console.log("Achievement Unlocked: Daily Finisher!");
+          unlockAchievement(ACHIEVEMENTS.GOAL_MASTER.id);
+        }
       }
     }
     await updateGoalInDB(id, { isCompleted: newCompletedState });
