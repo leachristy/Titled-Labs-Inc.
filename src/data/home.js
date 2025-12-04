@@ -95,21 +95,27 @@ export const resourcesData = [
     type: "ARTICLE",
     title: "5 ways to manage daily stress",
     description: "Discover practical techniques to reduce stress and improve your daily well-being.",
-    color: "primary"
+    color: "primary",
+    link: "/resources/stress-management",
+    requiresAuth: false
   },
   {
     id: 2,
     type: "GUIDE",
     title: "Getting started with therapy",
     description: "Your complete guide to beginning therapy and what to expect.",
-    color: "secondary"
+    color: "secondary",
+    link: "/resources/therapy-guide",
+    requiresAuth: false
   },
   {
     id: 3,
     type: "TEMPLATE",
     title: "Mindfulness journal template",
     description: "Track your thoughts and emotions with our free journal template.",
-    color: "tertiary"
+    color: "tertiary",
+    link: "/resources/journal-template",
+    requiresAuth: false
   }
 ];
 

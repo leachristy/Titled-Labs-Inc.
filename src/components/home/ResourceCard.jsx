@@ -1,7 +1,11 @@
 import { useTheme } from "../../contexts/ThemeContext";
+import { useNavigate } from "react-router-dom";
+import { UserAuth } from "../../contexts/AuthContext";
 
 export default function ResourceCard({ resource }) {
   const { currentTheme } = useTheme();
+  const { user } = UserAuth();
+  const navigate = useNavigate();
   const isEarthy = currentTheme === "earthy";
 
   const getResourceColor = (colorType) => {
@@ -36,8 +40,17 @@ export default function ResourceCard({ resource }) {
     return colorMap[isEarthy ? "earthy" : "cool"][colorType];
   };
 
+  const handleClick = () => {
+    if (resource.requiresAuth && !user) {
+      navigate("/login");
+    } else if (resource.link) {
+      navigate(resource.link);
+    }
+  };
+
   return (
     <div
+      onClick={handleClick}
       className={`${isEarthy ? "card" : "card-new"} overflow-hidden ${
         isEarthy ? "hover:border-rust-400" : "hover:border-blue-grey"
       } transition-colors duration-200 cursor-pointer group`}

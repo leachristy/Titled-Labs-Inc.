@@ -56,6 +56,9 @@ import { FriendProfilePage } from "./pages/FriendProfilePage";
 import { ChatPage } from "./pages/ChatPage";
 import DirectMessages from "./webapp-pages/DirectMessages";
 import { FriendsPage } from "./webapp-pages/FriendsPage";
+import StressManagement from "./pages/StressManagement";
+import TherapyGuide from "./pages/TherapyGuide";
+import JournalTemplate from "./pages/JournalTemplate";
 
 export default function App() {
   return (
@@ -79,6 +82,12 @@ export default function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
+                <Route path="/resources/stress-management" element={<StressManagement />} />
+                <Route path="/resources/therapy-guide" element={<TherapyGuide />} />
+                <Route path="/resources/journal-template" element={<JournalTemplate />} />
+                <Route path="/resources/stress-management" element={<StressManagement />} />
+                <Route path="/resources/therapy-guide" element={<TherapyGuide />} />
+                <Route path="/resources/journal-template" element={<JournalTemplate />} />
                 <Route
                   path="/dashboard"
                   element={

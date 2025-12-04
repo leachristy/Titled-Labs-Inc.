@@ -54,8 +54,9 @@
  * - Animated background adapts to theme changes
  */
 
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { UserAuth } from "../contexts/AuthContext";
 import HeroSection from "../components/home/HeroSection";
 import StatsBar from "../components/home/StatsBar";
 import FeaturesGrid from "../components/home/FeaturesGrid";
@@ -75,6 +76,7 @@ import {
 export default function UnifiedHome() {
   const navigate = useNavigate();
   const { currentTheme } = useTheme();
+  const { user } = UserAuth();
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -153,8 +155,11 @@ export default function UnifiedHome() {
           </div>
 
           <div className="mt-10 text-center">
-            <button className={`${isEarthy ? "text-rust-500 hover:text-rust-600" : "text-light-lavender hover:text-medium-lavender"} font-medium inline-flex items-center gap-2 group`}>
-              View all resources
+            <button 
+              onClick={() => handleNavigation(user ? "/dashboard" : "/login")}
+              className={`${isEarthy ? "text-rust-500 hover:text-rust-600" : "text-light-lavender hover:text-medium-lavender"} font-medium inline-flex items-center gap-2 group`}
+            >
+              {user ? "View all resources" : "Sign in to view resources"}
               <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
