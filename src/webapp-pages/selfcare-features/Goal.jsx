@@ -599,11 +599,11 @@ export default function Goals() {
                 goals.map(goal => (
                   <div
                     key={goal.id}
-                    className={`p-4 rounded-lg border-2 ${
+                    className={`p-4 rounded-lg border-2 transition-all ${
                       isEarthy
                         ? "border-tan-300 bg-cream-50"
                         : "border-cool-grey bg-charcoal-grey"
-                    } ${goal.isCompleted ? 'opacity-60' : ''}`}
+                    } ${goal.isCompleted ? 'opacity-50 grayscale' : ''}`}
                   >
                     <div className="flex items-start gap-3">
                       {/* Complete Checkbox */}
@@ -661,7 +661,7 @@ export default function Goals() {
                             </div>
                           </div>
                         ) : (
-                          <p className={`font-medium ${isEarthy ? "text-brown-800" : "text-white"}`}>
+                          <p className={`font-medium ${goal.isCompleted ? 'line-through' : ''} ${isEarthy ? "text-brown-800" : "text-white"}`}>
                             {goal.text}
                           </p>
                         )}
@@ -672,7 +672,7 @@ export default function Goals() {
 
                       {/* Action Buttons */}
                       {editingGoal !== goal.id && (
-                        <div className="flex gap-2">
+                        <div className="flex flex-col gap-2">
                           <button
                             onClick={() => {
                               setEditingGoal(goal.id);
@@ -685,18 +685,33 @@ export default function Goals() {
                             }`}
                             title="Edit goal"
                           >
-                            ✏️
+                            ✏️ Edit
                           </button>
                           <button
-                            onClick={() => archiveGoal(goal.id)}
-                            className={`px-3 py-1 rounded text-xs ${
-                              isEarthy
+                            onClick={() => toggleComplete(goal.id)}
+                            className={`px-3 py-1 rounded text-xs font-semibold ${
+                              goal.isCompleted
+                                ? isEarthy
+                                  ? "bg-amber-500 hover:bg-amber-600"
+                                  : "bg-amber-600 hover:bg-amber-700"
+                                : isEarthy
                                 ? "bg-green-500 hover:bg-green-600"
                                 : "bg-green-600 hover:bg-green-700"
                             } text-white`}
-                            title="Archive goal"
+                            title={goal.isCompleted ? "Mark as unfinished" : "Mark as finished"}
                           >
-                            ✓
+                            {goal.isCompleted ? "↩ Unfinish" : "✓ Finish"}
+                          </button>
+                          <button
+                            onClick={() => archiveGoal(goal.id)}
+                            className={`px-3 py-1 rounded text-xs font-semibold ${
+                              isEarthy
+                                ? "bg-blue-500 hover:bg-blue-600"
+                                : "bg-blue-600 hover:bg-blue-700"
+                            } text-white`}
+                            title="Move to archive"
+                          >
+                            📦 Archive
                           </button>
                           <button
                             onClick={() => deleteGoal(goal.id)}
@@ -707,7 +722,7 @@ export default function Goals() {
                             } text-white`}
                             title="Delete goal"
                           >
-                            🗑
+                            🗑 Delete
                           </button>
                         </div>
                       )}
@@ -736,13 +751,13 @@ export default function Goals() {
                     editingGoal === goal.id,
                     draggedGoal?.id === goal.id,
                     resizingGoal?.id === goal.id
-                  )} ${goal.isCompleted ? 'opacity-50' : ''}`}
+                  )} ${goal.isCompleted ? 'opacity-60 grayscale' : ''}`}
                   style={{
                     left: `${goal.position.x}px`,
                     top: `${goal.position.y}px`,
                     width: `${goal.width}px`,
                     height: `${goal.height}px`,
-                    transition: 'opacity 0.3s ease',
+                    transition: 'opacity 0.3s ease, filter 0.3s ease',
                     cursor: editingGoal === goal.id ? 'default' : 'grab',
                   }}
                   onMouseDown={(e) => editingGoal !== goal.id && handleMouseDown(e, goal)}
@@ -857,7 +872,7 @@ export default function Goals() {
                       </div>
                     ) : (
                       <div 
-                        className={goalStyles.card.text(isEarthy)}
+                        className={`${goalStyles.card.text(isEarthy)} ${goal.isCompleted ? 'line-through' : ''}`}
                         style={{ 
                           fontSize: getRelativeFontSize(goal)
                         }}

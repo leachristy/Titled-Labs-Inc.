@@ -21,7 +21,7 @@ export default function CommunityStats({ posts, isEarthy }) {
       >
         <div
           className={`text-2xl font-bold ${
-            isEarthy ? "text-rust-500" : "text-light-lavender"
+            isEarthy ? "text-rust-500" : "text-black"
           }`}
         >
           {posts.length}
@@ -43,7 +43,7 @@ export default function CommunityStats({ posts, isEarthy }) {
       >
         <div
           className={`text-2xl font-bold ${
-            isEarthy ? "text-rust-500" : "text-light-lavender"
+            isEarthy ? "text-rust-500" : "text-black"
           }`}
         >
           {totalComments}
@@ -65,7 +65,7 @@ export default function CommunityStats({ posts, isEarthy }) {
       >
         <div
           className={`text-2xl font-bold ${
-            isEarthy ? "text-rust-500" : "text-light-lavender"
+            isEarthy ? "text-rust-500" : "text-black"
           }`}
         >
           {totalContributors}
@@ -87,7 +87,7 @@ export default function CommunityStats({ posts, isEarthy }) {
       >
         <div
           className={`text-2xl font-bold ${
-            isEarthy ? "text-rust-500" : "text-light-lavender"
+            isEarthy ? "text-rust-500" : "text-black"
           }`}
         >
           {totalVotes}

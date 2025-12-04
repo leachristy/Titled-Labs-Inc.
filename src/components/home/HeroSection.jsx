@@ -54,18 +54,41 @@ export default function HeroSection({ onNavigate }) {
           skew: 0,
           shapes: ["c"]
         } : {
-          className: "finisher-header",
-          count: 14,
-          size: { min: 2, max: 251, pulse: 0 },
-          speed: { x: { min: 0, max: 0.8 }, y: { min: 0, max: 0.2 } },
-          colors: {
-            background: "#373e4f",
-            particles: ["#ff926b", "#87ddfe", "#acaaff", "#1bffc2", "#f9a5fe"]
+          // Cool theme animation - Using cool theme color palette
+          count: 12,
+          size: {
+            min: 1300,
+            max: 1500,
+            pulse: 0
           },
-          blending: "screen",
-          opacity: { center: 1, edge: 1 },
-          skew: -1,
-          shapes: ["c", "s", "t"]
+          speed: {
+            x: {
+              min: 0.6,
+              max: 3
+            },
+            y: {
+              min: 0.6,
+              max: 3
+            }
+          },
+          colors: {
+            background: "#373E4F", // charcoal-grey
+            particles: [
+              "#c7b4e2", // light-lavender
+              "#DFD2D5", // pale-lavender
+              "#646F89", // slate-blue
+              "#8090B0"  // blue-grey
+            ]
+          },
+          blending: "lighten",
+          opacity: {
+            center: 0.6,
+            edge: 0
+          },
+          skew: -2,
+          shapes: [
+            "c"
+          ]
         };
 
         new window.FinisherHeader(config);
@@ -119,13 +142,13 @@ export default function HeroSection({ onNavigate }) {
           }`}>
             Everything you need to manage
             <br />
-            <span className={isEarthy ? "text-rust-600" : "text-light-lavender"}>
+            <span className={isEarthy ? "text-rust-600" : "text-charcoal-grey"}>
               your mental wellness journey
             </span>
           </h1>
 
           <p className={`max-w-3xl mx-auto mb-10 text-lg leading-relaxed sm:text-xl ${
-            isEarthy ? "text-brown-700" : "text-gray-300"
+            isEarthy ? "text-brown-700" : "text-white"
           }`}>
             Access self-care tools, join supportive communities, get AI-powered guidance, and track your progress—all in one secure, easy-to-use platform designed for your mental wellness.
           </p>

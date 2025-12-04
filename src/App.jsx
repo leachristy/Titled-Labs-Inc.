@@ -1,3 +1,24 @@
+/**
+ * App Component - Main Application Entry Point
+ * 
+ * Root component that sets up the application structure:
+ * - Theme management (ThemeProvider wrapper)
+ * - Authentication state (AuthContextProvider)
+ * - Real-time messaging (MessengerProvider)
+ * - Global UI elements (ThemeToggle, MessengerWidget)
+ * - Route configuration for all pages
+ * 
+ * Route Structure:
+ * - Public routes: Home, About, Contact, Login, SignUp
+ * - Protected routes: Dashboard, Self-Care features, AI Chat, Community, Profile
+ * - Self-Care sub-routes: Breathing, Videos, Journal, Goals
+ * 
+ * Context Hierarchy:
+ * ThemeProvider → AuthContextProvider → MessengerProvider → Routes
+ * This ensures theme is available everywhere, auth is needed for messaging,
+ * and messaging is available for authenticated users
+ */
+
 import "./App.css";
 import "./ThemeStyles.css";
 import NavBar from "./components/navigation/NavBar";
@@ -6,6 +27,7 @@ import { Routes, Route } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./src/firebase";
 
+// Public Pages
 import UnifiedHome from "./pages/UnifiedHome";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -34,12 +56,17 @@ import { FriendProfilePage } from "./pages/FriendProfilePage";
 import { ChatPage } from "./pages/ChatPage";
 import DirectMessages from "./webapp-pages/DirectMessages";
 import { FriendsPage } from "./webapp-pages/FriendsPage";
+import StressManagement from "./pages/StressManagement";
+import TherapyGuide from "./pages/TherapyGuide";
+import JournalTemplate from "./pages/JournalTemplate";
 
 export default function App() {
   return (
+    // Theme provider enables theme switching throughout the app
     <ThemeProvider>
       <div className="min-h-screen">
         <AuthContextProvider>
+          {/* Messenger provider enables real-time chat features */}
           <MessengerProvider>
             <AchievementProvider>
               <AchievementModal /> 
@@ -55,6 +82,12 @@ export default function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
+                <Route path="/resources/stress-management" element={<StressManagement />} />
+                <Route path="/resources/therapy-guide" element={<TherapyGuide />} />
+                <Route path="/resources/journal-template" element={<JournalTemplate />} />
+                <Route path="/resources/stress-management" element={<StressManagement />} />
+                <Route path="/resources/therapy-guide" element={<TherapyGuide />} />
+                <Route path="/resources/journal-template" element={<JournalTemplate />} />
                 <Route
                   path="/dashboard"
                   element={

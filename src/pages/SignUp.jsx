@@ -59,10 +59,15 @@ import { UserAuth } from "../contexts/AuthContext.jsx";
 import NavBar from "../components/navigation/NavBar";
 
 export default function SignUp() {
+  // Get authentication functions and state from AuthContext
   const { googleSignIn, doCreateUserWithEmailAndPassword, user } = UserAuth();
   const navigate = useNavigate();
+  
+  // Get current theme state
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  
+  // Form state management
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -74,6 +79,11 @@ export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /**
+   * Handle form input changes
+   * Updates formData state as user types
+   * Handles both text inputs and checkbox inputs
+   */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -82,12 +92,29 @@ export default function SignUp() {
     });
   };
 
+  /**
+   * Handle form submission for sign-up
+   * 
+   * Validation:
+   * 1. Password match check
+   * 2. Terms agreement check
+   * 
+   * Process:
+   * 1. Prevent default form submission
+   * 2. Set loading state and clear errors
+   * 3. Validate passwords match
+   * 4. Validate terms agreement
+   * 5. Create Firebase auth account with email/password
+   * 6. Create Firestore profile document with first/last name
+   * 7. On success: Navigate to login page
+   * 8. On failure: Display error message
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Validation
+    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       setIsLoading(false);
@@ -113,7 +140,7 @@ export default function SignUp() {
     }
 
     try {
-      // Add your Firebase auth logic here
+      // Create Firebase auth account and Firestore profile
       await doCreateUserWithEmailAndPassword(
         formData.firstName,
         formData.lastName,
@@ -121,7 +148,7 @@ export default function SignUp() {
         formData.password
       );
 
-      // On success, redirect to home or dashboard
+      // On success, redirect to login page
       navigate("/login");
     } catch (error) {
       // Display specific Firebase error messages
@@ -142,11 +169,17 @@ export default function SignUp() {
       setError(errorMessage);
       console.error("Signup error:", error);
     } finally {
+      // Always clear loading state
       setIsLoading(false);
     }
   };
 
-  // handle google signin with popup/redirect
+  /**
+   * Handle Google Sign-Up
+   * 
+   * Opens Google OAuth popup for authentication
+   * On success, user is automatically redirected by useEffect below
+   */
   const handleGoogleSignIn = async () => {
     try {
       await googleSignIn();
@@ -155,7 +188,13 @@ export default function SignUp() {
     }
   };
 
-  // -> link to dashboard when signin sucessfully
+  /**
+   * Auto-redirect Effect
+   * 
+   * Monitors user authentication state
+   * If user successfully signs up, automatically redirect to dashboard
+   * This handles post-signup navigation for both email/password and Google sign-up
+   */
   useEffect(() => {
     if (user != null) {
       navigate("/dashboard");
@@ -164,8 +203,13 @@ export default function SignUp() {
 
   return (
     <>
+      {/* Page title for browser tab */}
       <title>Sign Up - Tilted | Mental Wellness</title>
+      
+      {/* Navigation bar */}
       <NavBar />
+      
+      {/* Main sign-up container with theme-aware styling */}
       <div
         className={`mt-10 min-h-screen ${
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"

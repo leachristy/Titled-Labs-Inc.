@@ -50,7 +50,10 @@ import MoodTracker from "./dashboard-features/MoodTracker";
 import StatTracker from "./dashboard-features/StatTracker";
 
 export default function Dashboard() {
+  // Get user authentication state and profile data
   const { user, profile, loading } = UserAuth();
+  
+  // Get current theme state
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
   const navigate = useNavigate();
@@ -152,7 +155,10 @@ export default function Dashboard() {
 
   return (
     <>
+      {/* Page title for browser tab */}
       <title>Dashboard - Tilted | Mental Wellness</title>
+      
+      {/* Application navigation bar */}
       <UntiltNavBar />
 
       {/* Main Container */}
@@ -163,8 +169,9 @@ export default function Dashboard() {
       >
         <div className="max-w-7xl px-4 mx-auto">
           
-          {/* Header Section */}
+          {/* Header Section - Combined with Wellness Summary */}
           <div className="mb-8">
+            {/* Welcome Card with personalized greeting and wellness summary */}
             <div
               className={`rounded-2xl shadow-lg p-6 ${
                 isEarthy
@@ -172,7 +179,8 @@ export default function Dashboard() {
                   : "bg-[#DFD2D5] text-gray-900 border-2 border-blue-grey"
               }`}
             >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+              {/* Welcome Section */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                 <div>
                   <p className="text-3xl font-bold mb-2">
                     Welcome back, {profile?.firstName || user?.displayName || "there"}!
@@ -191,6 +199,25 @@ export default function Dashboard() {
                   <div className={`px-4 py-2 rounded-lg ${isEarthy ? "bg-cream-100" : "bg-white/50"}`}>
                     <p className="text-xs opacity-70">This Week</p>
                     <p className="text-2xl font-bold">{moodStats.thisWeek}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Wellness Summary */}
+              <div className="border-t pt-4 mt-4" style={{ borderColor: isEarthy ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}>
+                <h3 className="text-lg font-bold mb-3">Your Wellness Summary</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className={`p-4 rounded-lg ${isEarthy ? "bg-cream-100" : "bg-white/50"}`}>
+                    <p className="text-sm opacity-70 mb-1">Most Common Mood</p>
+                    <p className="text-xl font-bold capitalize">{dominantMood}</p>
+                  </div>
+                  <div className={`p-4 rounded-lg ${isEarthy ? "bg-cream-100" : "bg-white/50"}`}>
+                    <p className="text-sm opacity-70 mb-1">Total Check-ins</p>
+                    <p className="text-xl font-bold">{moodStats.totalEntries} entries</p>
+                  </div>
+                  <div className={`p-4 rounded-lg ${isEarthy ? "bg-cream-100" : "bg-white/50"}`}>
+                    <p className="text-sm opacity-70 mb-1">Weekly Activity</p>
+                    <p className="text-xl font-bold">{moodStats.thisWeek} this week</p>
                   </div>
                 </div>
               </div>
@@ -291,31 +318,6 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Activity Summary */}
-          <div
-            className={`rounded-2xl shadow-lg p-6 border-2 ${
-              isEarthy
-                ? "bg-cream-200 text-brown-800 border-tan-300"
-                : "bg-pale-lavender text-gray-900 border-blue-grey"
-            }`}
-          >
-            <h3 className="text-xl font-bold mb-4">Your Wellness Summary</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className={`p-4 rounded-lg ${isEarthy ? "bg-cream-100" : "bg-white/50"}`}>
-                <p className="text-sm opacity-70 mb-1">Most Common Mood</p>
-                <p className="text-xl font-bold capitalize">{dominantMood}</p>
-              </div>
-              <div className={`p-4 rounded-lg ${isEarthy ? "bg-cream-100" : "bg-white/50"}`}>
-                <p className="text-sm opacity-70 mb-1">Total Check-ins</p>
-                <p className="text-xl font-bold">{moodStats.totalEntries} entries</p>
-              </div>
-              <div className={`p-4 rounded-lg ${isEarthy ? "bg-cream-100" : "bg-white/50"}`}>
-                <p className="text-sm opacity-70 mb-1">Weekly Activity</p>
-                <p className="text-xl font-bold">{moodStats.thisWeek} this week</p>
               </div>
             </div>
           </div>

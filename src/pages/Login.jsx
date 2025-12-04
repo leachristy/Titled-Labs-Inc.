@@ -53,8 +53,12 @@ import NavBar from "../components/navigation/NavBar";
 export default function Login() {
   const { googleSignIn, doSignInWithEmailAndPassword, doPasswordReset, user } = UserAuth();
   const navigate = useNavigate();
+  
+  // Get current theme state
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  
+  // Form state management
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -66,6 +70,10 @@ export default function Login() {
   const [resetSuccess, setResetSuccess] = useState(false);
   const [resetError, setResetError] = useState("");
 
+  /**
+   * Handle form input changes
+   * Updates formData state as user types
+   */
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -73,26 +81,43 @@ export default function Login() {
     });
   };
 
+  /**
+   * Handle form submission for email/password login
+   * 
+   * Process:
+   * 1. Prevent default form submission
+   * 2. Set loading state and clear errors
+   * 3. Call Firebase authentication with credentials
+   * 4. On success: Navigate to dashboard
+   * 5. On failure: Display error message
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Simulate login process
     try {
+      // Authenticate user with email and password
       await doSignInWithEmailAndPassword(formData.email, formData.password);
 
-      // On success, redirect to home
+      // On success, redirect to dashboard
       navigate("/dashboard");
     } catch (error) {
+      // On failure, show error message to user
       setError("Invalid email or password. Please try again.");
       console.log(error);
     } finally {
+      // Always clear loading state
       setIsLoading(false);
     }
   };
 
-  // handle google signin with popup/redirect
+  /**
+   * Handle Google Sign-In
+   * 
+   * Opens Google OAuth popup for authentication
+   * On success, user is automatically redirected by useEffect below
+   */
   const handleGoogleSignIn = async () => {
     try {
       await googleSignIn();
@@ -137,8 +162,13 @@ export default function Login() {
 
   return (
     <>
+      {/* Page title for browser tab */}
       <title>Login - Tilted | Mental Wellness</title>
+      
+      {/* Navigation bar */}
       <NavBar />
+      
+      {/* Main login container with theme-aware styling */}
       <div
         className={`mt-10 min-h-screen ${
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"
