@@ -1,6 +1,15 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
-import { UserAuth } from "../../contexts/AuthContext";
+import { db, auth } from "../../src/firebase";
+import {
+  collection,
+  addDoc,
+  query,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+
 
 function getTodayKey() {
   const today = new Date();
@@ -59,61 +68,80 @@ export default function MoodDailyCheckIn({ moodHistory, setMoodHistory }) {
   const [lastCheckInDate, setLastCheckInDate] = useState(null);
 
   const todayKey = getTodayKey();
+
+  const [userId, setUserId] = useState(null);
+
+// Load Firebase user
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+    setUserId(user ? user.uid : null);
+  });
+    return () => unsub();
+  }, []);
+
   
   // Check if user has already checked in today by looking at moodHistory
-  const hasCheckedToday = useMemo(() => {
-    if (!moodHistory || moodHistory.length === 0) return false;
-    
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    
-    return moodHistory.some(entry => {
-      const entryDate = new Date(entry.timestamp);
-      entryDate.setHours(0, 0, 0, 0);
-      return entryDate.getTime() === todayStart.getTime();
+  useEffect(() => {
+    if (!userId) return;
+  
+    const q = query(
+      collection(db, "moodCheckins"),
+      where("userId", "==", userId)
+    );
+  
+    const unsub = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: new Date(doc.data().timestamp),
+      }));
+  
+      // newest first
+      setMoodHistory(data.sort((a, b) => b.timestamp - a.timestamp));
     });
-  }, [moodHistory]);
+  
+    return () => unsub();
+  }, [userId]);
+  
 
-  const displayStreak = useMemo(() => {
-    if (!lastCheckInDate) return 0;
-    const diff = dayDiff(todayKey, lastCheckInDate);
-    if (diff > 1) return 0;
-    return streak;
-  }, [streak, lastCheckInDate, todayKey]);
-
-  function handleSubmit() {
+  async function handleSubmit() {
     const moodToSave = customMood || selectedMood;
     if (!moodToSave) return alert("Please select a mood for today!");
-
-    // Check again to prevent duplicate entries
+  
     if (hasCheckedToday) {
       return alert("You've already checked in today!");
     }
-
+  
     let newStreak = 1;
-
+  
     if (lastCheckInDate) {
       const diff = dayDiff(todayKey, lastCheckInDate);
-      if (diff === 1) newStreak = displayStreak + 1;
+      if (diff === 1) newStreak = streak + 1;
       else if (diff > 1) newStreak = 1;
     }
-
+  
     setStreak(newStreak);
     setLastCheckInDate(todayKey);
-
+  
     const newEntry = {
-      id: Date.now(),
+      userId,
       mood: moodToSave,
       description: description || "",
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
-
-    setMoodHistory((prev) => [newEntry, ...prev]);
-    
+  
+    try {
+      await addDoc(collection(db, "moodCheckins"), newEntry);
+    } catch (err) {
+      console.error("Error saving mood check-in:", err);
+    }
+  
     setSelectedMood("");
     setCustomMood("");
     setDescription("");
   }
+  
+  
 
   // ---- UI styling ----
   const cardBase = isEarthy
@@ -137,6 +165,20 @@ export default function MoodDailyCheckIn({ moodHistory, setMoodHistory }) {
     : "bg-white border-blue-grey";
 
   const days = getLastNDays(7);
+  // Check if user has already checked in today
+const hasCheckedToday = useMemo(() => {
+  if (!moodHistory) return false;
+
+  return moodHistory.some(entry => {
+    const date = new Date(entry.timestamp);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    const key = `${yyyy}-${mm}-${dd}`;
+    return key === todayKey;
+  });
+}, [moodHistory, todayKey]);
+
 
   // Check which days have mood entries
   const getDayHasEntry = (dayKey) => {
