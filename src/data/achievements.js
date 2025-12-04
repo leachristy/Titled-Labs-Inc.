@@ -28,5 +28,18 @@ export const ACHIEVEMENTS = {
     title: 'Daily Finisher',
     description: 'Completed all your goals for the day. Good job!',
     badge: '🏆',
+    repeatable: true,
+  },
+  COMMUNITY_ROOKIE: {
+    id: 'community_rookie',
+    title: 'Community Voice',
+    description: 'Shared your first post with the community.',
+    badge: '💬',
+  },
+  CHECKIN_ROOKIE: {
+    id: 'checkin_rookie',
+    title: 'First Step',
+    description: 'Completed your first daily mood check-in.',
+    badge: '✅',
   }
 };
