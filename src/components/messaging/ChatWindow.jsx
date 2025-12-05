@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { UserAuth } from "../../contexts/AuthContext";
 
 export default function ChatWindow({ userId, userName, userAvatar, index }) {
-  const { closeChat, minimizeChat, conversations, sendMessage, allUsers } = useMessenger();
+  const { closeChat, minimizeChat, conversations, sendMessage, allUsers, loadMessages } = useMessenger();
   const { currentTheme } = useTheme();
   const { user } = UserAuth();
   const isEarthy = currentTheme === "earthy";
@@ -16,8 +16,23 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
     window.innerWidth >= 768 && window.innerWidth <= 1024
   );
   const messagesEndRef = useRef(null);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
   const messages = conversations[userId] || [];
+  
+  // Ensure messages are loaded when chat window opens
+  useEffect(() => {
+    if (userId && !conversations[userId]) {
+      setIsLoadingMessages(true);
+      const unsubscribe = loadMessages(userId);
+      // Give a brief moment for initial load
+      const timer = setTimeout(() => setIsLoadingMessages(false), 1000);
+      return () => {
+        clearTimeout(timer);
+        if (unsubscribe) unsubscribe();
+      };
+    }
+  }, [userId]);
   
   // Get online status from allUsers
   const chatUser = allUsers.find(u => u.id === userId);
@@ -207,7 +222,14 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
             className="overflow-y-auto p-3 space-y-3 bg-white dark:bg-gray-50"
             style={{ height: "290px" }}
           >
-            {messages.length === 0 ? (
+            {isLoadingMessages ? (
+              <div className="flex items-center justify-center h-full text-sm text-gray-400">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400"></div>
+                  <span>Loading messages...</span>
+                </div>
+              </div>
+            ) : messages.length === 0 ? (
               <div className="flex items-center justify-center h-full text-sm text-gray-400">
                 Start a conversation!
               </div>
