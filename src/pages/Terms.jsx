@@ -14,7 +14,7 @@ export default function Terms() {
       <div
         className={`min-h-screen ${
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"
-        } py-12 px-4 sm:px-6 lg:px-8`}
+        } pt-24 pb-12 px-4 sm:px-6 lg:px-8`}
       >
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
