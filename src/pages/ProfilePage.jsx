@@ -23,24 +23,52 @@
  * 4. Redirect to sign-up page
  */
 
-// src/pages/ProfilePage.jsx (or wherever yours lives)
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import ThemeToggle from "../components/ui/ThemeToggle";
 import { db, auth } from "../src/firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { deleteUser, signOut } from "firebase/auth";
 import EditProfile from "../components/forms/EditProfile";
 import BadgeGallery from "../components/cards/BadgeGallery";
 import Confirmation from "../components/ui/Confirmation";
+import UntiltNavBar from "../components/navigation/UntiltNavBar";
 import defaultPic from "../assets/default-profile.jpg";
+import blob1 from "../assets/blob1.png"
+import blob2 from "../assets/blob2.png"
+import blob3 from "../assets/blob3.png"
+import blob4 from "../assets/blob4.png"
+import blobperson1 from "../assets/blobperson1.png"
+import smileblob1 from "../assets/smileblob1.png"
+import smileblob2 from "../assets/smileblob2.png"
+import smileblob3 from "../assets/smileblob3.png"
+import smileblob4 from "../assets/smileblob4.png"
+import normalperson1 from "../assets/normalperson1.png"
+import normalperson2 from "../assets/normalperson2.png"
+import normalperson3 from "../assets/normalperson3.png"
+import normalperson4 from "../assets/normalperson4.png"
+
+const AVATAR_PRESETS = [
+  { id: "blob1", src: blob1, alt: "Blob 1" },
+  { id: "blob2", src: blob2, alt: "Blob 2" },
+  { id: "blob3", src: blob3, alt: "Blob 3" },
+  { id: "blob4", src: blob4, alt: "Blob 4" },
+  { id: "blobperson1", src: blobperson1, alt: "Blobperson1"},
+  { id: "smileblob1", src: smileblob1, alt: "smileblob1"},
+  { id: "smileblob2", src: smileblob2, alt: "smileblob2"},
+  { id: "smileblob3", src: smileblob3, alt: "smileblob3"},
+  { id: "smileblob4", src: smileblob4, alt: "smileblob4"},
+  { id: "normalperson1", src: normalperson1, alt: "normalperson1"},
+  { id: "normalperson2", src: normalperson2, alt: "normalperson2"},
+  { id: "normalperson3", src: normalperson3, alt: "normalperson3"},
+  { id: "normalperson4", src: normalperson4, alt: "normalperson4"},
+];
 
 export default function ProfilePage() {
   // Get user authentication state and profile data
   const { user, profile } = UserAuth();
-  
+
   // Get current theme state
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
@@ -51,12 +79,8 @@ export default function ProfilePage() {
   const [confirmDelete, setConfirmDelete] = useState(false); // Show delete confirmation modal
   const [message, setMessage] = useState(""); // Success/error message banner
 
-  /**
-   * Navigate back to dashboard
-   */
-  const handleBack = () => {
-    navigate("/dashboard");
-  };
+  const isGoogleUser = user?.providerData?.[0]?.providerId === "google.com";
+  const googlePhotoUrl = user?.photoURL || user?.providerData?.[0]?.photoURL || null;
 
   /**
    * Save updated profile data to Firestore
@@ -96,15 +120,35 @@ export default function ProfilePage() {
    * Note: This is a destructive operation - all user data is permanently deleted
    */
   const handleDelete = async () => {
+    if (!user) 
+      return;
+
+    setMessage("Processing deletion...");
+
     try {
-      await deleteDoc(doc(db, "users", user.uid));
+      try{
+        await user.reload();
+      } catch (reloadErr) {
+        throw { code: 'auth/requires-recent-login' };
+      }
+
+      await deleteDoc(doc(db, "users", user.uid)),
       await deleteUser(user);
-      await signOut(auth);
+
       setMessage("Account successfully deleted");
-      setTimeout(() => navigate("/signup"), 1200);
+      setConfirmDelete(false);
+      setTimeout(() => navigate("/signup"), 1500);
+
     } catch (err) {
-      console.error(err);
-      setMessage("Error deleting account. Try again.");
+      console.error("Error deleting account. Try again.", err);
+      setConfirmDelete(false);
+
+      if (err.code === 'auth/requires-recent-login') {
+        setMessage("Security Alert: To delete your account, you must have logged in recently. Please log out and log back in to try again")
+      }
+      else {
+        setMessage("Error deleting avvount: " + err.message)
+      }
     }
   };
 
@@ -159,139 +203,88 @@ export default function ProfilePage() {
   // Determine profile photo source
   // Google users: Use Google profile photo
   // Email/password users: Use default placeholder
-  const isGoogleUser = user?.providerData?.[0]?.providerId === "google.com";
-  const googlePhoto =
-    user?.photoURL ||
-    user?.providerData?.[0]?.photoURL ||
-    profile?.photoUrl ||
-    null;
 
-  const displayPhoto = isGoogleUser ? googlePhoto || defaultPic : defaultPic;
+  const selectedPreset = profile.avatarId
+    ? AVATAR_PRESETS.find(p => p.id === profile.avatarId)
+    : null;
 
-  return (
-    <div
-      className={`relative min-h-screen pt-20 px-6 flex flex-col items-center ${
-        isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
-      }`}
-    >
-      {/* Fixed theme toggle button - top right */}
-      <div className="fixed top-4 right-4">
-        <ThemeToggle />
+ // const isGoogleUser = user?.providerData?.[0]?.providerId === "google.com";
+  //const googlePhoto = user?.photoURL || user?.providerData?.[0]?.photoURL || profile?.photoUrl; //||
+ //   null;
+
+  const displayPhoto = selectedPreset ? selectedPreset.src : (googlePhotoUrl || defaultPic);
+
+return (
+    <div className={`relative min-h-screen flex flex-col items-center ${isEarthy ? "bg-cream-100" : "bg-charcoal-grey"}`}>
+      
+      <div className="w-full fixed top-0 left-0 z-50">
+        <UntiltNavBar />
       </div>
 
-      {/* Fixed back button - top left */}
-      <div className="fixed top-4 left-4">
-        <button
-          onClick={handleBack}
-          className={`px-4 py-2 rounded-lg font-semibold transition shadow-md hover:shadow-lg ${
-            isEarthy
-              ? "bg-rust-500 hover:bg-rust-600 text-white"
-              : "bg-light-lavender hover:bg-medium-lavender text-white"
-          }`}
-        >
-          ← Back to Dashboard
-        </button>
-      </div>
-
-      {/* Success/Error message banner */}
-      {message && (
-        <div
-          className={`w-full max-w-lg text-center py-3 px-4 rounded-lg mb-6 shadow-lg ${
-            isEarthy
-              ? "bg-rust-500 text-white"
-              : "bg-light-lavender text-white"
-          }`}
-        >
-          {message}
-        </div>
-      )}
-
-      {/* Main profile card */}
-      <div
-        className={`w-full max-w-lg rounded-lg shadow-xl p-8 text-center border ${
-          isEarthy
-            ? "bg-white text-brown-800 border-tan-200"
-            : "bg-pale-lavender text-gray-900 border-blue-grey"
-        }`}
-      >
-        {!isEditing ? (
-          <>
-            {/* View Mode: Display profile information */}
-            
-            {/* Profile image with error fallback */}
-            <img
-              src={displayPhoto}
-              onError={(e) => (e.currentTarget.src = defaultPic)}
-              alt="Profile"
-              className={`w-32 h-32 rounded-full object-cover border-4 mx-auto mb-4 ${
-                isEarthy
-                  ? "border-rust-200"
-                  : "border-light-lavender"
-              }`}
-            />
-
-            {/* User's full name */}
-            <h2
-              className={`text-3xl font-bold mb-2 ${
-                isEarthy ? "text-brown-800" : "text-gray-900"
-              }`}
-            >
-              {profile.firstName} {profile.lastName}
-            </h2>
-
-            {/* User's email address */}
-            <p
-              className={`text-sm mb-4 ${
-                isEarthy ? "text-brown-600" : "text-gray-600"
-              }`}
-            >
-              {profile.email}
-            </p>
-
-            {/* Badges earned by user */}
-            <div className="mb-6">
-              <BadgeGallery badges={Array.isArray(profile.badges) ? profile.badges : []} />
-            </div>
-
-            {/* Action buttons: Edit and Delete */}
-            <div className="flex justify-center gap-3 mt-6">
-              <button
-                onClick={() => setIsEditing(true)}
-                className={`px-6 py-2.5 rounded-lg font-semibold transition shadow-md hover:shadow-lg ${
-                  isEarthy
-                    ? "bg-rust-500 hover:bg-rust-600 text-white"
-                    : "bg-light-lavender hover:bg-medium-lavender text-white"
-                }`}
-              >
-                Edit Profile
-              </button>
-              <button
-                onClick={() => setConfirmDelete(true)}
-                className={`px-6 py-2.5 rounded-lg font-semibold transition shadow-md hover:shadow-lg ${
-                  isEarthy
-                    ? "bg-brown-700 hover:bg-rust-500 text-white"
-                    : "bg-charcoal-grey hover:bg-gray-700 text-white"
-                }`}
-              >
-                Delete Account
-              </button>
-            </div>
-          </>
-        ) : (
-          /* Edit Mode: Show EditProfile form component */
-          <EditProfile
-            userId={user.uid}
-            profile={profile}
-            onSave={handleSave}
-            onCancel={() => setIsEditing(false)}
-          />
+      <div className="w-full flex flex-col items-center pt-28 px-6 pb-12">
+        {message && (
+          <div className={`w-full max-w-lg text-center py-3 px-4 rounded-lg mb-6 shadow-lg transition-all ${
+              message.includes("Security") 
+                ? "bg-red-500 text-white" 
+                : (isEarthy ? "bg-rust-500 text-white" : "bg-light-lavender text-white")
+            }`}
+          >
+            {message}
+          </div>
         )}
+
+        <div className={`w-full max-w-lg rounded-lg shadow-xl p-8 text-center border ${isEarthy ? "bg-white text-brown-800 border-tan-200" : "bg-pale-lavender text-gray-900 border-blue-grey"}`}>
+          {!isEditing ? (
+            <>
+              {/* VIEW MODE */}
+              <img
+                src={displayPhoto}
+                onError={(e) => (e.currentTarget.src = defaultPic)}
+                alt="Profile"
+                className={`w-32 h-32 rounded-full object-cover border-4 mx-auto mb-4 ${isEarthy ? "border-rust-200" : "border-light-lavender"}`}
+              />
+
+              <h2 className={`text-3xl font-bold mb-2 ${isEarthy ? "text-brown-800" : "text-gray-900"}`}>
+                {profile.firstName} {profile.lastName}
+              </h2>
+              <p className={`text-sm mb-1 ${isEarthy ? "text-brown-600" : "text-gray-600"}`}>{profile.email}</p>
+              
+              {profile.birthday && (
+                <p className={`text-sm mb-4 ${isEarthy ? "text-brown-600" : "text-gray-600"}`}>
+                  {new Date(profile.birthday).toLocaleDateString()}
+                </p>
+              )}
+
+              <div className="mb-6 mt-4">
+                <BadgeGallery badges={Array.isArray(profile.badges) ? profile.badges : []} />
+              </div>
+
+              <div className="flex justify-center gap-3 mt-6">
+                <button onClick={() => setIsEditing(true)} className={`px-6 py-2.5 rounded-lg font-semibold transition shadow-md hover:shadow-lg ${isEarthy ? "bg-rust-500 hover:bg-rust-600 text-white" : "bg-light-lavender hover:bg-medium-lavender text-white"}`}>
+                  Edit Profile
+                </button>
+                <button onClick={() => setConfirmDelete(true)} className={`px-6 py-2.5 rounded-lg font-semibold transition shadow-md hover:shadow-lg ${isEarthy ? "bg-brown-700 hover:bg-rust-500 text-white" : "bg-charcoal-grey hover:bg-gray-700 text-white"}`}>
+                  Delete Account
+                </button>
+              </div>
+            </>
+          ) : (
+            /* EDIT MODE */
+            <EditProfile
+              userId={user.uid}
+              profile={profile}
+              avatarOptions={AVATAR_PRESETS}
+              googlePhotoUrl={googlePhotoUrl}
+              onSave={handleSave}
+              onCancel={() => setIsEditing(false)}
+            />
+          )}
+        </div>
       </div>
 
-      {/* Delete Confirmation Modal - only shown when confirmDelete is true */}
       {confirmDelete && (
         <Confirmation
-          message="Are you sure you want to permanently delete your account and all data?"
+          message="Are you sure you want to permanently delete your account and all data? This cannot be undone."
           onConfirm={handleDelete}
           onCancel={() => setConfirmDelete(false)}
         />

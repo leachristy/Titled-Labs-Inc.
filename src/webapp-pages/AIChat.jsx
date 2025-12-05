@@ -73,7 +73,7 @@
 import { useState} from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import { UserAuth } from "../contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { selfCareResources } from "../data/resource";
 import UntiltNavBar from "../components/navigation/UntiltNavBar";
 
@@ -93,7 +93,6 @@ export default function AIChat() {
       .replace(/\[\/OUT\]\s*<\/s>/gi, "")
       .replace(/<\/?s>/gi, "")
       .replace(/\[INST\]|\[\/INST\]/gi, "")
-     // .replace(/\[/s\]gi, "") 
       .trim();
 
 
@@ -372,37 +371,61 @@ const findResourceReply = (text = "") => {
 
   const displayName = profile?.firstName || user?.displayName || "Friend";
 
-  return (
-    <div className={`${isEarthy ? "bg-cream-100" : "bg-[#646F89]"} min-h-screen hide-messenger-mobile`}>
+return (
+    <div
+      className={`min-h-screen hide-messenger-mobile transition-colors duration-300 ${
+        isEarthy ? "bg-cream-100" : "bg-[#373E4F]" // Dark Page Background
+      }`}
+    >
       <UntiltNavBar />
 
       <div
         className={`pt-24 px-4 pb-8 transition-colors duration-300 ${
-          isEarthy ? "bg-[#f4efe9] text-stone-800" : isDark ? "bg-[#1e1e1e] text-gray-100" : "bg-[#f5f3f7] text-gray-900"
+          isEarthy ? "text-stone-800" : "text-gray-800" // Dark text for light card
         }`}
       >
         <div
           className={`max-w-3xl mx-auto rounded-3xl shadow-lg p-6 transition-colors duration-300 ${
-            isEarthy ? "bg-[#fdfbf7]" : isDark ? "bg-[#2a2a2a]" : "bg-white/90 backdrop-blur-sm"
+            isEarthy ? "bg-[#fdfbf7]" : "bg-[#f5f3f7]" // Light Lavender/White Card
           }`}
         >
-          <h1 className="text-3xl font-bold text-center mb-1">Self-Care AI Chat</h1>
-          <p className="text-center text-gray-600 mb-6">
+          <h1 className="text-3xl font-bold text-center mb-1">
+            Self-Care AI Chat
+          </h1>
+          <p
+            className={`text-center mb-6 ${
+              isEarthy ? "text-gray-600" : "text-gray-500"
+            }`}
+          >
             Welcome, <span className="font-semibold">{displayName}</span>
           </p>
 
-          {/* Chat window */}
+          {/* Chat window - Inner Window */}
           <div
             className={`h-[60vh] overflow-y-auto rounded-2xl p-4 shadow-inner transition-colors duration-300 ${
-              isEarthy ? "bg-[#f8f6f1]" : isDark ? "bg-[#333333]" : "bg-[#faf9fb]"
+              isEarthy ? "bg-[#f8f6f1]" : "bg-white" // White inner background
             }`}
           >
             {messages.length === 0 ? (
-              <p className="text-center text-gray-400 italic mt-32">Start your self-care conversation</p>
+              <p
+                className={`text-center italic mt-32 ${
+                  isEarthy ? "text-gray-400" : "text-gray-400"
+                }`}
+              >
+                Start your self-care conversation
+              </p>
             ) : (
               messages.map(renderMessage)
             )}
-            {loading && <p className="text-center text-gray-400 italic mt-2">Thinking...</p>}
+            {loading && (
+              <p
+                className={`text-center italic mt-2 ${
+                  isEarthy ? "text-gray-400" : "text-gray-400"
+                }`}
+              >
+                Thinking...
+              </p>
+            )}
           </div>
 
           {/* Input area */}
@@ -415,17 +438,17 @@ const findResourceReply = (text = "") => {
               placeholder="Type your message..."
               className={`flex-1 p-3 rounded-l-2xl border text-sm focus:outline-none transition-colors duration-300 ${
                 isEarthy
-                  ? "border-[#d4c7b8] bg-[#f9f8f6] focus:border-[#a1866f]"
-                  : isDark
-                  ? "border-gray-600 bg-[#222222] text-gray-100 focus:border-[#7b6ca8]"
-                  : "border-gray-300 bg-white focus:border-[#9b8fc0]"
+                  ? "border-[#d4c7b8] bg-[#f9f8f6] focus:border-[#a1866f] text-gray-900"
+                  : "border-gray-300 bg-white focus:border-indigo-400 text-gray-900"
               }`}
             />
             <button
               onClick={sendMessage}
               disabled={loading}
               className={`px-6 py-3 rounded-r-2xl font-semibold text-sm shadow-sm transition-colors duration-300 ${
-                isEarthy ? "bg-[#e3a765] hover:bg-[#d3934d] text-white" : isDark ? "bg-[#7b6ca8] hover:bg-[#675799] text-white" : "bg-[#9b8fc0] hover:bg-[#8576b8] text-white"
+                isEarthy
+                  ? "bg-[#e3a765] hover:bg-[#d3934d] text-white"
+                  : "bg-slate-600 hover:bg-slate-700 text-white"
               }`}
             >
               {loading ? "..." : "Send"}
