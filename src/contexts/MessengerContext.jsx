@@ -44,7 +44,7 @@
  * - activeView: Current messenger view ('chats', 'global', or 'rooms')
  */
 
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { UserAuth } from "./AuthContext";
 import {
   collection,
@@ -115,9 +115,6 @@ export const MessengerProvider = ({ children }) => {
   // Chat Rooms State
   const [chatRooms, setChatRooms] = useState([]); // All available chat rooms
   const [roomMessages, setRoomMessages] = useState({}); // Room messages: { roomId: messages[] }
-  
-  // Track active message listeners to prevent duplicates
-  const activeListenersRef = useRef(new Map()); // Map of userId -> unsubscribe function
 
   /**
    * Auto-close Chat Windows on Mobile/Tablet
@@ -155,14 +152,6 @@ export const MessengerProvider = ({ children }) => {
       setGlobalMessages([]);
       setChatRooms([]);
       setRoomMessages({});
-      
-      // Clean up all active listeners
-      activeListenersRef.current.forEach((unsubscribe) => {
-        if (typeof unsubscribe === 'function') {
-          unsubscribe();
-        }
-      });
-      activeListenersRef.current.clear();
       return;
     }
 
@@ -274,9 +263,10 @@ export const MessengerProvider = ({ children }) => {
       return [...prev, { userId, userName, userAvatar }];
     });
 
-    // Always ensure messages are loading for this conversation
-    // The loadMessages function now prevents duplicates internally
-    loadMessages(userId);
+    // Start listening to messages for this conversation if not already loaded
+    if (!conversations[userId]) {
+      loadMessages(userId);
+    }
   };
 
   /**
@@ -316,11 +306,6 @@ export const MessengerProvider = ({ children }) => {
   const loadMessages = (otherUserId) => {
     if (!user) return;
 
-    // Check if we already have an active listener for this user
-    if (activeListenersRef.current.has(otherUserId)) {
-      return activeListenersRef.current.get(otherUserId);
-    }
-
     // Create a unique conversation ID by sorting user IDs
     // Example: user1="abc", user2="xyz" → conversationId="abc_xyz"
     // This ensures both users see the same conversation
@@ -347,14 +332,7 @@ export const MessengerProvider = ({ children }) => {
         ...prev,
         [otherUserId]: messages,
       }));
-    }, (error) => {
-      console.error("Error loading messages:", error);
-      // Even on error, ensure we can retry
-      activeListenersRef.current.delete(otherUserId);
     });
-
-    // Store the unsubscribe function
-    activeListenersRef.current.set(otherUserId, unsubscribe);
 
     return unsubscribe;
   };
