@@ -59,6 +59,8 @@ import { FriendsPage } from "./webapp-pages/FriendsPage";
 import StressManagement from "./pages/StressManagement";
 import TherapyGuide from "./pages/TherapyGuide";
 import JournalTemplate from "./pages/JournalTemplate";
+import Resources from "./webapp-pages/selfcare-features/Resources";
+
 
 export default function App() {
   return (
@@ -185,6 +187,16 @@ export default function App() {
                       <FriendsPage />
                     </Protected>
                   }
+
+                   />
+            <Route
+              path="/resources"
+              element={
+                <Protected>
+                  <Resources />
+                </Protected>
+              }
+            />
                 />
               </Routes>
             </AchievementProvider>
