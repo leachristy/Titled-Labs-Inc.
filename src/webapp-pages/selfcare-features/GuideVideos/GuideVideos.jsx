@@ -7,6 +7,10 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  updateDoc,
+  getDocs,
+  getDoc,
+  increment,
 } from "firebase/firestore";
 import { db, auth } from "../../../src/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -72,25 +76,42 @@ export default function GuidedVideos() {
       alert("Please sign in to favorite videos");
       return;
     }
+
+    const videoRef = doc(db, "guideVideos", videoId);
+
+    // ⭐ Fix #2: ensure favoriteCount exists before using increment()
+    const snap = await getDoc(videoRef);
+    if (!snap.exists() || snap.data().favoriteCount === undefined) {
+      await updateDoc(videoRef, { favoriteCount: 0 });
+    }
+
     if (favorites.has(videoId)) {
-      // find and delete favorite
-      const q = query(
+      // UNFAVORITE: delete my favorite docs and decrement count
+      const favQ = query(
         collection(db, "videoFavorites"),
         where("userId", "==", userId),
         where("videoId", "==", videoId)
       );
-      const unsub = onSnapshot(q, async (snap) => {
-        const batchDelete = snap.docs.map((d) =>
-          deleteDoc(doc(db, "videoFavorites", d.id))
+      const favSnap = await getDocs(favQ);
+
+      if (!favSnap.empty) {
+        await Promise.all(
+          favSnap.docs.map((d) => deleteDoc(doc(db, "videoFavorites", d.id)))
         );
-        await Promise.all(batchDelete);
-        unsub(); // one-shot
-      });
+        await updateDoc(videoRef, {
+          favoriteCount: increment(-favSnap.docs.length),
+        });
+      }
     } else {
+      // FAVORITE: add favorite doc and increment count by 1
       await addDoc(collection(db, "videoFavorites"), {
         userId,
         videoId,
         createdAt: new Date().toISOString(),
+      });
+
+      await updateDoc(videoRef, {
+        favoriteCount: increment(1),
       });
     }
   };
@@ -107,15 +128,16 @@ export default function GuidedVideos() {
       >
         {/* Back Button */}
         <button
-            onClick={() => navigate("/selfcare")}
-            className={`mb-6 px-4 py-2 rounded-lg flex items-center gap-2 font-medium shadow-sm ${
-              isEarthy
-                ? "bg-tan-300 hover:bg-tan-400 text-brown-900"
-                : "bg-indigo-200 hover:bg-indigo-300 text-indigo-900"
-            } transition`}
-          >
-            ← Back to Self-Care
-          </button>
+          onClick={() => navigate("/selfcare")}
+          className={`mb-6 px-4 py-2 rounded-lg flex items-center gap-2 font-medium shadow-sm ${
+            isEarthy
+              ? "bg-tan-300 hover:bg-tan-400 text-brown-900"
+              : "bg-indigo-200 hover:bg-indigo-300 text-indigo-900"
+          } transition`}
+        >
+          ← Back to Self-Care
+        </button>
+
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h1
@@ -140,117 +162,64 @@ export default function GuidedVideos() {
             </select>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.map((v) => (
-              <div
-                key={v.id}
-                className={`rounded-xl shadow-md overflow-hidden border cursor-pointer ${
-                  isEarthy
-                    ? "bg-cream-50 border-tan-300"
-                    : "bg-white border-slate-200"
-                }`}
-              >
-                <div onClick={() => toWatch(v)}>
-                  <img
-                    alt={v.title}
-                    className="w-full h-44 object-cover"
-                    src={
-                      v.thumbnailUrl ||
-                      `https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg`
-                    }
-                  />
-                  <div className="p-4">
-                    <p className="text-sm opacity-70 uppercase">{v.category}</p>
-                    <h3
-                      className={`text-lg font-semibold ${
-                        isEarthy ? "text-brown-800" : "text-indigo-900"
-                      }`}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {videos.map((v) => {
+              const count = v.favoriteCount ?? 0;
+
+              return (
+                <div
+                  key={v.id}
+                  className={`rounded-xl shadow-md overflow-hidden border cursor-pointer ${
+                    isEarthy
+                      ? "bg-cream-50 border-tan-300"
+                      : "bg-white border-slate-200"
+                  }`}
+                >
+                  <div onClick={() => toWatch(v)}>
+                    <img
+                      alt={v.title}
+                      className="object-cover w-full h-44"
+                      src={
+                        v.thumbnailUrl ||
+                        `https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg`
+                      }
+                    />
+                    <div className="p-4">
+                      <p className="text-sm uppercase opacity-70">
+                        {v.category}
+                      </p>
+                      <h3
+                        className={`text-lg font-semibold ${
+                          isEarthy ? "text-brown-800" : "text-indigo-900"
+                        }`}
+                      >
+                        {v.title}
+                      </h3>
+                      <p className="text-sm opacity-80 line-clamp-2">
+                        {v.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Bottom bar: heart + count */}
+                  <div className="flex items-center justify-start gap-2 px-4 pb-4">
+                    <button
+                      onClick={() => toggleFavorite(v.id)}
+                      className={`text-xl ${
+                        favorites.has(v.id) ? "text-red-500" : "text-gray-400"
+                      } flex items-center gap-1`}
+                      title={favorites.has(v.id) ? "Unfavorite" : "Favorite"}
                     >
-                      {v.title}
-                    </h3>
-                    <p className="text-sm opacity-80 line-clamp-2">
-                      {v.description}
-                    </p>
+                      {favorites.has(v.id) ? "♥" : "♡"}
+                      <span className="text-sm">{count}</span>
+                    </button>
                   </div>
                 </div>
-
-                <div className="flex items-center justify-between px-4 pb-4">
-                  <button
-                    onClick={() => toggleFavorite(v.id)}
-                    className={`text-xl ${
-                      favorites.has(v.id) ? "text-red-500" : "text-gray-400"
-                    }`}
-                    title={favorites.has(v.id) ? "Unfavorite" : "Favorite"}
-                  >
-                    {favorites.has(v.id) ? "♥" : "♡"}
-                  </button>
-
-                  {/* quick reaction */}
-                  <QuickReaction videoId={v.id} userId={userId} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
     </>
-  );
-}
-
-function QuickReaction({ videoId, userId }) {
-  const [mine, setMine] = useState(null);
-  useEffect(() => {
-    if (!userId) {
-      setMine(null);
-      return;
-    }
-    const q = query(
-      collection(db, "videoReactions"),
-      where("userId", "==", userId),
-      where("videoId", "==", videoId)
-    );
-    return onSnapshot(q, (snap) =>
-      setMine(snap.docs[0]?.data()?.emoji || null)
-    );
-  }, [userId, videoId]);
-
-  const setEmoji = async (emoji) => {
-    if (!userId) return alert("Sign in to react");
-    // clear old; then add new
-    const q = query(
-      collection(db, "videoReactions"),
-      where("userId", "==", userId),
-      where("videoId", "==", videoId)
-    );
-    const unsub = onSnapshot(q, async (snap) => {
-      await Promise.all(
-        snap.docs.map((d) => deleteDoc(doc(db, "videoReactions", d.id)))
-      );
-      unsub();
-      await addDoc(collection(db, "videoReactions"), {
-        userId,
-        videoId,
-        emoji,
-        createdAt: new Date().toISOString(),
-      });
-    });
-  };
-
-  const EMOJIS = ["👍", "❤️", "😊", "🙌", "😢", "🧘"];
-  return (
-    <div className="flex gap-2">
-      {EMOJIS.map((e) => (
-        <button
-          key={e}
-          onClick={() => setEmoji(e)}
-          className={`text-lg ${
-            mine === e ? "opacity-100" : "opacity-50 hover:opacity-80"
-          }`}
-          title="React"
-        >
-          {e}
-        </button>
-      ))}
-    </div>
   );
 }

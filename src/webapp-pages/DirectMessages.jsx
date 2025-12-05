@@ -2,12 +2,12 @@
  * ========================================
  * DIRECT MESSAGES PAGE
  * ========================================
- * 
+ *
  * Purpose:
  * Lists all direct message conversations for the current user.
  * Provides navigation to individual chat pages for each conversation.
  * Shows conversation previews with last message and timestamp.
- * 
+ *
  * Features:
  * - Real-time conversation list from Firebase Firestore
  * - Displays other participant's name and last message
@@ -16,7 +16,7 @@
  * - Handles deduplication of multiple conversation docs
  * - Lazy loading of message previews
  * - Theme-aware styling with hover effects
- * 
+ *
  * Firebase Structure:
  * Collection: "conversations"
  * Document: {
@@ -28,49 +28,49 @@
  *   lastMessageTime: timestamp,
  *   createdAt: timestamp
  * }
- * 
+ *
  * Subcollection: "conversations/{id}/messages"
  * - Used for preview when parent doc has no lastMessage
- * 
+ *
  * Data Processing:
  * 1. Query conversations where current user is participant
  * 2. Resolve participant names from user profiles
  * 3. Deduplicate by other user (keeps most recent)
  * 4. Fetch latest message from subcollection if needed
  * 5. Sort by timestamp (newest first)
- * 
+ *
  * Name Resolution:
  * - First checks participantDetails in conversation doc
  * - Falls back to fetching from users collection
  * - Caches names in nameMap to avoid duplicate fetches
- * 
+ *
  * Deduplication Logic:
  * - Some legacy code created multiple docs per user pair
  * - Groups by other participant ID
  * - Keeps conversation with most recent activity
  * - Uses bestByOther Map to track newest per user
- * 
+ *
  * Preview Loading:
  * - If conversation doc has lastMessage: use it
  * - If no lastMessage: fetch from messages subcollection
  * - Limits to 1 message with orderBy createdAt desc
  * - Falls back to "No messages yet" on error
- * 
+ *
  * Navigation:
  * - Links to: /chat/{otherUserId}
  * - Uses React Router Link component
  * - Preserves conversation context
- * 
+ *
  * State Management:
  * - rows: Array of conversation data
  * - loading: Initial data load state
  * - Each row: { id, otherId, otherName, lastMessage, lastMessageTime }
- * 
+ *
  * Real-Time Updates:
  * - onSnapshot listener on conversations collection
  * - Auto-updates when new messages arrive
  * - Re-resolves names on participant changes
- * 
+ *
  * Theme Support:
  * - Earthy: Cream backgrounds, tan borders, brown text
  * - Cool: Charcoal grey background, lavender cards, purple text

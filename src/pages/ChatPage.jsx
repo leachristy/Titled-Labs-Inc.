@@ -30,6 +30,9 @@ export const ChatPage = () => {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
 
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockMessage, setBlockMessage] = useState("");
+
   // auth
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) =>
@@ -71,6 +74,47 @@ export const ChatPage = () => {
     })();
   }, [currentUser, uid]);
 
+  // check block status (either direction)
+  useEffect(() => {
+    if (!currentUser || !uid) return;
+
+    const checkBlocked = async () => {
+      try {
+        const [iBlockedSnap, blockedMeSnap] = await Promise.all([
+          getDoc(doc(db, "users", currentUser.uid, "blocked", uid)),
+          getDoc(doc(db, "users", uid, "blocked", currentUser.uid)),
+        ]);
+
+        const iBlocked = iBlockedSnap.exists();
+        const blockedMe = blockedMeSnap.exists();
+
+        if (iBlocked && blockedMe) {
+          setBlockMessage(
+            "You can't reply to this conversation. You may have blocked this user or been blocked by them."
+          );
+        } else if (iBlocked) {
+          setBlockMessage(
+            "You have blocked this user. You can't reply to this conversation."
+          );
+        } else if (blockedMe) {
+          setBlockMessage(
+            "You can't reply to this conversation because this user has blocked you."
+          );
+        } else {
+          setBlockMessage("");
+        }
+
+        setIsBlocked(iBlocked || blockedMe);
+      } catch (err) {
+        console.error("Error checking block status:", err);
+        setIsBlocked(false);
+        setBlockMessage("");
+      }
+    };
+
+    checkBlocked();
+  }, [currentUser, uid]);
+
   // live message listener in conversations/{conversationId}/messages
   useEffect(() => {
     if (!conversationId) return;
@@ -92,6 +136,9 @@ export const ChatPage = () => {
   const handleSend = async () => {
     const text = newMessage.trim();
     if (!currentUser || !conversationId || !text) return;
+
+    // Don't allow sending if blocked
+    if (isBlocked) return;
 
     await addDoc(collection(db, "conversations", conversationId, "messages"), {
       text,
@@ -187,30 +234,45 @@ export const ChatPage = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              className={`flex-1 rounded-lg px-4 py-2 border shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
-                isEarthy
-                  ? "border-tan-300 bg-cream-50 focus:ring-rust-400 text-brown-800"
-                  : "border-blue-grey bg-white focus:ring-light-lavender text-gray-900"
-              }`}
-            />
-            <button
-              onClick={handleSend}
-              className={`px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-200 hover:scale-105 ${
-                isEarthy
-                  ? "bg-rust-500 hover:bg-rust-600 text-white"
-                  : "bg-light-lavender hover:bg-medium-lavender text-gray-900"
-              }`}
-            >
-              Send
-            </button>
+          {/* Input / Blocked message */}
+          <div className="flex items-center gap-2">
+            {isBlocked ? (
+              <div
+                className={`w-full rounded-lg px-4 py-3 text-sm border shadow-sm ${
+                  isEarthy
+                    ? "bg-cream-100 border-rust-300 text-brown-800"
+                    : "bg-pale-lavender border-blue-grey text-gray-900"
+                }`}
+              >
+                {blockMessage ||
+                  "You can't reply to this conversation. You may have blocked this user or been blocked by them."}
+              </div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                  className={`flex-1 rounded-lg px-4 py-2 border shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
+                    isEarthy
+                      ? "border-tan-300 bg-cream-50 focus:ring-rust-400 text-brown-800"
+                      : "border-blue-grey bg-white focus:ring-light-lavender text-gray-900"
+                  }`}
+                />
+                <button
+                  onClick={handleSend}
+                  className={`px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-200 hover:scale-105 ${
+                    isEarthy
+                      ? "bg-rust-500 hover:bg-rust-600 text-white"
+                      : "bg-light-lavender hover:bg-medium-lavender text-gray-900"
+                  }`}
+                >
+                  Send
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
