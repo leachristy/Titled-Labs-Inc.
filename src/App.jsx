@@ -58,7 +58,7 @@ import DirectMessages from "./webapp-pages/DirectMessages";
 import { FriendsPage } from "./webapp-pages/FriendsPage";
 import StressManagement from "./pages/StressManagement";
 import TherapyGuide from "./pages/TherapyGuide";
-import JournalTemplate from "./pages/JournalTemplate";import Resources from "./webapp-pages/selfcare-features/Resources";
+import JournalTemplate from "./pages/JournalTemplate";
 import Resources from "./webapp-pages/selfcare-features/Resources";
 
 
