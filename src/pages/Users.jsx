@@ -1,3 +1,41 @@
+/**
+ * ========================================
+ * USERS PAGE (PUBLIC)
+ * ========================================
+ * 
+ * Purpose:
+ * Displays a list of all registered users in the platform.
+ * Provides a simple directory of users with first/last names.
+ * 
+ * Features:
+ * - Toggle button to show/hide users list
+ * - Real-time user data from Firebase Firestore
+ * - Alphabetical sorting by first name
+ * - Grid layout for user cards
+ * - Loading and error states
+ * - Filters out users without names
+ * 
+ * Firebase Integration:
+ * - Uses react-firebase-hooks for real-time data
+ * - Collection: "users"
+ * - Only fetches when visibility is toggled on
+ * - Metadata changes excluded for performance
+ * 
+ * State Management:
+ * - visible: Controls whether users list is shown
+ * - Lazy loading: Only queries Firestore when visible is true
+ * 
+ * User Display:
+ * - Shows first name and last name
+ * - Falls back to "Anonymous" if no name
+ * - Grid: 1 column mobile, 2 tablet, 3 desktop
+ * - Card-based layout with theme styling
+ * 
+ * Theme Support:
+ * - Earthy: Cream background, tan borders, brown text
+ * - Cool: Pale lavender background, blue-grey borders, charcoal text
+ */
+
 import { useState } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, query } from "firebase/firestore";

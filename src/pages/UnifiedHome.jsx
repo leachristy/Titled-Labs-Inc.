@@ -1,5 +1,62 @@
-import { useNavigate } from "react-router";
+/**
+ * ========================================
+ * UNIFIED HOME PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * Main landing page for Tilted mental wellness platform.
+ * Showcases all features, services, testimonials, and resources in a
+ * comprehensive single-page layout designed to convert visitors into users.
+ * 
+ * Features:
+ * - Hero section with Spline 3D animation and animated particle background
+ * - Platform statistics bar (users, sessions, satisfaction)
+ * - Features grid highlighting key platform capabilities
+ * - Detailed feature sections with mockups (AI chat, community, self-care)
+ * - User testimonials and success stories
+ * - "Who we serve" section with target audience cards
+ * - Call-to-action section for signup conversion
+ * - Resource cards for additional platform content
+ * - Full theme support with smooth transitions
+ * 
+ * Sections:
+ * 1. HeroSection: Main banner with CTA buttons and trust indicators
+ * 2. StatsBar: Platform usage statistics
+ * 3. FeaturesGrid: Grid of feature cards
+ * 4. DetailedFeatures: In-depth feature descriptions with mockups
+ * 5. Testimonial: User reviews and ratings
+ * 6. WhoWeServe: Target audience cards
+ * 7. CTASection: Final conversion section
+ * 8. Resources: Additional platform resources
+ * 
+ * Components Used:
+ * - NavBar: Navigation header
+ * - HeroSection: Hero with animated background (Finisher Header)
+ * - StatsBar: Statistics display
+ * - FeaturesGrid: Feature cards grid
+ * - DetailedFeature: Feature section with description
+ * - DetailedFeatureMockup: Visual mockup for features
+ * - Testimonial: User testimonial component
+ * - ServiceCard: Who we serve cards
+ * - ResourceCard: Resource link cards
+ * - CTASection: Call to action section
+ * 
+ * Data Sources:
+ * - home.js: detailedFeaturesData, whoWeServeData, resourcesData
+ * 
+ * Navigation:
+ * - handleNavigation: Programmatic routing to various pages
+ * - Passes navigation function to child components
+ * 
+ * Theme Support:
+ * - Earthy: Cream/terracotta backgrounds, brown/rust text
+ * - Cool: Charcoal/lavender backgrounds, slate/white text
+ * - Animated background adapts to theme changes
+ */
+
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { UserAuth } from "../contexts/AuthContext";
 import HeroSection from "../components/home/HeroSection";
 import StatsBar from "../components/home/StatsBar";
 import FeaturesGrid from "../components/home/FeaturesGrid";
@@ -19,6 +76,7 @@ import {
 export default function UnifiedHome() {
   const navigate = useNavigate();
   const { currentTheme } = useTheme();
+  const { user } = UserAuth();
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -97,8 +155,11 @@ export default function UnifiedHome() {
           </div>
 
           <div className="mt-10 text-center">
-            <button className={`${isEarthy ? "text-rust-500 hover:text-rust-600" : "text-light-lavender hover:text-medium-lavender"} font-medium inline-flex items-center gap-2 group`}>
-              View all resources
+            <button 
+              onClick={() => handleNavigation(user ? "/dashboard" : "/login")}
+              className={`${isEarthy ? "text-rust-500 hover:text-rust-600" : "text-light-lavender hover:text-medium-lavender"} font-medium inline-flex items-center gap-2 group`}
+            >
+              {user ? "View all resources" : "Sign in to view resources"}
               <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>

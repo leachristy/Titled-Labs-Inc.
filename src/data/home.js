@@ -79,7 +79,7 @@ export const whoWeServeData = [
     title: "Therapists & Practices",
     description: "Streamline your practice management and provide better care with our comprehensive platform.",
     features: [
-      "Automated scheduling and billing",
+      "Place to pratice management",
       "Client progress tracking",
       "Secure messaging system"
     ],
@@ -95,35 +95,31 @@ export const resourcesData = [
     type: "ARTICLE",
     title: "5 ways to manage daily stress",
     description: "Discover practical techniques to reduce stress and improve your daily well-being.",
-    color: "primary"
+    color: "primary",
+    link: "/resources/stress-management",
+    requiresAuth: false
   },
   {
     id: 2,
     type: "GUIDE",
     title: "Getting started with therapy",
     description: "Your complete guide to beginning therapy and what to expect.",
-    color: "secondary"
+    color: "secondary",
+    link: "/resources/therapy-guide",
+    requiresAuth: false
   },
   {
     id: 3,
     type: "TEMPLATE",
     title: "Mindfulness journal template",
     description: "Track your thoughts and emotions with our free journal template.",
-    color: "tertiary"
+    color: "tertiary",
+    link: "/resources/journal-template",
+    requiresAuth: false
   }
 ];
 
 export const detailedFeaturesData = [
-  {
-    id: 1,
-    badge: "PROFESSIONAL SUPPORT",
-    title: "Connect with licensed therapists and supportive communities",
-    description: "Join specialized groups, attend sessions, and access evidence-based therapy tools—all in one secure platform.",
-    linkText: "Learn more about our team",
-    link: "/about",
-    mockupType: "therapist",
-    reverse: false
-  },
   {
     id: 2,
     badge: "WELLNESS SUPPORT",

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { UserAuth } from "../../contexts/AuthContext";
 
 export default function ChatWindow({ userId, userName, userAvatar, index }) {
-  const { closeChat, minimizeChat, conversations, sendMessage } = useMessenger();
+  const { closeChat, minimizeChat, conversations, sendMessage, allUsers, loadMessages } = useMessenger();
   const { currentTheme } = useTheme();
   const { user } = UserAuth();
   const isEarthy = currentTheme === "earthy";
@@ -16,8 +16,27 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
     window.innerWidth >= 768 && window.innerWidth <= 1024
   );
   const messagesEndRef = useRef(null);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
   const messages = conversations[userId] || [];
+  
+  // Ensure messages are loaded when chat window opens
+  useEffect(() => {
+    if (userId && !conversations[userId]) {
+      setIsLoadingMessages(true);
+      const unsubscribe = loadMessages(userId);
+      // Give a brief moment for initial load
+      const timer = setTimeout(() => setIsLoadingMessages(false), 1000);
+      return () => {
+        clearTimeout(timer);
+        if (unsubscribe) unsubscribe();
+      };
+    }
+  }, [userId]);
+  
+  // Get online status from allUsers
+  const chatUser = allUsers.find(u => u.id === userId);
+  const isOnline = chatUser?.online === true;
 
   // Check for tablet on resize
   useEffect(() => {
@@ -100,31 +119,49 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
         }`}
         onClick={() => setIsMinimized(!isMinimized)}
       >
-        <div className="flex items-center gap-2">
-          {/* Avatar */}
-          <div
-            className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center overflow-hidden cursor-pointer border-2 border-white"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleProfileClick();
-            }}
-          >
-            {userAvatar ? (
-              <img
-                src={userAvatar}
-                alt={userName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-white font-semibold text-sm">
-                {userName?.[0]?.toUpperCase() || "?"}
-              </span>
-            )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleProfileClick();
+          }}
+          className="flex items-center gap-2"
+        >
+          {/* Avatar with Online Status */}
+          <div className="relative">
+            <div
+              className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center overflow-hidden border-2 border-white"
+            >
+              {userAvatar ? (
+                <img
+                  src={userAvatar}
+                  alt={userName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-white font-semibold text-sm">
+                  {userName?.[0]?.toUpperCase() || "?"}
+                </span>
+              )}
+            </div>
+            {/* Online Status Indicator */}
+            <div
+              className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 ${
+                isEarthy ? "border-amber-700" : "border-light-lavender"
+              } ${
+                isOnline ? "bg-green-500" : "bg-gray-400"
+              }`}
+              title={isOnline ? "Online" : "Offline"}
+            />
           </div>
 
-          {/* Name */}
-          <span className="text-white font-semibold text-sm">{userName}</span>
-        </div>
+          {/* Name with Status */}
+          <div className="text-left">
+            <span className="text-white font-semibold text-sm block">{userName}</span>
+            <span className="text-white/80 text-xs">
+              {isOnline ? "Active now" : "Offline"}
+            </span>
+          </div>
+        </button>
 
         <div className="flex items-center gap-1">
           {/* Minimize Button */}
@@ -185,7 +222,14 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
             className="overflow-y-auto p-3 space-y-3 bg-white dark:bg-gray-50"
             style={{ height: "290px" }}
           >
-            {messages.length === 0 ? (
+            {isLoadingMessages ? (
+              <div className="flex items-center justify-center h-full text-sm text-gray-400">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400"></div>
+                  <span>Loading messages...</span>
+                </div>
+              </div>
+            ) : messages.length === 0 ? (
               <div className="flex items-center justify-center h-full text-sm text-gray-400">
                 Start a conversation!
               </div>
@@ -236,7 +280,7 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
                               isCurrentUser
                                 ? isEarthy
                                   ? "bg-amber-700 text-white"
-                                  : "bg-linear-to-r from-blue-500 to-blue-600 text-white"
+                                  : "bg-light-lavender text-white"
                                 : "bg-gray-200 text-gray-900"
                             } ${
                               isCurrentUser
@@ -307,7 +351,7 @@ export default function ChatWindow({ userId, userName, userAvatar, index }) {
                   message.trim()
                     ? isEarthy
                       ? "bg-amber-700 text-white hover:bg-amber-800"
-                      : "bg-blue-500 text-white hover:bg-blue-600"
+                      : "bg-light-lavender text-white hover:bg-medium-lavender"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >

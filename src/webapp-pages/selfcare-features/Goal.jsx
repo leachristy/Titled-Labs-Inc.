@@ -6,6 +6,8 @@ import { db, auth } from "../../src/firebase";
 import { collection, addDoc, updateDoc, deleteDoc, doc, query, where, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useAchievements } from "../../contexts/AchievementContext";
+import { ACHIEVEMENTS } from "../../data/achievements";
 
 const PRESET_GOALS = [
   "Reduce anxiety levels",
@@ -35,6 +37,7 @@ const INITIAL_GOALS = [
 export default function Goals() {
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  const { unlockAchievement } = useAchievements();
   
   const [goals, setGoals] = useState([]);
   const [archivedGoals, setArchivedGoals] = useState([]);
@@ -50,6 +53,54 @@ export default function Goals() {
   const [resizingGoal, setResizingGoal] = useState(null);
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const navigate = useNavigate();
+
+  // Detect if device is mobile/touch-enabled
+  const isMobile = () => {
+    return window.innerWidth < 768 || (('ontouchstart' in window) && window.innerWidth < 1024);
+  };
+
+  const [viewMode, setViewMode] = useState(isMobile() ? 'list' : 'board');
+
+  // Update view mode on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setViewMode(isMobile() ? 'list' : 'board');
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Global mouse event listeners for dragging
+  useEffect(() => {
+    const handleGlobalMouseMove = (e) => {
+      if (draggedGoal || resizingGoal) {
+        handleMouseMove(e);
+      }
+    };
+
+    const handleGlobalMouseUp = (e) => {
+      if (draggedGoal || resizingGoal) {
+        handleMouseUp(e);
+      }
+    };
+
+    if (draggedGoal || resizingGoal) {
+      // Prevent text selection during drag
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = draggedGoal ? 'grabbing' : 'nwse-resize';
+      
+      document.addEventListener('mousemove', handleGlobalMouseMove);
+      document.addEventListener('mouseup', handleGlobalMouseUp);
+      
+      return () => {
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+        document.removeEventListener('mousemove', handleGlobalMouseMove);
+        document.removeEventListener('mouseup', handleGlobalMouseUp);
+      };
+    }
+  }, [draggedGoal, resizingGoal, dragOffset, resizeStart, goals]);
 
   // Listen to auth state changes
   useEffect(() => {
@@ -157,6 +208,26 @@ export default function Goals() {
     if (!goal) return;
 
     const newCompletedState = !goal.isCompleted;
+
+    if (newCompletedState) {
+
+      const updatedGoalsList = goals.map(g => 
+        g.id === id ? { ...g, isCompleted: true } : g
+      );
+
+      if (ACHIEVEMENTS.GOAL_ROOKIE?.id) {
+        unlockAchievement(ACHIEVEMENTS.GOAL_ROOKIE.id);
+      }
+
+      const allCompleted = updatedGoalsList.every(g => g.isCompleted);
+
+      if (allCompleted && updatedGoalsList.length > 0) {
+        if (ACHIEVEMENTS.GOAL_MASTER?.id) {
+          console.log("Achievement Unlocked: Daily Finisher!");
+          unlockAchievement(ACHIEVEMENTS.GOAL_MASTER.id);
+        }
+      }
+    }
     await updateGoalInDB(id, { isCompleted: newCompletedState });
   };
 
@@ -225,10 +296,11 @@ export default function Goals() {
     setShowPresetModal(false);
   };
 
-  // Drag and resize handlers
+  // Drag and resize handlers (mouse)
   const handleMouseDown = (e, goal) => {
     if (editingGoal || resizingGoal) return;
     e.preventDefault();
+    e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     setDragOffset({
       x: e.clientX - rect.left,
@@ -239,7 +311,10 @@ export default function Goals() {
 
   const handleMouseMove = (e) => {
     if (draggedGoal && !resizingGoal) {
+      e.preventDefault();
       const container = document.getElementById('goals-container');
+      if (!container) return;
+      
       const containerRect = container.getBoundingClientRect();
       
       const newX = e.clientX - containerRect.left - dragOffset.x;
@@ -255,7 +330,7 @@ export default function Goals() {
       const newPosition = { x: boundedX, y: boundedY };
       
       // Update local state immediately for smooth dragging
-      setGoals(goals.map(goal =>
+      setGoals(prevGoals => prevGoals.map(goal =>
         goal.id === draggedGoal.id
           ? { ...goal, position: newPosition }
           : goal
@@ -263,6 +338,7 @@ export default function Goals() {
     }
     
     if (resizingGoal) {
+      e.preventDefault();
       const deltaX = e.clientX - resizeStart.x;
       const deltaY = e.clientY - resizeStart.y;
       
@@ -271,6 +347,8 @@ export default function Goals() {
 
       // Calculate max size to keep within board
       const container = document.getElementById('goals-container');
+      if (!container) return;
+      
       const containerRect = container.getBoundingClientRect();
       const goal = goals.find(g => g.id === resizingGoal.id);
       
@@ -282,7 +360,7 @@ export default function Goals() {
         const boundedHeight = Math.min(newHeight, maxHeight);
         
         // Update local state immediately for smooth resizing
-        setGoals(goals.map(g =>
+        setGoals(prevGoals => prevGoals.map(g =>
           g.id === resizingGoal.id
             ? { ...g, width: boundedWidth, height: boundedHeight }
             : g
@@ -313,6 +391,120 @@ export default function Goals() {
     
     setDraggedGoal(null);
     setResizingGoal(null);
+  };
+
+  // Touch handlers for mobile support
+  const handleTouchStart = (e, goal) => {
+    if (editingGoal || resizingGoal) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    setDragOffset({
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top,
+    });
+    setDraggedGoal(goal);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!e.touches[0]) return;
+    
+    // Only prevent default scrolling if we're actually dragging or resizing a goal
+    // This allows scrolling outside the goals but prevents it when manipulating goals
+    if (draggedGoal || resizingGoal) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    const touch = e.touches[0];
+    
+    if (draggedGoal && !resizingGoal) {
+      const container = document.getElementById('goals-container');
+      const containerRect = container.getBoundingClientRect();
+      
+      const newX = touch.clientX - containerRect.left - dragOffset.x;
+      const newY = touch.clientY - containerRect.top - dragOffset.y;
+
+      // Calculate boundaries to keep goal within board
+      const maxX = containerRect.width - draggedGoal.width - 8;
+      const maxY = containerRect.height - draggedGoal.height - 8;
+
+      const boundedX = Math.max(0, Math.min(newX, maxX));
+      const boundedY = Math.max(0, Math.min(newY, maxY));
+
+      const newPosition = { x: boundedX, y: boundedY };
+      
+      // Update local state immediately for smooth dragging
+      setGoals(goals.map(goal =>
+        goal.id === draggedGoal.id
+          ? { ...goal, position: newPosition }
+          : goal
+      ));
+    }
+    
+    if (resizingGoal) {
+      const deltaX = touch.clientX - resizeStart.x;
+      const deltaY = touch.clientY - resizeStart.y;
+      
+      const newWidth = Math.max(180, resizeStart.width + deltaX);
+      const newHeight = Math.max(100, resizeStart.height + deltaY);
+
+      // Calculate max size to keep within board
+      const container = document.getElementById('goals-container');
+      const containerRect = container.getBoundingClientRect();
+      const goal = goals.find(g => g.id === resizingGoal.id);
+      
+      if (goal) {
+        const maxWidth = containerRect.width - goal.position.x - 8;
+        const maxHeight = containerRect.height - goal.position.y - 8;
+        
+        const boundedWidth = Math.min(newWidth, maxWidth);
+        const boundedHeight = Math.min(newHeight, maxHeight);
+        
+        // Update local state immediately for smooth resizing
+        setGoals(goals.map(g =>
+          g.id === resizingGoal.id
+            ? { ...g, width: boundedWidth, height: boundedHeight }
+            : g
+        ));
+      }
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    // Same logic as handleMouseUp
+    if (draggedGoal) {
+      const goal = goals.find(g => g.id === draggedGoal.id);
+      if (goal) {
+        await updateGoalInDB(draggedGoal.id, { position: goal.position });
+      }
+    }
+    
+    if (resizingGoal) {
+      const goal = goals.find(g => g.id === resizingGoal.id);
+      if (goal) {
+        await updateGoalInDB(resizingGoal.id, { 
+          width: goal.width, 
+          height: goal.height 
+        });
+      }
+    }
+    
+    setDraggedGoal(null);
+    setResizingGoal(null);
+  };
+
+  const handleResizeTouchStart = (e, goal) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const touch = e.touches[0];
+    setResizingGoal(goal);
+    setResizeStart({
+      x: touch.clientX,
+      y: touch.clientY,
+      width: goal.width,
+      height: goal.height,
+    });
   };
 
   // Edit handlers
@@ -395,14 +587,156 @@ export default function Goals() {
             </button>
           </div>
 
-          {/* Goals Board */}
-          <div
-            id="goals-container"
-            className={goalStyles.board(isEarthy)}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-          >
+          {/* Goals Display - Board or List View */}
+          {viewMode === 'list' ? (
+            /* Mobile List View */
+            <div className="space-y-3">
+              {goals.length === 0 ? (
+                <p className={`text-center py-12 ${isEarthy ? "text-brown-600" : "text-slate-blue"}`}>
+                  No goals yet. Add some goals to get started!
+                </p>
+              ) : (
+                goals.map(goal => (
+                  <div
+                    key={goal.id}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      isEarthy
+                        ? "border-tan-300 bg-cream-50"
+                        : "border-cool-grey bg-charcoal-grey"
+                    } ${goal.isCompleted ? 'opacity-50 grayscale' : ''}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Complete Checkbox */}
+                      <button
+                        onClick={() => toggleComplete(goal.id)}
+                        className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center ${
+                          goal.isCompleted
+                            ? isEarthy
+                              ? "bg-green-500 border-green-600"
+                              : "bg-green-600 border-green-700"
+                            : isEarthy
+                            ? "border-brown-400"
+                            : "border-slate-blue"
+                        }`}
+                      >
+                        {goal.isCompleted && <span className="text-white text-sm">✓</span>}
+                      </button>
+
+                      {/* Goal Content */}
+                      <div className="flex-1">
+                        {editingGoal === goal.id ? (
+                          <div>
+                            <textarea
+                              value={editText}
+                              onChange={(e) => setEditText(e.target.value)}
+                              className={`w-full p-2 border rounded ${
+                                isEarthy
+                                  ? "border-tan-300 bg-white"
+                                  : "border-cool-grey bg-pale-lavender"
+                              }`}
+                              rows={3}
+                              autoFocus
+                            />
+                            <div className="flex gap-2 mt-2">
+                              <button
+                                onClick={() => handleEditSave(goal.id)}
+                                className={`px-3 py-1 rounded text-sm ${
+                                  isEarthy
+                                    ? "bg-rust-500 hover:bg-rust-600"
+                                    : "bg-slate-blue hover:bg-charcoal-grey"
+                                } text-white`}
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={handleEditCancel}
+                                className={`px-3 py-1 rounded text-sm ${
+                                  isEarthy
+                                    ? "bg-tan-300 hover:bg-tan-400"
+                                    : "bg-cool-grey hover:bg-slate-blue"
+                                } ${isEarthy ? "text-brown-800" : "text-white"}`}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className={`font-medium ${goal.isCompleted ? 'line-through' : ''} ${isEarthy ? "text-brown-800" : "text-white"}`}>
+                            {goal.text}
+                          </p>
+                        )}
+                        <p className={`text-xs mt-1 ${isEarthy ? "text-brown-600" : "text-slate-blue"}`}>
+                          Created: {new Date(goal.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+
+                      {/* Action Buttons */}
+                      {editingGoal !== goal.id && (
+                        <div className="flex flex-col gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingGoal(goal.id);
+                              setEditText(goal.text);
+                            }}
+                            className={`px-3 py-1 rounded text-xs ${
+                              isEarthy
+                                ? "bg-tan-300 hover:bg-tan-400 text-brown-800"
+                                : "bg-cool-grey hover:bg-slate-blue text-white"
+                            }`}
+                            title="Edit goal"
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            onClick={() => toggleComplete(goal.id)}
+                            className={`px-3 py-1 rounded text-xs font-semibold ${
+                              goal.isCompleted
+                                ? isEarthy
+                                  ? "bg-amber-500 hover:bg-amber-600"
+                                  : "bg-amber-600 hover:bg-amber-700"
+                                : isEarthy
+                                ? "bg-green-500 hover:bg-green-600"
+                                : "bg-green-600 hover:bg-green-700"
+                            } text-white`}
+                            title={goal.isCompleted ? "Mark as unfinished" : "Mark as finished"}
+                          >
+                            {goal.isCompleted ? "↩ Unfinish" : "✓ Finish"}
+                          </button>
+                          <button
+                            onClick={() => archiveGoal(goal.id)}
+                            className={`px-3 py-1 rounded text-xs font-semibold ${
+                              isEarthy
+                                ? "bg-blue-500 hover:bg-blue-600"
+                                : "bg-blue-600 hover:bg-blue-700"
+                            } text-white`}
+                            title="Move to archive"
+                          >
+                            📦 Archive
+                          </button>
+                          <button
+                            onClick={() => deleteGoal(goal.id)}
+                            className={`px-3 py-1 rounded text-xs ${
+                              isEarthy
+                                ? "bg-rust-500 hover:bg-rust-600"
+                                : "bg-slate-blue hover:bg-charcoal-grey"
+                            } text-white`}
+                            title="Delete goal"
+                          >
+                            🗑 Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          ) : (
+            /* Desktop Board View with Sticky Notes */
+            <div
+              id="goals-container"
+              className={goalStyles.board(isEarthy)}
+            >
             {goals.length === 0 ? (
               <div className="absolute inset-0 flex items-center justify-center">
                 <p className={goalStyles.emptyState(isEarthy)}>
@@ -417,13 +751,14 @@ export default function Goals() {
                     editingGoal === goal.id,
                     draggedGoal?.id === goal.id,
                     resizingGoal?.id === goal.id
-                  )} ${goal.isCompleted ? 'opacity-50' : ''}`}
+                  )} ${goal.isCompleted ? 'opacity-60 grayscale' : ''}`}
                   style={{
                     left: `${goal.position.x}px`,
                     top: `${goal.position.y}px`,
                     width: `${goal.width}px`,
                     height: `${goal.height}px`,
-                    transition: 'opacity 0.3s ease',
+                    transition: 'opacity 0.3s ease, filter 0.3s ease',
+                    cursor: editingGoal === goal.id ? 'default' : 'grab',
                   }}
                   onMouseDown={(e) => editingGoal !== goal.id && handleMouseDown(e, goal)}
                   onDoubleClick={(e) => handleDoubleClick(e, goal)}
@@ -537,7 +872,7 @@ export default function Goals() {
                       </div>
                     ) : (
                       <div 
-                        className={goalStyles.card.text(isEarthy)}
+                        className={`${goalStyles.card.text(isEarthy)} ${goal.isCompleted ? 'line-through' : ''}`}
                         style={{ 
                           fontSize: getRelativeFontSize(goal)
                         }}
@@ -577,7 +912,8 @@ export default function Goals() {
                 </div>
               ))
             )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Add Custom Goal Modal */}

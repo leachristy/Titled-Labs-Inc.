@@ -1,3 +1,28 @@
+/**
+ * Profile Page Component
+ * 
+ * User profile management page with full CRUD operations
+ * Displays user information, badges, and account management options
+ * 
+ * Features:
+ * - View profile information (name, email, photo)
+ * - Display earned badges gallery
+ * - Edit profile (firstName, lastName via EditProfile component)
+ * - Delete account with confirmation modal
+ * - Google profile photo integration with fallback
+ * - Theme toggle in fixed position
+ * - Back to dashboard navigation
+ * - Success/error message banner
+ * - Theme-aware styling
+ * - Loading state handling
+ * 
+ * Account Deletion Flow:
+ * 1. User clicks "Delete Account"
+ * 2. Confirmation modal appears
+ * 3. On confirm: Delete Firestore document → Delete Firebase auth user → Sign out
+ * 4. Redirect to sign-up page
+ */
+
 // src/pages/ProfilePage.jsx (or wherever yours lives)
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,19 +38,38 @@ import Confirmation from "../components/ui/Confirmation";
 import defaultPic from "../assets/default-profile.jpg";
 
 export default function ProfilePage() {
-  const { user, profile } = UserAuth();  
+  // Get user authentication state and profile data
+  const { user, profile } = UserAuth();
+  
+  // Get current theme state
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
   const navigate = useNavigate();
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [message, setMessage] = useState("");
+  // Component state management
+  const [isEditing, setIsEditing] = useState(false); // Toggle edit mode
+  const [confirmDelete, setConfirmDelete] = useState(false); // Show delete confirmation modal
+  const [message, setMessage] = useState(""); // Success/error message banner
 
+  /**
+   * Navigate back to dashboard
+   */
   const handleBack = () => {
     navigate("/dashboard");
   };
 
+  /**
+   * Save updated profile data to Firestore
+   * 
+   * @param {Object} updatedProfile - Profile fields to update (firstName, lastName)
+   * 
+   * Process:
+   * 1. Update Firestore document with new profile data
+   * 2. Show success message
+   * 3. Exit edit mode
+   * 4. Clear message after 3 seconds
+   * 5. On error: Display error message
+   */
   const handleSave = async (updatedProfile) => {
     try {
       await updateDoc(doc(db, "users", user.uid), updatedProfile);
@@ -38,6 +82,19 @@ export default function ProfilePage() {
     }
   };
 
+  /**
+   * Delete user account permanently
+   * 
+   * Process:
+   * 1. Delete user document from Firestore (users collection)
+   * 2. Delete user from Firebase Authentication
+   * 3. Sign out user session
+   * 4. Show success message
+   * 5. Redirect to sign-up page after 1.2 seconds
+   * 6. On error: Display error message
+   * 
+   * Note: This is a destructive operation - all user data is permanently deleted
+   */
   const handleDelete = async () => {
     try {
       await deleteDoc(doc(db, "users", user.uid));
@@ -51,18 +108,57 @@ export default function ProfilePage() {
     }
   };
 
+  // Loading state - show spinner while profile data loads from Firestore
   if (!profile) {
     return (
       <div
         className={`min-h-screen flex items-center justify-center ${
-          isEarthy ? "bg-cream-100 text-brown-800" : "bg-pale-lavender text-charcoal-grey"
+          isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
         }`}
       >
-        Loading profile...
+        <div
+          className={`rounded-lg shadow-lg p-12 text-center ${
+            isEarthy
+              ? "bg-white border-tan-200"
+              : "bg-pale-lavender border-blue-grey"
+          } border`}
+        >
+          <svg
+            className={`animate-spin h-12 w-12 mb-4 mx-auto ${
+              isEarthy ? "text-rust-500" : "text-light-lavender"
+            }`}
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          <p
+            className={`text-lg ${
+              isEarthy ? "text-brown-600" : "text-gray-300"
+            }`}
+          >
+            Loading profile...
+          </p>
+        </div>
       </div>
     );
   }
 
+  // Determine profile photo source
+  // Google users: Use Google profile photo
+  // Email/password users: Use default placeholder
   const isGoogleUser = user?.providerData?.[0]?.providerId === "google.com";
   const googlePhoto =
     user?.photoURL ||
@@ -75,19 +171,19 @@ export default function ProfilePage() {
   return (
     <div
       className={`relative min-h-screen pt-20 px-6 flex flex-col items-center ${
-        isEarthy ? "bg-cream-100 text-brown-800" : "bg-pale-lavender text-charcoal-grey"
+        isEarthy ? "bg-cream-100" : "bg-charcoal-grey"
       }`}
     >
-      {/* Theme toggle */}
+      {/* Fixed theme toggle button - top right */}
       <div className="fixed top-4 right-4">
         <ThemeToggle />
       </div>
 
-      {/* Back to Dashboard */}
+      {/* Fixed back button - top left */}
       <div className="fixed top-4 left-4">
         <button
           onClick={handleBack}
-          className={`px-4 py-2 rounded font-semibold transition ${
+          className={`px-4 py-2 rounded-lg font-semibold transition shadow-md hover:shadow-lg ${
             isEarthy
               ? "bg-rust-500 hover:bg-rust-600 text-white"
               : "bg-light-lavender hover:bg-medium-lavender text-white"
@@ -97,55 +193,71 @@ export default function ProfilePage() {
         </button>
       </div>
 
-      {/* Message banner */}
+      {/* Success/Error message banner */}
       {message && (
         <div
-          className={`w-full max-w-lg text-center py-3 px-4 rounded mb-6 ${
-            isEarthy ? "bg-tan-400 text-white" : "bg-light-lavender text-white"
+          className={`w-full max-w-lg text-center py-3 px-4 rounded-lg mb-6 shadow-lg ${
+            isEarthy
+              ? "bg-rust-500 text-white"
+              : "bg-light-lavender text-white"
           }`}
         >
           {message}
         </div>
       )}
 
-      {/* Profile card */}
+      {/* Main profile card */}
       <div
-        className={`w-full max-w-lg rounded-lg shadow-md p-8 text-center ${
-          isEarthy ? "bg-white text-brown-800" : "bg-white text-charcoal-grey"
+        className={`w-full max-w-lg rounded-lg shadow-xl p-8 text-center border ${
+          isEarthy
+            ? "bg-white text-brown-800 border-tan-200"
+            : "bg-pale-lavender text-gray-900 border-blue-grey"
         }`}
       >
         {!isEditing ? (
           <>
-            {/* Profile image with safe fallback */}
+            {/* View Mode: Display profile information */}
+            
+            {/* Profile image with error fallback */}
             <img
               src={displayPhoto}
               onError={(e) => (e.currentTarget.src = defaultPic)}
               alt="Profile"
-              className="w-32 h-32 rounded-full object-cover border-4 border-opacity-40 border-brown-700 mx-auto mb-4"
+              className={`w-32 h-32 rounded-full object-cover border-4 mx-auto mb-4 ${
+                isEarthy
+                  ? "border-rust-200"
+                  : "border-light-lavender"
+              }`}
             />
 
-            {/* Name */}
-            <h2 className="text-2xl font-semibold mb-1">
+            {/* User's full name */}
+            <h2
+              className={`text-3xl font-bold mb-2 ${
+                isEarthy ? "text-brown-800" : "text-gray-900"
+              }`}
+            >
               {profile.firstName} {profile.lastName}
             </h2>
 
-            {/* Email */}
+            {/* User's email address */}
             <p
-              className={`text-sm mb-3 ${
-                isEarthy ? "text-brown-600" : "text-light-lavender"
+              className={`text-sm mb-4 ${
+                isEarthy ? "text-brown-600" : "text-gray-600"
               }`}
             >
               {profile.email}
             </p>
 
-            {/* Badges */}
-            <BadgeGallery badges={Array.isArray(profile.badges) ? profile.badges : []} />
+            {/* Badges earned by user */}
+            <div className="mb-6">
+              <BadgeGallery badges={Array.isArray(profile.badges) ? profile.badges : []} />
+            </div>
 
-            {/* Actions */}
+            {/* Action buttons: Edit and Delete */}
             <div className="flex justify-center gap-3 mt-6">
               <button
                 onClick={() => setIsEditing(true)}
-                className={`px-5 py-2 rounded font-semibold transition ${
+                className={`px-6 py-2.5 rounded-lg font-semibold transition shadow-md hover:shadow-lg ${
                   isEarthy
                     ? "bg-rust-500 hover:bg-rust-600 text-white"
                     : "bg-light-lavender hover:bg-medium-lavender text-white"
@@ -155,10 +267,10 @@ export default function ProfilePage() {
               </button>
               <button
                 onClick={() => setConfirmDelete(true)}
-                className={`px-5 py-2 rounded font-semibold transition ${
+                className={`px-6 py-2.5 rounded-lg font-semibold transition shadow-md hover:shadow-lg ${
                   isEarthy
                     ? "bg-brown-700 hover:bg-rust-500 text-white"
-                    : "bg-charcoal-grey hover:bg-light-lavender text-white"
+                    : "bg-charcoal-grey hover:bg-gray-700 text-white"
                 }`}
               >
                 Delete Account
@@ -166,6 +278,7 @@ export default function ProfilePage() {
             </div>
           </>
         ) : (
+          /* Edit Mode: Show EditProfile form component */
           <EditProfile
             userId={user.uid}
             profile={profile}
@@ -175,6 +288,7 @@ export default function ProfilePage() {
         )}
       </div>
 
+      {/* Delete Confirmation Modal - only shown when confirmDelete is true */}
       {confirmDelete && (
         <Confirmation
           message="Are you sure you want to permanently delete your account and all data?"

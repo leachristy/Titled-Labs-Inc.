@@ -1,28 +1,29 @@
 /**
  * Messenger Context for Real-Time Chat Functionality
- * 
+ *
  * Provides comprehensive messaging features throughout the app:
- * - Direct messages: 1-on-1 conversations with other users
+ * - Direct messages: 1-on-1 conversations with friends
  * - Global chat: Public chat room for all users
  * - Chat rooms: User-created topic-based chat rooms
- * 
+ *
  * Features:
  * - Real-time message synchronization via Firestore
  * - Support for up to 3 concurrent chat windows
  * - Message persistence across sessions
  * - User presence and profile integration
  * - Room creation, joining, and management
- * 
+ * - Only shows friends in the chat list (users must be friends to message)
+ *
  * Available functions:
  * Direct Messages:
  * - openChat(): Open a chat window with a user
  * - closeChat(): Close a chat window
  * - sendMessage(): Send a direct message
- * 
+ *
  * Global Chat:
  * - sendGlobalMessage(): Send a message to global chat
  * - clearGlobalMessages(): Clear all global messages (admin)
- * 
+ *
  * Chat Rooms:
  * - createChatRoom(): Create a new chat room
  * - joinChatRoom(): Join an existing room
@@ -31,19 +32,19 @@
  * - sendRoomMessage(): Send a message in a room
  * - loadRoomMessages(): Load messages for a room
  * - clearRoomMessages(): Clear room messages (creator only)
- * 
+ *
  * Available state:
  * - isMessengerOpen: Boolean for messenger popup visibility
  * - openChats: Array of currently open chat windows
  * - conversations: Object mapping userId to their messages
- * - allUsers: Array of all registered users
+ * - allUsers: Array of user's friends (only friends shown for messaging)
  * - globalMessages: Array of global chat messages
  * - chatRooms: Array of available chat rooms
  * - roomMessages: Object mapping roomId to their messages
  * - activeView: Current messenger view ('chats', 'global', or 'rooms')
  */
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { UserAuth } from "./AuthContext";
 import {
   collection,
@@ -54,6 +55,7 @@ import {
   serverTimestamp,
   orderBy,
   getDocs,
+  getDoc,
   doc,
   updateDoc,
   arrayUnion,
@@ -66,13 +68,13 @@ const MessengerContext = createContext();
 
 /**
  * Custom Hook: useMessenger
- * 
+ *
  * Provides easy access to messenger context in any component
  * Throws error if used outside MessengerProvider
- * 
+ *
  * Usage example:
  * const { openChat, sendMessage, conversations, isMessengerOpen } = useMessenger();
- * 
+ *
  * @returns {Object} Messenger context value with all messaging state and functions
  */
 export const useMessenger = () => {
@@ -85,40 +87,62 @@ export const useMessenger = () => {
 
 /**
  * MessengerProvider Component
- * 
+ *
  * Wraps the app to provide messaging functionality to all child components
  * Manages real-time Firestore listeners for messages, users, and rooms
  * Automatically cleans up listeners when user logs out
- * 
+ *
  * @param {ReactNode} children - All components wrapped by this provider
  */
 export const MessengerProvider = ({ children }) => {
   // Get current authenticated user and their profile from AuthContext
   const { user, profile } = UserAuth();
-  
+
   // UI State
   const [isMessengerOpen, setIsMessengerOpen] = useState(false); // Messenger popup visibility
   const [activeView, setActiveView] = useState("chats"); // Active tab: "chats", "global", or "rooms"
-  
+
   // Direct Messages State
   const [openChats, setOpenChats] = useState([]); // Currently open chat windows: [{ userId, userName, userAvatar }]
   const [conversations, setConversations] = useState({}); // All conversations: { userId: messages[] }
-  
+
   // Users State
   const [allUsers, setAllUsers] = useState([]); // All registered users (except current user)
-  
+
   // Global Chat State
   const [globalMessages, setGlobalMessages] = useState([]); // All global chat messages
-  
+
   // Chat Rooms State
   const [chatRooms, setChatRooms] = useState([]); // All available chat rooms
   const [roomMessages, setRoomMessages] = useState({}); // Room messages: { roomId: messages[] }
   
+  // Track active message listeners to prevent duplicates
+  const activeListenersRef = useRef(new Map()); // Map of userId -> unsubscribe function
+
   /**
-   * Load All Users Effect
-   * 
-   * Listens for changes to the users collection in Firestore
-   * Filters out the current user from the list
+   * Auto-close Chat Windows on Mobile/Tablet
+   *
+   * Monitors window size and automatically closes all open chat windows
+   * when the screen becomes mobile or tablet sized
+   */
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      // Close all chat windows when switching to mobile or tablet
+      if (width < 1024 && openChats.length > 0) {
+        setOpenChats([]);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [openChats.length]);
+
+  /**
+   * Load Friends (Users to Chat With) Effect
+   *
+   * Listens for changes to the current user's friends collection
+   * Loads full user profiles for each friend
    * Clears state when user logs out
    */
   useEffect(() => {
@@ -131,29 +155,51 @@ export const MessengerProvider = ({ children }) => {
       setGlobalMessages([]);
       setChatRooms([]);
       setRoomMessages({});
+      
+      // Clean up all active listeners
+      activeListenersRef.current.forEach((unsubscribe) => {
+        if (typeof unsubscribe === 'function') {
+          unsubscribe();
+        }
+      });
+      activeListenersRef.current.clear();
       return;
     }
 
-    // Subscribe to users collection for real-time updates
-    const usersRef = collection(db, "users");
-    const unsubscribe = onSnapshot(usersRef, (snapshot) => {
-      const users = snapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        .filter((u) => u.id !== user.uid); // Exclude current user from list
+    // Subscribe to the current user's friends collection
+    const friendsRef = collection(db, `users/${user.uid}/friends`);
+    const unsubscribe = onSnapshot(friendsRef, async (snapshot) => {
+      const friendUids = snapshot.docs.map((doc) => doc.id);
 
-      setAllUsers(users);
+      if (friendUids.length === 0) {
+        setAllUsers([]);
+        return;
+      }
+
+      // Load full user profiles for all friends
+      const friendProfiles = await Promise.all(
+        friendUids.map(async (friendUid) => {
+          const userRef = doc(db, "users", friendUid);
+          const userSnap = await getDoc(userRef);
+          if (!userSnap.exists()) return null;
+          return {
+            id: friendUid,
+            ...userSnap.data(),
+          };
+        })
+      );
+
+      // Filter out any null values and set the friends list
+      setAllUsers(friendProfiles.filter(Boolean));
     });
 
-    // Cleanup: Unsubscribe from users listener when component unmounts or user changes
+    // Cleanup: Unsubscribe from friends listener when component unmounts or user changes
     return () => unsubscribe();
   }, [user]);
 
   /**
    * Load Global Chat Messages Effect
-   * 
+   *
    * Listens for changes to the global chat collection
    * Orders messages chronologically by creation time
    */
@@ -179,7 +225,7 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Load Chat Rooms Effect
-   * 
+   *
    * Listens for changes to the chatRooms collection
    * Loads all available chat rooms that users can join
    */
@@ -202,12 +248,12 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Open Chat Window Function
-   * 
+   *
    * Opens a floating chat window for direct messaging with another user
    * Limits to 3 concurrent chat windows - removes oldest if limit reached
    * Prevents duplicate windows for the same user
    * Automatically starts loading messages for the conversation
-   * 
+   *
    * @param {string} userId - ID of the user to chat with
    * @param {string} userName - Display name of the user
    * @param {string} userAvatar - Avatar URL of the user (can be null)
@@ -228,18 +274,17 @@ export const MessengerProvider = ({ children }) => {
       return [...prev, { userId, userName, userAvatar }];
     });
 
-    // Start listening to messages for this conversation if not already loaded
-    if (!conversations[userId]) {
-      loadMessages(userId);
-    }
+    // Always ensure messages are loading for this conversation
+    // The loadMessages function now prevents duplicates internally
+    loadMessages(userId);
   };
 
   /**
    * Close Chat Window Function
-   * 
+   *
    * Closes a specific chat window
    * Does NOT delete the conversation history - only closes the UI window
-   * 
+   *
    * @param {string} userId - ID of the user whose chat window to close
    */
   const closeChat = (userId) => {
@@ -248,10 +293,10 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Minimize Chat Window Function
-   * 
+   *
    * Currently just closes the chat (same as closeChat)
    * Can be enhanced in the future to minimize rather than close
-   * 
+   *
    * @param {string} userId - ID of the user whose chat window to minimize
    */
   const minimizeChat = (userId) => {
@@ -260,16 +305,21 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Load Conversation Messages Function
-   * 
+   *
    * Sets up a real-time listener for messages in a specific conversation
    * Creates a unique conversation ID by sorting both user IDs alphabetically
    * This ensures both users access the same conversation regardless of who initiated it
-   * 
+   *
    * @param {string} otherUserId - ID of the other user in the conversation
    * @returns {function} Unsubscribe function to stop listening
    */
   const loadMessages = (otherUserId) => {
     if (!user) return;
+
+    // Check if we already have an active listener for this user
+    if (activeListenersRef.current.has(otherUserId)) {
+      return activeListenersRef.current.get(otherUserId);
+    }
 
     // Create a unique conversation ID by sorting user IDs
     // Example: user1="abc", user2="xyz" → conversationId="abc_xyz"
@@ -297,17 +347,24 @@ export const MessengerProvider = ({ children }) => {
         ...prev,
         [otherUserId]: messages,
       }));
+    }, (error) => {
+      console.error("Error loading messages:", error);
+      // Even on error, ensure we can retry
+      activeListenersRef.current.delete(otherUserId);
     });
+
+    // Store the unsubscribe function
+    activeListenersRef.current.set(otherUserId, unsubscribe);
 
     return unsubscribe;
   };
 
   /**
    * Send Direct Message Function
-   * 
+   *
    * Sends a message to a specific user in a 1-on-1 conversation
    * Includes sender information and timestamp
-   * 
+   *
    * @param {string} recipientId - ID of the user receiving the message
    * @param {string} text - Message content
    */
@@ -343,9 +400,9 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Send Global Message Function
-   * 
+   *
    * Sends a message to the global chat visible to all users
-   * 
+   *
    * @param {string} text - Message content
    */
   const sendGlobalMessage = async (text) => {
@@ -371,10 +428,10 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Create Chat Room Function
-   * 
+   *
    * Creates a new public chat room that other users can join
    * The creator is automatically added as the first member
-   * 
+   *
    * @param {string} roomName - Name of the chat room
    * @param {string} roomDescription - Optional description of the room's purpose
    * @returns {string|null} The new room's ID if successful, null if failed
@@ -402,10 +459,10 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Join Chat Room Function
-   * 
+   *
    * Adds the current user to a chat room's member list
    * Users must join a room to send messages in it
-   * 
+   *
    * @param {string} roomId - ID of the room to join
    */
   const joinChatRoom = async (roomId) => {
@@ -425,10 +482,10 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Leave Chat Room Function
-   * 
+   *
    * Removes the current user from a chat room's member list
    * User can no longer send messages until they rejoin
-   * 
+   *
    * @param {string} roomId - ID of the room to leave
    */
   const leaveChatRoom = async (roomId) => {
@@ -453,10 +510,10 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Send Room Message Function
-   * 
+   *
    * Sends a message to a specific chat room
    * Only members of the room should be able to send messages
-   * 
+   *
    * @param {string} roomId - ID of the room
    * @param {string} text - Message content
    */
@@ -484,10 +541,10 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Load Room Messages Function
-   * 
+   *
    * Sets up a real-time listener for messages in a specific chat room
    * Messages are ordered chronologically
-   * 
+   *
    * @param {string} roomId - ID of the room to load messages from
    * @returns {function} Unsubscribe function to stop listening
    */
@@ -517,11 +574,11 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Delete Chat Room Function
-   * 
+   *
    * Deletes a chat room and all its messages
    * Only the room creator should be able to delete the room
    * This is a permanent action that cannot be undone
-   * 
+   *
    * @param {string} roomId - ID of the room to delete
    */
   const deleteChatRoom = async (roomId) => {
@@ -533,7 +590,7 @@ export const MessengerProvider = ({ children }) => {
       // Step 1: Delete all messages in the room first
       const messagesRef = collection(db, "chatRooms", roomId, "messages");
       const messagesSnapshot = await getDocs(messagesRef);
-      
+
       // Create array of delete promises for all messages
       const deletePromises = messagesSnapshot.docs.map((doc) =>
         deleteDoc(doc.ref)
@@ -556,7 +613,7 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Clear Global Messages Function
-   * 
+   *
    * Deletes all messages from the global chat
    * This is a permanent action that cannot be undone
    * Should typically be restricted to admin users
@@ -569,7 +626,7 @@ export const MessengerProvider = ({ children }) => {
     try {
       // Get all global messages
       const snapshot = await getDocs(globalRef);
-      
+
       // Delete all messages concurrently
       const deletePromises = snapshot.docs.map((doc) => deleteDoc(doc.ref));
       await Promise.all(deletePromises);
@@ -580,12 +637,12 @@ export const MessengerProvider = ({ children }) => {
 
   /**
    * Clear Room Messages Function
-   * 
+   *
    * Deletes all messages in a specific chat room
    * The room itself remains, only messages are deleted
    * Only the room creator should be able to clear messages
    * This is a permanent action that cannot be undone
-   * 
+   *
    * @param {string} roomId - ID of the room whose messages to clear
    */
   const clearRoomMessages = async (roomId) => {
@@ -596,7 +653,7 @@ export const MessengerProvider = ({ children }) => {
     try {
       // Get all messages in the room
       const snapshot = await getDocs(messagesRef);
-      
+
       // Delete all messages concurrently
       const deletePromises = snapshot.docs.map((doc) => deleteDoc(doc.ref));
       await Promise.all(deletePromises);
@@ -613,7 +670,7 @@ export const MessengerProvider = ({ children }) => {
     setIsMessengerOpen,
     activeView,
     setActiveView,
-    
+
     // Direct Messages
     openChats,
     openChat,
@@ -621,15 +678,16 @@ export const MessengerProvider = ({ children }) => {
     minimizeChat,
     conversations,
     sendMessage,
-    
+    loadMessages,
+
     // Users
     allUsers,
-    
+
     // Global Chat
     globalMessages,
     sendGlobalMessage,
     clearGlobalMessages,
-    
+
     // Chat Rooms
     chatRooms,
     createChatRoom,
@@ -640,7 +698,7 @@ export const MessengerProvider = ({ children }) => {
     sendRoomMessage,
     loadRoomMessages,
     clearRoomMessages,
-    
+
     // Auth (for convenience - duplicated from AuthContext)
     user,
     profile,

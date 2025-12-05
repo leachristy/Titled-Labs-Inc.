@@ -1,3 +1,36 @@
+/**
+ * ========================================
+ * CONTACT PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * Provides users with multiple ways to contact Tilted support team.
+ * Displays contact information and a form for submitting inquiries.
+ * 
+ * Features:
+ * - Contact form with fields for name, email, subject, and message
+ * - Contact information display (phone, email, address, hours)
+ * - Form validation and submission handling
+ * - Success alert on form submission
+ * - Two-column responsive layout
+ * 
+ * Components Used:
+ * - NavBar: Navigation header
+ * - ContactForm: Form component with validation
+ * - ContactInfo: Displays contact details
+ * 
+ * Data Sources:
+ * - contact.js: Contact information and form field definitions
+ * 
+ * Form Handling:
+ * - handleFormSubmit: Logs form data and shows success alert
+ * - Currently uses console.log (ready for backend integration)
+ * 
+ * Theme Support:
+ * - Earthy: Cream background, brown/tan accents
+ * - Cool: Pale lavender background, slate/charcoal accents
+ */
+
 import NavBar from "../components/navigation/NavBar";
 import { useTheme } from "../contexts/ThemeContext";
 import ContactForm from "../components/forms/ContactForm";

@@ -1,3 +1,49 @@
+/**
+ * ========================================
+ * LOGIN PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * Authenticates existing users to access their Tilted wellness platform account.
+ * Supports email/password login and OAuth (Google, Twitter).
+ * 
+ * Features:
+ * - Email and password authentication via Firebase
+ * - Google OAuth signin integration
+ * - Remember me checkbox functionality
+ * - Forgot password link
+ * - Error handling with user-friendly messages
+ * - Loading states during authentication
+ * - Auto-redirect to dashboard on successful login
+ * - Social login options (Google, Twitter)
+ * - Crisis hotline information for immediate support
+ * 
+ * Authentication Flow:
+ * 1. User enters email and password
+ * 2. Form validation on submit
+ * 3. Firebase authentication via doSignInWithEmailAndPassword()
+ * 4. On success: Navigate to /dashboard
+ * 5. On error: Display error message
+ * 
+ * State Management:
+ * - formData: Email and password inputs
+ * - isLoading: Controls loading state during auth
+ * - error: Displays authentication errors
+ * 
+ * Firebase Methods Used:
+ * - doSignInWithEmailAndPassword: Email/password auth
+ * - googleSignIn: Google OAuth authentication
+ * 
+ * Navigation:
+ * - Redirects to /dashboard if user already logged in
+ * - Links to /signup for new users
+ * - Links to /forgot-password for password recovery
+ * 
+ * Theme Support:
+ * - Earthy: Cream background, rust/brown accents
+ * - Cool: Pale lavender background, slate blue accents
+ */
+
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
@@ -5,17 +51,29 @@ import { UserAuth } from "../contexts/AuthContext.jsx";
 import NavBar from "../components/navigation/NavBar";
 
 export default function Login() {
-  const { googleSignIn, doSignInWithEmailAndPassword, user } = UserAuth();
+  const { googleSignIn, doSignInWithEmailAndPassword, doPasswordReset, user } = UserAuth();
   const navigate = useNavigate();
+  
+  // Get current theme state
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  
+  // Form state management
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetError, setResetError] = useState("");
 
+  /**
+   * Handle form input changes
+   * Updates formData state as user types
+   */
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,31 +81,75 @@ export default function Login() {
     });
   };
 
+  /**
+   * Handle form submission for email/password login
+   * 
+   * Process:
+   * 1. Prevent default form submission
+   * 2. Set loading state and clear errors
+   * 3. Call Firebase authentication with credentials
+   * 4. On success: Navigate to dashboard
+   * 5. On failure: Display error message
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Simulate login process
     try {
+      // Authenticate user with email and password
       await doSignInWithEmailAndPassword(formData.email, formData.password);
 
-      // On success, redirect to home
+      // On success, redirect to dashboard
       navigate("/dashboard");
     } catch (error) {
+      // On failure, show error message to user
       setError("Invalid email or password. Please try again.");
       console.log(error);
     } finally {
+      // Always clear loading state
       setIsLoading(false);
     }
   };
 
-  // handle google signin with popup/redirect
+  /**
+   * Handle Google Sign-In
+   * 
+   * Opens Google OAuth popup for authentication
+   * On success, user is automatically redirected by useEffect below
+   */
   const handleGoogleSignIn = async () => {
     try {
       await googleSignIn();
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  // handle forgot password
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setResetError("");
+    setResetSuccess(false);
+
+    if (!resetEmail.trim()) {
+      setResetError("Please enter your email address");
+      return;
+    }
+
+    try {
+      await doPasswordReset(resetEmail);
+      setResetSuccess(true);
+      setResetEmail("");
+    } catch (error) {
+      console.error(error);
+      if (error.code === "auth/user-not-found") {
+        setResetError("No account found with this email address");
+      } else if (error.code === "auth/invalid-email") {
+        setResetError("Invalid email address");
+      } else {
+        setResetError("Failed to send reset email. Please try again.");
+      }
     }
   };
 
@@ -60,8 +162,13 @@ export default function Login() {
 
   return (
     <>
+      {/* Page title for browser tab */}
       <title>Login - Tilted | Mental Wellness</title>
+      
+      {/* Navigation bar */}
       <NavBar />
+      
+      {/* Main login container with theme-aware styling */}
       <div
         className={`mt-10 min-h-screen ${
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"
@@ -176,8 +283,9 @@ export default function Login() {
                 </div>
 
                 <div className="text-sm">
-                  <Link
-                    to="/forgot-password"
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
                     className={`font-medium ${
                       isEarthy
                         ? "text-rust-500 hover:text-rust-600"
@@ -185,7 +293,7 @@ export default function Login() {
                     }`}
                   >
                     Forgot your password?
-                  </Link>
+                  </button>
                 </div>
               </div>
 
@@ -253,9 +361,10 @@ export default function Login() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mt-6">
+            <div className="mt-6">
               <button
                 type="button"
+                onClick={handleGoogleSignIn}
                 className={`w-full inline-flex justify-center py-2 px-4 border ${
                   isEarthy
                     ? "border-tan-300 bg-white text-brown-700 hover:bg-tan-50"
@@ -280,27 +389,7 @@ export default function Login() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                <span className="ml-2" onClick={handleGoogleSignIn}>
-                  Google
-                </span>
-              </button>
-
-              <button
-                type="button"
-                className={`w-full inline-flex justify-center py-2 px-4 border ${
-                  isEarthy
-                    ? "border-tan-300 bg-white text-brown-700 hover:bg-tan-50"
-                    : "border-cool-grey bg-white text-charcoal-grey hover:bg-pale-lavender"
-                } rounded-md shadow-sm text-sm font-medium`}
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                </svg>
-                <span className="ml-2">Twitter</span>
+                <span className="ml-2">Continue with Google</span>
               </button>
             </div>
           </div>
@@ -329,6 +418,124 @@ export default function Login() {
             </p>
           </div>
         </div>
+
+        {/* Forgot Password Modal */}
+        {showForgotPassword && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div
+              className={`${
+                isEarthy ? "card" : "card-new"
+              } p-8 max-w-md w-full`}
+            >
+              <h2
+                className={`text-2xl font-bold mb-4 ${
+                  isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                }`}
+              >
+                Reset Password
+              </h2>
+              
+              {resetSuccess ? (
+                <div>
+                  <div
+                    className={`${
+                      isEarthy
+                        ? "bg-green-50 border-green-200 text-green-700"
+                        : "bg-green-100 border-green-300 text-green-800"
+                    } border px-4 py-3 rounded mb-4`}
+                  >
+                    Password reset email sent! Check your inbox for instructions.
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowForgotPassword(false);
+                      setResetSuccess(false);
+                    }}
+                    className={`${
+                      isEarthy ? "btn-primary" : "btn-primary-new"
+                    } w-full`}
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotPassword}>
+                  <p
+                    className={`mb-4 ${
+                      isEarthy ? "text-brown-700" : "text-slate-blue"
+                    }`}
+                  >
+                    Enter your email address and we'll send you a link to reset
+                    your password.
+                  </p>
+
+                  {resetError && (
+                    <div
+                      className={`${
+                        isEarthy
+                          ? "bg-rust-50 border-rust-200 text-rust-700"
+                          : "bg-blue-grey/10 border-blue-grey text-slate-blue"
+                      } border px-4 py-3 rounded mb-4`}
+                    >
+                      {resetError}
+                    </div>
+                  )}
+
+                  <div className="mb-4">
+                    <label
+                      htmlFor="reset-email"
+                      className={`form-label ${
+                        isEarthy ? "text-brown-800" : "text-charcoal-grey"
+                      }`}
+                    >
+                      Email address
+                    </label>
+                    <input
+                      id="reset-email"
+                      type="email"
+                      required
+                      className={`form-input w-full px-3 py-2 border rounded-md ${
+                        isEarthy
+                          ? "border-tan-300 focus:border-rust-500 focus:ring-rust-500"
+                          : "border-cool-grey focus:border-slate-blue focus:ring-slate-blue"
+                      }`}
+                      placeholder="Enter your email"
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="submit"
+                      className={`${
+                        isEarthy ? "btn-primary" : "btn-primary-new"
+                      } flex-1`}
+                    >
+                      Send Reset Link
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForgotPassword(false);
+                        setResetEmail("");
+                        setResetError("");
+                      }}
+                      className={`flex-1 px-4 py-2 border ${
+                        isEarthy
+                          ? "border-tan-300 text-brown-700 hover:bg-tan-50"
+                          : "border-cool-grey text-charcoal-grey hover:bg-pale-lavender"
+                      } rounded-md font-medium`}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

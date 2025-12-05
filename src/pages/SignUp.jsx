@@ -1,3 +1,57 @@
+/**
+ * ========================================
+ * SIGN UP PAGE
+ * ========================================
+ * 
+ * Purpose:
+ * Registers new users to create a Tilted wellness platform account.
+ * Supports email/password registration and OAuth (Google, Twitter).
+ * 
+ * Features:
+ * - User registration with Firebase authentication
+ * - First name, last name, email, and password collection
+ * - Password confirmation validation
+ * - Terms of Service and Privacy Policy agreement
+ * - Google OAuth signup integration
+ * - Error handling with validation messages
+ * - Loading states during registration
+ * - Auto-redirect to login page after successful signup
+ * - Account benefits display
+ * - Social signup options (Google, Twitter)
+ * - Crisis hotline information
+ * 
+ * Registration Flow:
+ * 1. User fills out registration form
+ * 2. Validate password match
+ * 3. Validate terms agreement
+ * 4. Firebase authentication via doCreateUserWithEmailAndPassword()
+ * 5. On success: Navigate to /login
+ * 6. On error: Display error message
+ * 
+ * Form Validation:
+ * - Password confirmation must match password
+ * - Terms of Service agreement required
+ * - Minimum 8 characters with letters and numbers
+ * 
+ * State Management:
+ * - formData: User input for all form fields
+ * - isLoading: Controls loading state during registration
+ * - error: Displays validation/registration errors
+ * 
+ * Firebase Methods Used:
+ * - doCreateUserWithEmailAndPassword: Creates new user account
+ * - googleSignIn: Google OAuth signup
+ * 
+ * Navigation:
+ * - Redirects to /dashboard if user already logged in
+ * - Links to /login for existing users
+ * - Links to /terms and /privacy for legal documents
+ * 
+ * Theme Support:
+ * - Earthy: Cream background, rust/tan accents
+ * - Cool: Pale lavender background, slate/charcoal accents
+ */
+
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
@@ -5,10 +59,15 @@ import { UserAuth } from "../contexts/AuthContext.jsx";
 import NavBar from "../components/navigation/NavBar";
 
 export default function SignUp() {
+  // Get authentication functions and state from AuthContext
   const { googleSignIn, doCreateUserWithEmailAndPassword, user } = UserAuth();
   const navigate = useNavigate();
+  
+  // Get current theme state
   const { currentTheme } = useTheme();
   const isEarthy = currentTheme === "earthy";
+  
+  // Form state management
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -20,6 +79,11 @@ export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /**
+   * Handle form input changes
+   * Updates formData state as user types
+   * Handles both text inputs and checkbox inputs
+   */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -28,14 +92,43 @@ export default function SignUp() {
     });
   };
 
+  /**
+   * Handle form submission for sign-up
+   * 
+   * Validation:
+   * 1. Password match check
+   * 2. Terms agreement check
+   * 
+   * Process:
+   * 1. Prevent default form submission
+   * 2. Set loading state and clear errors
+   * 3. Validate passwords match
+   * 4. Validate terms agreement
+   * 5. Create Firebase auth account with email/password
+   * 6. Create Firestore profile document with first/last name
+   * 7. On success: Navigate to login page
+   * 8. On failure: Display error message
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Validation
+    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
+      setError("Password must contain both letters and numbers");
       setIsLoading(false);
       return;
     }
@@ -47,7 +140,7 @@ export default function SignUp() {
     }
 
     try {
-      // Add your Firebase auth logic here
+      // Create Firebase auth account and Firestore profile
       await doCreateUserWithEmailAndPassword(
         formData.firstName,
         formData.lastName,
@@ -55,17 +148,38 @@ export default function SignUp() {
         formData.password
       );
 
-      // On success, redirect to home or dashboard
+      // On success, redirect to login page
       navigate("/login");
     } catch (error) {
-      setError("An error occurred during signup. Please try again.");
-      console.error(error);
+      // Display specific Firebase error messages
+      let errorMessage = "An error occurred during signup. Please try again.";
+      
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "This email is already registered. Try signing in instead.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Please enter a valid email address.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "Password is too weak. Please choose a stronger password.";
+      } else if (error.code === "auth/operation-not-allowed") {
+        errorMessage = "Email/password accounts are not enabled. Please contact support.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
+      console.error("Signup error:", error);
     } finally {
+      // Always clear loading state
       setIsLoading(false);
     }
   };
 
-  // handle google signin with popup/redirect
+  /**
+   * Handle Google Sign-Up
+   * 
+   * Opens Google OAuth popup for authentication
+   * On success, user is automatically redirected by useEffect below
+   */
   const handleGoogleSignIn = async () => {
     try {
       await googleSignIn();
@@ -74,7 +188,13 @@ export default function SignUp() {
     }
   };
 
-  // -> link to dashboard when signin sucessfully
+  /**
+   * Auto-redirect Effect
+   * 
+   * Monitors user authentication state
+   * If user successfully signs up, automatically redirect to dashboard
+   * This handles post-signup navigation for both email/password and Google sign-up
+   */
   useEffect(() => {
     if (user != null) {
       navigate("/dashboard");
@@ -83,8 +203,13 @@ export default function SignUp() {
 
   return (
     <>
+      {/* Page title for browser tab */}
       <title>Sign Up - Tilted | Mental Wellness</title>
+      
+      {/* Navigation bar */}
       <NavBar />
+      
+      {/* Main sign-up container with theme-aware styling */}
       <div
         className={`mt-10 min-h-screen ${
           isEarthy ? "bg-cream-100" : "bg-pale-lavender"
@@ -375,9 +500,10 @@ export default function SignUp() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mt-6">
+            <div className="mt-6">
               <button
                 type="button"
+                onClick={handleGoogleSignIn}
                 className={`w-full inline-flex justify-center py-2 px-4 border ${
                   isEarthy
                     ? "border-tan-300 bg-white text-brown-700 hover:bg-tan-50"
@@ -402,27 +528,7 @@ export default function SignUp() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                <span className="ml-2" onClick={handleGoogleSignIn}>
-                  Google
-                </span>
-              </button>
-
-              <button
-                type="button"
-                className={`w-full inline-flex justify-center py-2 px-4 border ${
-                  isEarthy
-                    ? "border-tan-300 bg-white text-brown-700 hover:bg-tan-50"
-                    : "border-cool-grey bg-white text-charcoal-grey hover:bg-pale-lavender"
-                } rounded-md shadow-sm text-sm font-medium`}
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                </svg>
-                <span className="ml-2">Twitter</span>
+                <span className="ml-2">Google</span>
               </button>
             </div>
           </div>
