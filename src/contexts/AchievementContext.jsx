@@ -4,6 +4,20 @@ import { db, auth } from "../src/firebase";
 import { doc, updateDoc, arrayUnion, onSnapshot, setDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
+import checkin_rookie from "../assets/checkin_rookie.png";
+import community_rookie from "../assets/community_rookie.png";
+import goal_getter from "../assets/goal_getter.png";
+import journal_rookie from "../assets/journal_rookie.png";
+import goal_master from "../assets/goal_master.png";
+
+const BADGE_IMAGES = {
+  'community_rookie': community_rookie,
+  'checkin_rookie': checkin_rookie,
+  'goal_rookie': goal_getter,       
+  'journal_rookie': journal_rookie,
+  'goal_master': goal_master,
+};
+
 const AchievementContext = createContext();
 
 export const AchievementProvider = ({ children }) => {
@@ -37,7 +51,13 @@ export const AchievementProvider = ({ children }) => {
         if (existing.length > unlockedAchievements.length && unlockedAchievements.length > 0) {
              const newBadgeId = existing.find(id => !unlockedAchievements.includes(id));
              const badgeDetails = Object.values(ACHIEVEMENTS).find(a => a.id === newBadgeId);
-             if (badgeDetails && !badgeDetails.repeatable) setCurrentNotification(badgeDetails);
+
+             if (badgeDetails && !badgeDetails.repeatable) {
+              setCurrentNotification({
+                ...badgeDetails,
+                badge: BADGE_IMAGES[newBadgeId] || badgeDetails.badge
+              });
+            }
         }
         
         setUnlockedAchievements(existing);
@@ -61,7 +81,7 @@ export const AchievementProvider = ({ children }) => {
     try {
       if (badgeDetails.repeatable) {
         const currentStat = achievementStats[achievementId] || { count: 0, lastUnlocked: null };
-        const todayDateString = new Date().toDateString(); // For daily comparison
+        const todayDateString = new Date().toDateString(); 
 
         const lastDateString = currentStat.lastUnlocked ? new Date(currentStat.lastUnlocked).toDateString() : null;
 
@@ -74,7 +94,8 @@ export const AchievementProvider = ({ children }) => {
         
         setCurrentNotification({
           ...badgeDetails,
-          customTitle: `${badgeDetails.title} (${newCount}x)`
+          customTitle: `${badgeDetails.title} (${newCount}x)`,
+          badge: BADGE_IMAGES[achievementId] || badgeDetails.badge
         });
 
         await setDoc(userDocRef, {
@@ -90,7 +111,11 @@ export const AchievementProvider = ({ children }) => {
       } else {
         if (unlockedAchievements.includes(achievementId)) return;
 
-        setCurrentNotification(badgeDetails);
+        setCurrentNotification({
+          ...badgeDetails,
+          // Use the map to get the real image file
+          badge: BADGE_IMAGES[achievementId] || badgeDetails.badge
+        });
 
         await setDoc(userDocRef, {
           unlockedAchievements: arrayUnion(achievementId),
