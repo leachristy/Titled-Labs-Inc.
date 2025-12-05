@@ -3,9 +3,22 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { useAchievements } from "../../contexts/AchievementContext";
 import { ACHIEVEMENTS } from "../../data/achievements";
 
+import checkin_rookie from "../../assets/checkin_rookie.png";
+import community_rookie from "../../assets/community_rookie.png";
+import goal_getter from "../../assets/goal_getter.png"; 
+import journal_rookie from "../../assets/journal_rookie.png";
+import goal_master from "../../assets/goal_master.png";
+
+const BADGE_IMAGES = {
+  'community_rookie': community_rookie,
+  'checkin_rookie': checkin_rookie,
+  'goal_rookie': goal_getter,
+  'journal_rookie': journal_rookie,
+  'goal_master': goal_master,
+};
+
 const formatDate = (dateInput) => {
   if (!dateInput) return "Date Unknown";
-  
   if (dateInput.toDate) return dateInput.toDate().toLocaleDateString();
   return new Date(dateInput).toLocaleDateString();
 };
@@ -35,6 +48,7 @@ const BadgeGallery = () => {
         {Object.values(ACHIEVEMENTS).map((badge) => {
           const isUnlocked = unlockedAchievements.includes(badge.id);
           const stats = achievementStats[badge.id] || {}; 
+          const badgeImage = BADGE_IMAGES[badge.id];
 
           return (
             <div
@@ -47,8 +61,16 @@ const BadgeGallery = () => {
               `}
               title={isUnlocked ? badge.title : "Locked Achievement"}
             >
-              <div className="text-4xl sm:text-5xl mb-2 drop-shadow-sm">
-                {badge.badge}
+              <div className="w-12 h-12 sm:w-16 sm:h-16 mb-2 flex items-center justify-center">
+                {badgeImage ? (
+                   <img 
+                     src={badgeImage} 
+                     alt={badge.title} 
+                     className="w-full h-full object-contain drop-shadow-sm"
+                   />
+                ) : (
+                   <span className="text-3xl">❓</span>
+                )}
               </div>
 
               <span className={`text-[10px] sm:text-xs font-semibold truncate w-full text-center ${textColor}`}>
@@ -78,8 +100,17 @@ const BadgeGallery = () => {
               </div>
             )}
 
-            <div className={`text-7xl mb-4 ${!selectedBadge.isUnlocked ? "grayscale opacity-50" : "animate-bounce-slow"}`}>
-              {selectedBadge.badge}
+            {/* Modal Image Display */}
+            <div className={`w-32 h-32 mb-4 flex items-center justify-center ${!selectedBadge.isUnlocked ? "grayscale opacity-50" : "animate-bounce-slow"}`}>
+               {BADGE_IMAGES[selectedBadge.id] ? (
+                 <img 
+                   src={BADGE_IMAGES[selectedBadge.id]} 
+                   alt={selectedBadge.title} 
+                   className="w-full h-full object-contain drop-shadow-md"
+                 />
+               ) : (
+                 <span className="text-6xl">❓</span>
+               )}
             </div>
             
             <h3 className={`text-2xl font-bold mb-2 ${textColor}`}>
@@ -90,10 +121,8 @@ const BadgeGallery = () => {
               {selectedBadge.description}
             </p>
 
-            {/* UPDATED DATE LOGIC */}
             {selectedBadge.isUnlocked && (
               <p className={`text-sm font-medium uppercase tracking-wider mb-6 opacity-80 ${textColor}`}>
-                {/* Check if we actually have a date. If not, show generic 'Earned' message */}
                 {(selectedBadge.lastUnlocked || selectedBadge.dateEarned) 
                   ? `Earned on: ${formatDate(selectedBadge.lastUnlocked || selectedBadge.dateEarned)}`
                   : "Status: Unlocked"} 

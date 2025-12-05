@@ -12,8 +12,12 @@ const AchievementModal = () => {
       <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl transform transition-all scale-100 animate-bounce-in">
         
         {/* Badge Icon */}
-        <div className="mx-auto w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
-          <span className="text-6xl animate-pulse">{currentNotification.badge}</span>
+        <div className="mx-auto w-24 h-24 flex items-center justify-center mb-4">
+           <img 
+             src={currentNotification.badge} 
+             alt={currentNotification.title} 
+             className="w-full h-full object-contain drop-shadow-md animate-pulse"
+           />
         </div>
 
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
